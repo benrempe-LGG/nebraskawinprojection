@@ -67,6 +67,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen gradient-page pb-20">
+      {/* Capturable region */}
+      <div ref={captureRef}>
       {/* Header */}
       <header className="gradient-header relative overflow-hidden border-b-4 border-accent shadow-[0_8px_32px_rgba(200,16,46,0.4)]">
         <div className="absolute inset-0 opacity-[0.06] texture-overlay" />

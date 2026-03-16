@@ -130,7 +130,7 @@ const Index = () => {
       </div>{/* End capturable region */}
 
       {/* Save as Image button */}
-      <div className="max-w-[900px] mx-auto mt-5 px-4 flex justify-center">
+      <div className="max-w-[900px] mx-auto mt-8 px-4 flex justify-center">
         <button
           onClick={handleSaveImage}
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
@@ -140,7 +140,7 @@ const Index = () => {
       </div>
 
       {/* Info pills */}
-      <div className="max-w-[900px] mx-auto flex flex-wrap justify-center gap-3 px-4 mb-5">
+      <div className="max-w-[900px] mx-auto flex flex-wrap justify-center gap-3 px-4 mt-8">
         {["Home-field advantage: 2.75 pts", "Spread = logit(win%) × 8.0 ± HFA", "Enter win % (0–100) for each game"].map(
           (text) => (
             <span
@@ -154,7 +154,7 @@ const Index = () => {
       </div>
 
       {/* Methodology */}
-      <div className="max-w-[900px] mx-auto px-4">
+      <div className="max-w-[900px] mx-auto mt-6 px-4">
         <div className="bg-surface-alt border border-border rounded-lg p-5 text-[13px] text-muted-foreground leading-relaxed">
           <strong className="text-foreground/60">How the spread math works:</strong> Your expected win % is
           converted to a neutral-site point spread using a logit function. The formula is:{" "}

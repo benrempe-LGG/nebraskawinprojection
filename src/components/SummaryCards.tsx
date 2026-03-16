@@ -1,18 +1,40 @@
+const CONF_ABBR: Record<string, string> = {
+  "Big Ten": "B1G",
+  SEC: "SEC",
+  ACC: "ACC",
+  "Big 12": "Big 12",
+};
+
 interface SummaryCardsProps {
   totalExpectedWins: number;
   filledCount: number;
   confWins: number;
+  confGameCount: number;
   vegasTotal: string;
   onVegasTotalChange: (value: string) => void;
   vegasLoading?: boolean;
   vegasSource?: string | null;
+  teamConf: string;
+  gameCount: number;
 }
 
-const SummaryCards = ({ totalExpectedWins, filledCount, confWins, vegasTotal, onVegasTotalChange, vegasLoading, vegasSource }: SummaryCardsProps) => {
+const SummaryCards = ({
+  totalExpectedWins,
+  filledCount,
+  confWins,
+  confGameCount,
+  vegasTotal,
+  onVegasTotalChange,
+  vegasLoading,
+  vegasSource,
+  teamConf,
+  gameCount,
+}: SummaryCardsProps) => {
   const vegasNum = parseFloat(vegasTotal);
   const vegasDiff =
-    !isNaN(vegasNum) && filledCount === 12 ? (totalExpectedWins - vegasNum).toFixed(1) : null;
+    !isNaN(vegasNum) && filledCount === gameCount ? (totalExpectedWins - vegasNum).toFixed(1) : null;
   const diffNum = vegasDiff ? parseFloat(vegasDiff) : 0;
+  const confAbbr = CONF_ABBR[teamConf] || teamConf;
 
   return (
     <div className="max-w-[900px] mx-auto mt-7 px-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -25,7 +47,7 @@ const SummaryCards = ({ totalExpectedWins, filledCount, confWins, vegasTotal, on
           {totalExpectedWins.toFixed(1)}
         </div>
         <div className="text-xs text-muted-foreground mt-1.5 font-mono-data">
-          of 12 games ({filledCount} entered)
+          of {gameCount} games ({filledCount} entered)
         </div>
       </div>
 
@@ -38,7 +60,7 @@ const SummaryCards = ({ totalExpectedWins, filledCount, confWins, vegasTotal, on
           {confWins.toFixed(1)}
         </div>
         <div className="text-xs text-muted-foreground mt-1.5 font-mono-data">
-          of 9 B1G games
+          of {confGameCount} {confAbbr} games
         </div>
       </div>
 

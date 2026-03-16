@@ -1,10 +1,18 @@
-import { Game, getImpliedSpread, formatSpread, getSpreadSentiment, isConferenceGame } from "@/lib/oddsmaker";
+import { Game, getImpliedSpread, formatSpread, getSpreadSentiment, isConferenceGame, getTeamConference } from "@/lib/oddsmaker";
+
+const CONF_ABBR: Record<string, string> = {
+  "Big Ten": "B1G",
+  SEC: "SEC",
+  ACC: "ACC",
+  "Big 12": "Big 12",
+};
 
 interface GameRowProps {
   game: Game;
   index: number;
   winPct: string;
   onChange: (value: string) => void;
+  teamName: string;
 }
 
 const spreadColorClass: Record<string, string> = {
@@ -14,14 +22,28 @@ const spreadColorClass: Record<string, string> = {
   none: "text-muted-foreground",
 };
 
-const GameRow = ({ game, index, winPct, onChange }: GameRowProps) => {
+const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
   const isHome = game.loc === "HOME";
   const pct = parseFloat(winPct);
   const spread = getImpliedSpread(pct, isHome);
   const sentiment = getSpreadSentiment(spread);
-  const isConf = isConferenceGame(game.opponent);
+  const isConf = isConferenceGame(game.opponent, teamName);
+  const confAbbr = CONF_ABBR[getTeamConference(teamName)] || "";
   const isCloseGame = spread !== null && Math.abs(spread) <= 7;
   const dateParts = game.date.split(" ");
+
+  // Format spread with team abbreviation
+  const formattedSpread = (() => {
+    if (spread === null) return "—";
+    const abs = Math.abs(spread);
+    if (abs < 0.5) return "Pick'em";
+    const rounded = Math.round(abs * 2) / 2;
+    // Get a short name for the team
+    const shortName = teamName.length > 10 ? teamName.split(" ").pop()?.toUpperCase() || teamName.slice(0, 4).toUpperCase() : teamName.toUpperCase();
+    const oppShort = game.opponent.length > 10 ? game.opponent.split(" ").pop()?.toUpperCase() || game.opponent.slice(0, 4).toUpperCase() : game.opponent.toUpperCase();
+    if (spread < 0) return `${shortName} -${rounded.toFixed(1)}`;
+    return `OPP -${rounded.toFixed(1)}`;
+  })();
 
   return (
     <div
@@ -47,7 +69,7 @@ const GameRow = ({ game, index, winPct, onChange }: GameRowProps) => {
         </div>
         <div className="text-[11px] text-muted-foreground truncate">
           {game.venue}
-          {isConf ? " • B1G" : ""}
+          {isConf ? ` • ${confAbbr}` : ""}
         </div>
       </div>
 
@@ -87,7 +109,7 @@ const GameRow = ({ game, index, winPct, onChange }: GameRowProps) => {
 
       {/* Implied spread */}
       <div className={`text-center text-sm sm:text-base font-bold font-mono-data ${spreadColorClass[sentiment]}`}>
-        {formatSpread(spread)}
+        {formattedSpread}
       </div>
     </div>
   );

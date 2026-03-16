@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import html2canvas from "html2canvas";
 import { SCHEDULE, isConferenceGame } from "@/lib/oddsmaker";
 import { fetchVegasWinTotal } from "@/lib/vegasApi";
 import FootballIcon from "@/components/FootballIcon";
@@ -7,9 +8,10 @@ import SummaryCards from "@/components/SummaryCards";
 
 const Index = () => {
   const [winPcts, setWinPcts] = useState<string[]>(() => SCHEDULE.map(() => ""));
-  const [vegasTotal, setVegasTotal] = useState("");
+  const [vegasTotal, setVegasTotal] = useState("6.5");
   const [vegasSource, setVegasSource] = useState<string | null>(null);
   const [vegasLoading, setVegasLoading] = useState(true);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchVegasWinTotal()
@@ -21,6 +23,23 @@ const Index = () => {
         setVegasLoading(false);
       })
       .catch(() => setVegasLoading(false));
+  }, []);
+
+  const handleSaveImage = useCallback(async () => {
+    if (!captureRef.current) return;
+    try {
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: "#0d0d0d",
+        scale: 2,
+        useCORS: true,
+      });
+      const link = document.createElement("a");
+      link.download = "husker-oddsmaker.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (e) {
+      console.error("Screenshot failed:", e);
+    }
   }, []);
 
   const handleChange = useCallback((idx: number, val: string) => {
@@ -48,6 +67,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen gradient-page pb-20">
+      {/* Capturable region */}
+      <div ref={captureRef}>
       {/* Header */}
       <header className="gradient-header relative overflow-hidden border-b-4 border-accent shadow-[0_8px_32px_rgba(200,16,46,0.4)]">
         <div className="absolute inset-0 opacity-[0.06] texture-overlay" />
@@ -118,6 +139,17 @@ const Index = () => {
         vegasLoading={vegasLoading}
         vegasSource={vegasSource}
       />
+      </div>{/* End capturable region */}
+
+      {/* Save as Image button */}
+      <div className="max-w-[900px] mx-auto mt-5 px-4 flex justify-center">
+        <button
+          onClick={handleSaveImage}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          📷 Save &amp; Share
+        </button>
+      </div>
 
       {/* Methodology */}
       <div className="max-w-[900px] mx-auto mt-7 px-4">

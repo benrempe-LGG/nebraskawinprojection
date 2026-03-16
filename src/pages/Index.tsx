@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import html2canvas from "html2canvas";
 import { SCHEDULE, isConferenceGame } from "@/lib/oddsmaker";
 import { fetchVegasWinTotal } from "@/lib/vegasApi";
 import FootballIcon from "@/components/FootballIcon";
@@ -7,9 +8,10 @@ import SummaryCards from "@/components/SummaryCards";
 
 const Index = () => {
   const [winPcts, setWinPcts] = useState<string[]>(() => SCHEDULE.map(() => ""));
-  const [vegasTotal, setVegasTotal] = useState("");
+  const [vegasTotal, setVegasTotal] = useState("6.5");
   const [vegasSource, setVegasSource] = useState<string | null>(null);
   const [vegasLoading, setVegasLoading] = useState(true);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchVegasWinTotal()
@@ -21,6 +23,23 @@ const Index = () => {
         setVegasLoading(false);
       })
       .catch(() => setVegasLoading(false));
+  }, []);
+
+  const handleSaveImage = useCallback(async () => {
+    if (!captureRef.current) return;
+    try {
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: "#0d0d0d",
+        scale: 2,
+        useCORS: true,
+      });
+      const link = document.createElement("a");
+      link.download = "husker-oddsmaker.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (e) {
+      console.error("Screenshot failed:", e);
+    }
   }, []);
 
   const handleChange = useCallback((idx: number, val: string) => {

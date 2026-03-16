@@ -111,7 +111,12 @@ const Index = () => {
         filledCount={filledCount}
         confWins={confWins}
         vegasTotal={vegasTotal}
-        onVegasTotalChange={setVegasTotal}
+        onVegasTotalChange={(v) => {
+          setVegasTotal(v);
+          setVegasSource(null);
+        }}
+        vegasLoading={vegasLoading}
+        vegasSource={vegasSource}
       />
 
       {/* Methodology */}

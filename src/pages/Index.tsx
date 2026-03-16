@@ -224,6 +224,9 @@ const Index = () => {
           vegasLoading={vegasLoading}
           vegasSource={vegasSource}
         />
+
+        {/* Win Distribution */}
+        <WinDistribution winPcts={winPcts} totalGames={schedule.length} />
       </div>
       {/* End capturable region */}
 

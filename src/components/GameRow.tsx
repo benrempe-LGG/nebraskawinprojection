@@ -76,8 +76,8 @@ const GameRow = ({ game, index, winPct, onChange }: GameRowProps) => {
             className={`w-16 sm:w-20 py-2 pl-2 pr-6 rounded-md border-2 text-center text-sm sm:text-base font-bold font-mono-data outline-none transition-all duration-200 ${
               winPct
                 ? "border-primary/40 bg-primary/10 text-foreground"
-                : "border-primary/60 bg-primary/5 text-foreground animate-pulse ring-1 ring-primary/20"
-            } focus:border-primary focus:ring-2 focus:ring-primary/30 focus:animate-none`}
+                : "border-primary/50 bg-primary/5 text-muted-foreground"
+            } focus:border-primary focus:ring-2 focus:ring-primary/30`}
           />
           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-semibold pointer-events-none font-mono-data">
             %

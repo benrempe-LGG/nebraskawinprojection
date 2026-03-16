@@ -11,6 +11,7 @@ import { fetchVegasWinTotal } from "@/lib/vegasApi";
 import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
+import WinDistribution from "@/components/WinDistribution";
 
 const CONF_ABBR: Record<string, string> = {
   "Big Ten": "B1G",

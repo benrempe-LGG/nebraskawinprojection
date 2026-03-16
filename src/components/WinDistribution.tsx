@@ -21,6 +21,8 @@ function computeDistribution(probs: number[]): number[] {
   return dp;
 }
 
+const MAX_BAR_HEIGHT = 180;
+
 const WinDistribution = ({ winPcts, totalGames }: WinDistributionProps) => {
   const distribution = useMemo(() => {
     const probs: number[] = [];
@@ -31,7 +33,7 @@ const WinDistribution = ({ winPcts, totalGames }: WinDistributionProps) => {
     return computeDistribution(probs);
   }, [winPcts, totalGames]);
 
-  const maxProb = Math.max(...distribution, 0.01);
+  const maxProb = Math.max(...distribution, 0.001);
   const filledCount = Object.values(winPcts).filter(
     (v) => v !== "" && v !== undefined && !isNaN(parseFloat(v))
   ).length;
@@ -59,9 +61,12 @@ const WinDistribution = ({ winPcts, totalGames }: WinDistributionProps) => {
           Win Distribution
         </div>
 
-        <div className="flex items-end justify-center gap-[3px] sm:gap-1.5 h-40 sm:h-48 px-1">
+        <div
+          className="flex items-end justify-center gap-[3px] sm:gap-2 px-2"
+          style={{ height: `${MAX_BAR_HEIGHT + 40}px` }}
+        >
           {distribution.slice(0, totalGames + 1).map((prob, winCount) => {
-            const heightPct = maxProb > 0 ? (prob / maxProb) * 100 : 0;
+            const barHeight = maxProb > 0 ? Math.round((prob / maxProb) * MAX_BAR_HEIGHT) : 0;
             const pctDisplay = (prob * 100).toFixed(1);
             const isMode = prob === maxProb && prob > 0;
             const isBowlEligible = winCount >= 6;
@@ -70,37 +75,36 @@ const WinDistribution = ({ winPcts, totalGames }: WinDistributionProps) => {
             return (
               <div
                 key={winCount}
-                className="flex flex-col items-center flex-1 max-w-[52px] min-w-[20px]"
+                className="flex flex-col items-center justify-end flex-1 max-w-[52px] min-w-[18px]"
+                style={{ height: `${MAX_BAR_HEIGHT + 40}px` }}
               >
                 <div
-                  className={`text-[9px] sm:text-[10px] font-bold mb-1 font-mono-data transition-opacity duration-200 ${
-                    prob >= 0.01
+                  className={`text-[9px] sm:text-[10px] font-bold mb-1 font-mono-data ${
+                    prob >= 0.005
                       ? isMode
                         ? "text-accent"
                         : "text-muted-foreground"
-                      : "text-transparent"
+                      : "invisible"
                   }`}
                 >
-                  {prob >= 0.01 ? `${pctDisplay}%` : ""}
+                  {prob >= 0.005 ? `${pctDisplay}%` : ""}
                 </div>
 
                 <div
-                  className={`w-full rounded-t-sm transition-all duration-500 ease-out ${
-                    isMode ? "shadow-[0_0_12px_hsl(var(--accent)/0.3)]" : ""
-                  }`}
+                  className="w-full rounded-t transition-all duration-500 ease-out"
                   style={{
-                    height: `${Math.max(heightPct, prob > 0.001 ? 2 : 0)}%`,
-                    minHeight: prob > 0.001 ? "2px" : "0px",
+                    height: `${Math.max(barHeight, prob > 0.001 ? 3 : 0)}px`,
                     background: isMode
-                      ? "linear-gradient(180deg, hsl(var(--accent)) 0%, hsl(var(--primary)) 100%)"
+                      ? "linear-gradient(180deg, #ffd54f 0%, #c8102e 100%)"
                       : isBowlEligible
-                      ? "linear-gradient(180deg, hsl(var(--primary) / 0.8) 0%, hsl(var(--primary) / 0.4) 100%)"
-                      : "linear-gradient(180deg, hsl(var(--muted-foreground) / 0.6) 0%, hsl(var(--muted-foreground) / 0.25) 100%)",
+                      ? "linear-gradient(180deg, rgba(200, 16, 46, 0.9) 0%, rgba(200, 16, 46, 0.45) 100%)"
+                      : "linear-gradient(180deg, rgba(120, 104, 88, 0.7) 0%, rgba(120, 104, 88, 0.3) 100%)",
+                    boxShadow: isMode ? "0 -4px 16px rgba(255, 213, 79, 0.35)" : "none",
                   }}
                 />
 
                 <div
-                  className={`text-[10px] sm:text-xs font-bold mt-1.5 font-mono-data ${
+                  className={`text-[10px] sm:text-xs font-bold mt-2 font-mono-data ${
                     isNearExpected
                       ? "text-accent"
                       : isBowlEligible
@@ -115,32 +119,17 @@ const WinDistribution = ({ winPcts, totalGames }: WinDistributionProps) => {
           })}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 mt-4 text-[10px] text-muted-foreground">
+        <div className="flex flex-wrap justify-center gap-4 mt-5 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-sm"
-              style={{
-                background: "linear-gradient(180deg, hsl(var(--accent)) 0%, hsl(var(--primary)) 100%)",
-              }}
-            />
+            <div className="w-3 h-3 rounded-sm" style={{ background: "linear-gradient(180deg, #ffd54f 0%, #c8102e 100%)" }} />
             <span>Most likely</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-sm"
-              style={{
-                background: "linear-gradient(180deg, hsl(var(--primary) / 0.8) 0%, hsl(var(--primary) / 0.4) 100%)",
-              }}
-            />
+            <div className="w-3 h-3 rounded-sm" style={{ background: "linear-gradient(180deg, rgba(200, 16, 46, 0.9) 0%, rgba(200, 16, 46, 0.45) 100%)" }} />
             <span>Bowl eligible (6+)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-sm"
-              style={{
-                background: "linear-gradient(180deg, hsl(var(--muted-foreground) / 0.6) 0%, hsl(var(--muted-foreground) / 0.25) 100%)",
-              }}
-            />
+            <div className="w-3 h-3 rounded-sm" style={{ background: "linear-gradient(180deg, rgba(120, 104, 88, 0.7) 0%, rgba(120, 104, 88, 0.3) 100%)" }} />
             <span>Below .500</span>
           </div>
         </div>

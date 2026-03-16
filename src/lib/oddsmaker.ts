@@ -31,7 +31,7 @@ function winPctToFairSpread(winPct: number): number {
   if (winPct <= 0 || winPct >= 100) return winPct <= 0 ? 50 : -50;
   const p = winPct / 100;
   const logit = Math.log(p / (1 - p));
-  return logit * 8.0;
+  return -logit * 8.0;
 }
 
 export function getImpliedSpread(winPct: number, isHome: boolean): number | null {

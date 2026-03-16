@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import html2canvas from "html2canvas";
 import { SCHEDULE, isConferenceGame } from "@/lib/oddsmaker";
 import { fetchVegasWinTotal } from "@/lib/vegasApi";
-import FootballIcon from "@/components/FootballIcon";
+import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 

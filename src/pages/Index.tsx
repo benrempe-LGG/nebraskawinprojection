@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import html2canvas from "html2canvas";
 import { SCHEDULE, isConferenceGame } from "@/lib/oddsmaker";
 import { fetchVegasWinTotal } from "@/lib/vegasApi";
-import FootballIcon from "@/components/FootballIcon";
+import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 
@@ -72,8 +72,8 @@ const Index = () => {
       {/* Header */}
       <header className="gradient-header relative overflow-hidden border-b-4 border-accent shadow-[0_8px_32px_rgba(200,16,46,0.4)]">
         <div className="absolute inset-0 opacity-[0.06] texture-overlay" />
-        <div className="relative flex items-center justify-center gap-4 py-8 px-5">
-          <FootballIcon size={48} />
+        <div className="relative flex items-center justify-center gap-5 py-6 px-5">
+          <img src={logoImg} alt="The Husker Oddsmaker" className="w-20 h-20 sm:w-28 sm:h-28 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
           <div className="text-center">
             <h1 className="text-2xl sm:text-[32px] font-black tracking-tight text-primary-foreground glow-header leading-none font-display">
               THE HUSKER ODDSMAKER
@@ -82,7 +82,6 @@ const Index = () => {
               Nebraska 2026 Expected Win Calculator
             </p>
           </div>
-          <FootballIcon size={48} />
         </div>
       </header>
 

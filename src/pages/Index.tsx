@@ -85,19 +85,8 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Info pills */}
-      <div className="max-w-[900px] mx-auto flex flex-wrap justify-center gap-3 px-5 py-4">
-        {["Home-field advantage: 2.75 pts", "Spread = logit(win%) × 8.0 ± HFA", "Enter win % (0–100) for each game"].map(
-          (text) => (
-            <span
-              key={text}
-              className="bg-muted px-3.5 py-1.5 rounded-md border border-border text-xs text-muted-foreground font-mono-data"
-            >
-              {text}
-            </span>
-          )
-        )}
-      </div>
+
+
 
       {/* Schedule table */}
       <div className="max-w-[900px] mx-auto px-4">

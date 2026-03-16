@@ -4,9 +4,11 @@ interface SummaryCardsProps {
   confWins: number;
   vegasTotal: string;
   onVegasTotalChange: (value: string) => void;
+  vegasLoading?: boolean;
+  vegasSource?: string | null;
 }
 
-const SummaryCards = ({ totalExpectedWins, filledCount, confWins, vegasTotal, onVegasTotalChange }: SummaryCardsProps) => {
+const SummaryCards = ({ totalExpectedWins, filledCount, confWins, vegasTotal, onVegasTotalChange, vegasLoading, vegasSource }: SummaryCardsProps) => {
   const vegasNum = parseFloat(vegasTotal);
   const vegasDiff =
     !isNaN(vegasNum) && filledCount === 12 ? (totalExpectedWins - vegasNum).toFixed(1) : null;

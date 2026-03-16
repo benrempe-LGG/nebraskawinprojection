@@ -74,7 +74,7 @@
   }
 
   .gradient-header {
-    background: linear-gradient(135deg, hsl(350 89% 44%) 0%, hsl(350 89% 30%) 50%, hsl(350 89% 21%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 4%) 50%, hsl(0 0% 2%) 100%);
   }
 
   .gradient-page {

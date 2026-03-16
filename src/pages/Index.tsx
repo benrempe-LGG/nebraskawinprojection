@@ -211,8 +211,10 @@ const Index = () => {
         <SummaryCards
           totalExpectedWins={totalExpectedWins}
           filledCount={filledCount}
+          totalGames={schedule.length}
           confWins={confWins}
           confGameCount={confGameCount}
+          confAbbr={CONF_ABBR[teamConf] || teamConf}
           vegasTotal={vegasTotal}
           onVegasTotalChange={(v) => {
             setVegasTotal(v);
@@ -220,8 +222,6 @@ const Index = () => {
           }}
           vegasLoading={vegasLoading}
           vegasSource={vegasSource}
-          teamConf={teamConf}
-          gameCount={schedule.length}
         />
       </div>
       {/* End capturable region */}

@@ -24,6 +24,7 @@ const spreadColorClass: Record<string, string> = {
 
 const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
   const isHome = game.loc === "HOME";
+  const isNeutral = game.loc === "NEUTRAL";
   const pct = parseFloat(winPct);
   const spread = getImpliedSpread(pct, isHome);
   const sentiment = getSpreadSentiment(spread);
@@ -31,19 +32,6 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
   const confAbbr = CONF_ABBR[getTeamConference(teamName)] || "";
   const isCloseGame = spread !== null && Math.abs(spread) <= 7;
   const dateParts = game.date.split(" ");
-
-  // Format spread with team abbreviation
-  const formattedSpread = (() => {
-    if (spread === null) return "—";
-    const abs = Math.abs(spread);
-    if (abs < 0.5) return "Pick'em";
-    const rounded = Math.round(abs * 2) / 2;
-    // Get a short name for the team
-    const shortName = teamName.length > 10 ? teamName.split(" ").pop()?.toUpperCase() || teamName.slice(0, 4).toUpperCase() : teamName.toUpperCase();
-    const oppShort = game.opponent.length > 10 ? game.opponent.split(" ").pop()?.toUpperCase() || game.opponent.slice(0, 4).toUpperCase() : game.opponent.toUpperCase();
-    if (spread < 0) return `${shortName} -${rounded.toFixed(1)}`;
-    return `OPP -${rounded.toFixed(1)}`;
-  })();
 
   return (
     <div
@@ -64,7 +52,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
       {/* Opponent */}
       <div className="min-w-0">
         <div className={`text-sm sm:text-base font-bold truncate ${isCloseGame ? "text-accent" : "text-foreground"}`}>
-          {isHome ? "vs. " : "at "}
+          {isNeutral ? "vs. " : isHome ? "vs. " : "at "}
           {game.opponent}
         </div>
         <div className="text-[11px] text-muted-foreground truncate">
@@ -79,10 +67,12 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
           className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold tracking-wide ${
             isHome
               ? "bg-primary/20 text-primary border border-primary/30"
+              : isNeutral
+              ? "bg-accent/20 text-accent border border-accent/30"
               : "bg-muted text-muted-foreground border border-border"
           }`}
         >
-          {game.loc}
+          {isNeutral ? "N" : game.loc}
         </span>
       </div>
 
@@ -109,7 +99,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
 
       {/* Implied spread */}
       <div className={`text-center text-sm sm:text-base font-bold font-mono-data ${spreadColorClass[sentiment]}`}>
-        {formattedSpread}
+        {formatSpread(spread, teamName)}
       </div>
     </div>
   );

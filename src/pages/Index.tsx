@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SCHEDULE, isConferenceGame } from "@/lib/oddsmaker";
+import { fetchVegasWinTotal } from "@/lib/vegasApi";
 import FootballIcon from "@/components/FootballIcon";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
@@ -7,6 +8,20 @@ import SummaryCards from "@/components/SummaryCards";
 const Index = () => {
   const [winPcts, setWinPcts] = useState<string[]>(() => SCHEDULE.map(() => ""));
   const [vegasTotal, setVegasTotal] = useState("");
+  const [vegasSource, setVegasSource] = useState<string | null>(null);
+  const [vegasLoading, setVegasLoading] = useState(true);
+
+  useEffect(() => {
+    fetchVegasWinTotal()
+      .then((result) => {
+        if (result && result.total !== null) {
+          setVegasTotal(String(result.total));
+          setVegasSource(result.book || "The Odds API");
+        }
+        setVegasLoading(false);
+      })
+      .catch(() => setVegasLoading(false));
+  }, []);
 
   const handleChange = useCallback((idx: number, val: string) => {
     if (val === "" || (/^\d{0,3}\.?\d{0,2}$/.test(val) && (val === "" || parseFloat(val) <= 100))) {
@@ -96,7 +111,12 @@ const Index = () => {
         filledCount={filledCount}
         confWins={confWins}
         vegasTotal={vegasTotal}
-        onVegasTotalChange={setVegasTotal}
+        onVegasTotalChange={(v) => {
+          setVegasTotal(v);
+          setVegasSource(null);
+        }}
+        vegasLoading={vegasLoading}
+        vegasSource={vegasSource}
       />
 
       {/* Methodology */}

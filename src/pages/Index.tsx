@@ -139,6 +139,17 @@ const Index = () => {
         vegasLoading={vegasLoading}
         vegasSource={vegasSource}
       />
+      </div>{/* End capturable region */}
+
+      {/* Save as Image button */}
+      <div className="max-w-[900px] mx-auto mt-5 px-4 flex justify-center">
+        <button
+          onClick={handleSaveImage}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          📷 Save &amp; Share
+        </button>
+      </div>
 
       {/* Methodology */}
       <div className="max-w-[900px] mx-auto mt-7 px-4">

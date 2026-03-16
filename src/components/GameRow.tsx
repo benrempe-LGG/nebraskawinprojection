@@ -1,19 +1,19 @@
 import { Game, getImpliedSpread, formatSpread, getSpreadSentiment, isConferenceGame, getTeamConference } from "@/lib/oddsmaker";
 
+interface GameRowProps {
+  game: Game;
+  index: number;
+  winPct: string;
+  onChange: (value: string) => void;
+  teamName?: string;
+}
+
 const CONF_ABBR: Record<string, string> = {
   "Big Ten": "B1G",
   SEC: "SEC",
   ACC: "ACC",
   "Big 12": "Big 12",
 };
-
-interface GameRowProps {
-  game: Game;
-  index: number;
-  winPct: string;
-  onChange: (value: string) => void;
-  teamName: string;
-}
 
 const spreadColorClass: Record<string, string> = {
   positive: "text-positive",
@@ -22,16 +22,16 @@ const spreadColorClass: Record<string, string> = {
   none: "text-muted-foreground",
 };
 
-const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
+const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameRowProps) => {
   const isHome = game.loc === "HOME";
   const isNeutral = game.loc === "NEUTRAL";
   const pct = parseFloat(winPct);
   const spread = getImpliedSpread(pct, isHome);
   const sentiment = getSpreadSentiment(spread);
   const isConf = isConferenceGame(game.opponent, teamName);
-  const confAbbr = CONF_ABBR[getTeamConference(teamName)] || "";
   const isCloseGame = spread !== null && Math.abs(spread) <= 7;
   const dateParts = game.date.split(" ");
+  const confName = isConf ? (CONF_ABBR[getTeamConference(teamName)] || "") : "";
 
   return (
     <div
@@ -52,12 +52,12 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
       {/* Opponent */}
       <div className="min-w-0">
         <div className={`text-sm sm:text-base font-bold truncate ${isCloseGame ? "text-accent" : "text-foreground"}`}>
-          {isNeutral ? "vs. " : isHome ? "vs. " : "at "}
+          {isHome ? "vs. " : isNeutral ? "vs. " : "at "}
           {game.opponent}
         </div>
         <div className="text-[11px] text-muted-foreground truncate">
           {game.venue}
-          {isConf ? ` • ${confAbbr}` : ""}
+          {isConf ? ` • ${confName}` : ""}
         </div>
       </div>
 
@@ -72,7 +72,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName }: GameRowProps) => {
               : "bg-muted text-muted-foreground border border-border"
           }`}
         >
-          {isNeutral ? "N" : game.loc}
+          {isNeutral ? "NEU" : game.loc}
         </span>
       </div>
 

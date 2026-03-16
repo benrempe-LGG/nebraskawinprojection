@@ -154,7 +154,7 @@ const Index = () => {
       </div>
 
       {/* Methodology */}
-      <div className="max-w-[900px] mx-auto px-4">
+      <div className="max-w-[900px] mx-auto mt-6 px-4">
         <div className="bg-surface-alt border border-border rounded-lg p-5 text-[13px] text-muted-foreground leading-relaxed">
           <strong className="text-foreground/60">How the spread math works:</strong> Your expected win % is
           converted to a neutral-site point spread using a logit function. The formula is:{" "}

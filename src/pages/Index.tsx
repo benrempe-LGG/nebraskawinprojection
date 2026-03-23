@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import {
   CONFERENCES,
@@ -240,8 +241,18 @@ const Index = () => {
         </button>
       </div>
 
+      {/* Analytics link */}
+      <div className="max-w-[900px] mx-auto mt-8 px-4 flex justify-center">
+        <Link
+          to="/analytics"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          📊 Program Analytics — Calibrate Your Predictions
+        </Link>
+      </div>
+
       {/* Info pills */}
-      <div className="max-w-[900px] mx-auto flex flex-wrap justify-center gap-3 px-4 mt-8">
+      <div className="max-w-[900px] mx-auto flex flex-wrap justify-center gap-3 px-4 mt-6">
         {[
           "Home-field advantage: 2.75 pts",
           "Spread = logit(win%) × 8.0 ± HFA",

@@ -35,7 +35,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameR
 
   return (
     <div
-      className={`grid grid-cols-[70px_1fr_60px_100px_110px] sm:grid-cols-[90px_1fr_72px_140px_140px] items-center px-3 sm:px-4 py-3 sm:py-3.5 border-b border-border transition-colors duration-150 ${
+      className={`grid grid-cols-[52px_1fr_40px_68px_72px] sm:grid-cols-[90px_1fr_72px_140px_140px] items-center px-2 sm:px-4 py-3 sm:py-3.5 border-b border-border transition-colors duration-150 ${
         index % 2 === 0 ? "bg-surface-alt" : "bg-surface"
       } ${isCloseGame ? "border-l-[3px] border-l-primary" : "border-l-[3px] border-l-transparent"}`}
     >
@@ -85,7 +85,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameR
             value={winPct}
             onChange={(e) => onChange(e.target.value)}
             placeholder="0"
-            className={`w-16 sm:w-20 py-2 pl-2 pr-6 rounded-md border-2 text-center text-sm sm:text-base font-bold font-mono-data outline-none transition-all duration-200 ${
+            className={`w-14 sm:w-20 py-1.5 sm:py-2 pl-1 sm:pl-2 pr-5 sm:pr-6 rounded-md border-2 text-center text-xs sm:text-base font-bold font-mono-data outline-none transition-all duration-200 ${
               winPct
                 ? "border-primary/40 bg-primary/10 text-foreground"
                 : "border-primary/50 bg-primary/5 text-muted-foreground"

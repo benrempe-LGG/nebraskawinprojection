@@ -184,7 +184,7 @@ const Index = () => {
         {/* Schedule table */}
         <div className="max-w-[900px] mx-auto px-4 mt-6">
           {/* Table header */}
-          <div className="grid grid-cols-[70px_1fr_60px_100px_110px] sm:grid-cols-[90px_1fr_72px_140px_140px] px-3 sm:px-4 py-3 bg-primary rounded-t-lg text-[11px] font-bold uppercase tracking-[1.5px] text-primary-foreground font-display">
+          <div className="grid grid-cols-[52px_1fr_40px_68px_72px] sm:grid-cols-[90px_1fr_72px_140px_140px] px-2 sm:px-4 py-3 bg-primary rounded-t-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-[1px] sm:tracking-[1.5px] text-primary-foreground font-display">
             <span>Date</span>
             <span>Opponent</span>
             <span className="text-center">Site</span>

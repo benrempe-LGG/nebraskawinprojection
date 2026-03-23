@@ -35,7 +35,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameR
 
   return (
     <div
-      className={`grid grid-cols-[70px_1fr_60px_100px_110px] sm:grid-cols-[90px_1fr_72px_140px_140px] items-center px-3 sm:px-4 py-3 sm:py-3.5 border-b border-border transition-colors duration-150 ${
+      className={`grid grid-cols-[52px_1fr_40px_68px_72px] sm:grid-cols-[90px_1fr_72px_140px_140px] items-center px-2 sm:px-4 py-3 sm:py-3.5 border-b border-border transition-colors duration-150 ${
         index % 2 === 0 ? "bg-surface-alt" : "bg-surface"
       } ${isCloseGame ? "border-l-[3px] border-l-primary" : "border-l-[3px] border-l-transparent"}`}
     >

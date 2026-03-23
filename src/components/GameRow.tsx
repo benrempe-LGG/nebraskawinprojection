@@ -52,7 +52,6 @@ const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameR
       {/* Opponent */}
       <div className="min-w-0">
         <div className={`text-sm sm:text-base font-bold truncate ${isCloseGame ? "text-accent" : "text-foreground"}`}>
-          {isHome ? "vs. " : isNeutral ? "vs. " : "at "}
           {game.opponent}
         </div>
         <div className="text-[11px] text-muted-foreground truncate">

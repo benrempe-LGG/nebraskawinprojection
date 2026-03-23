@@ -85,7 +85,7 @@ const GameRow = ({ game, index, winPct, onChange, teamName = "Nebraska" }: GameR
             value={winPct}
             onChange={(e) => onChange(e.target.value)}
             placeholder="0"
-            className={`w-16 sm:w-20 py-2 pl-2 pr-6 rounded-md border-2 text-center text-sm sm:text-base font-bold font-mono-data outline-none transition-all duration-200 ${
+            className={`w-14 sm:w-20 py-1.5 sm:py-2 pl-1 sm:pl-2 pr-5 sm:pr-6 rounded-md border-2 text-center text-xs sm:text-base font-bold font-mono-data outline-none transition-all duration-200 ${
               winPct
                 ? "border-primary/40 bg-primary/10 text-foreground"
                 : "border-primary/50 bg-primary/5 text-muted-foreground"

@@ -1,24 +1,9 @@
 import { useMemo } from "react";
+import { computeDistribution } from "@/lib/oddsmaker";
 
 interface WinDistributionProps {
   winPcts: Record<number, string>;
   totalGames: number;
-}
-
-function computeDistribution(probs: number[]): number[] {
-  const n = probs.length;
-  let dp = new Array(n + 1).fill(0);
-  dp[0] = 1;
-  for (let i = 0; i < n; i++) {
-    const p = probs[i];
-    const newDp = new Array(n + 1).fill(0);
-    for (let k = 0; k <= i + 1; k++) {
-      if (k > 0) newDp[k] += dp[k - 1] * p;
-      newDp[k] += dp[k] * (1 - p);
-    }
-    dp = newDp;
-  }
-  return dp;
 }
 
 const MAX_BAR_HEIGHT = 180;

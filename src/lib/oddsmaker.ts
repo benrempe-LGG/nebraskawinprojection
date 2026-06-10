@@ -64,6 +64,23 @@ export function isConferenceGame(opponent: string, teamName: string = "Nebraska"
   return oppConf === teamConf;
 }
 
+// Probability of finishing with exactly k wins, given per-game win probabilities
+export function computeDistribution(probs: number[]): number[] {
+  const n = probs.length;
+  let dp = new Array(n + 1).fill(0);
+  dp[0] = 1;
+  for (let i = 0; i < n; i++) {
+    const p = probs[i];
+    const newDp = new Array(n + 1).fill(0);
+    for (let k = 0; k <= i + 1; k++) {
+      if (k > 0) newDp[k] += dp[k - 1] * p;
+      newDp[k] += dp[k] * (1 - p);
+    }
+    dp = newDp;
+  }
+  return dp;
+}
+
 // Spread math (unchanged)
 function winPctToFairSpread(winPct: number): number {
   if (winPct <= 0 || winPct >= 100) return winPct <= 0 ? 50 : -50;

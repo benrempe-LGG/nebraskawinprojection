@@ -7,8 +7,6 @@ interface SummaryCardsProps {
   confAbbr: string;
   vegasTotal: string;
   onVegasTotalChange: (value: string) => void;
-  vegasLoading?: boolean;
-  vegasSource?: string | null;
 }
 
 const SummaryCards = ({
@@ -20,8 +18,6 @@ const SummaryCards = ({
   confAbbr,
   vegasTotal,
   onVegasTotalChange,
-  vegasLoading,
-  vegasSource,
 }: SummaryCardsProps) => {
   const vegasNum = parseFloat(vegasTotal);
   const vegasDiff =
@@ -63,34 +59,23 @@ const SummaryCards = ({
         <div className="text-[11px] uppercase tracking-[2px] text-muted-foreground mb-2 font-display">
           Vegas O/U Win Total
         </div>
-        {vegasLoading ? (
-          <div className="text-[13px] text-muted-foreground mt-3">Checking lines...</div>
-        ) : (
-          <>
-            <div className="flex items-center justify-center gap-2 mt-1">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={vegasTotal}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v === "" || /^\d{0,2}\.?\d{0,1}$/.test(v)) onVegasTotalChange(v);
-                }}
-                placeholder="e.g. 7.5"
-                className="w-20 py-2.5 px-3 rounded-md border border-border bg-background text-accent text-xl font-bold text-center font-mono-data outline-none focus:border-primary transition-colors duration-200"
-              />
-            </div>
-            {vegasSource && (
-              <div className="text-[10px] text-muted-foreground/50 mt-1.5">
-                via {vegasSource} • updates daily
-              </div>
-            )}
-            {!vegasSource && vegasTotal === "" && (
-              <div className="text-[10px] text-muted-foreground/50 mt-1.5">
-                No line available yet — enter manually
-              </div>
-            )}
-          </>
+        <div className="flex items-center justify-center gap-2 mt-1">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={vegasTotal}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === "" || /^\d{0,2}\.?\d{0,1}$/.test(v)) onVegasTotalChange(v);
+            }}
+            placeholder="e.g. 7.5"
+            className="w-20 py-2.5 px-3 rounded-md border border-border bg-background text-accent text-xl font-bold text-center font-mono-data outline-none focus:border-primary transition-colors duration-200"
+          />
+        </div>
+        {vegasTotal === "" && (
+          <div className="text-[10px] text-muted-foreground/50 mt-1.5">
+            Enter your book's season win total
+          </div>
         )}
         {vegasDiff !== null && (
           <div className="mt-3">

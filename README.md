@@ -1,73 +1,31 @@
-# Welcome to your Lovable project
+# The P4 Oddsmaker — 2026 Expected Win Calculator
 
-## Project info
+Pick any Power 4 team, set your win probability for each game, and get:
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+- **Expected wins** (overall + conference) from your own numbers
+- **Implied point spreads** for every game (logit model + 2.75 home-field advantage)
+- **Win distribution** — the probability of every possible final record, including bowl-eligibility odds
+- **Vegas comparison** — enter the sportsbook season win total and see whether your model says over or under
 
-## How can I edit this code?
+**Live app:** https://benrempe-lgg.github.io/nebraskawinprojection/
 
-There are several ways of editing your application.
+## Sharing your projection
 
-**Use Lovable**
+- **📋 Copy Forum Post** — copies a ready-to-paste text breakdown of your picks (with a challenge link) for message boards.
+- **🔗 Copy Link to My Picks** — your team, all win percentages, and the Vegas total are encoded in the URL. Anyone who opens it sees your exact projection and can tweak it and fire back their own link.
+- **📷 Save as Image** — exports the full card as a PNG for posts that allow images.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Predictions also save locally per team, so you can switch schools without losing work.
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev    # dev server on :8080
+npm run build  # production build
+npm test       # vitest
 ```
 
-**Edit a file directly in GitHub**
+Built with Vite, React, TypeScript, Tailwind, and shadcn/ui. Deploys to GitHub Pages automatically on push to `main` (see `.github/workflows/deploy.yml`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+For entertainment & analysis purposes only. Not affiliated with any university.

@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
+import { toast } from "sonner";
 import {
   CONFERENCES,
   ALL_TEAMS,
   getTeamSchedule,
   getTeamConference,
   isConferenceGame,
+  computeDistribution,
 } from "@/lib/oddsmaker";
-import { fetchVegasWinTotal } from "@/lib/vegasApi";
 import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
@@ -22,73 +23,108 @@ const CONF_ABBR: Record<string, string> = {
 };
 
 const PREDS_KEY = "oddsmaker_preds";
+const VEGAS_KEY = "oddsmaker_vegas_totals";
+
+const isValidPct = (v: string) =>
+  /^\d{0,3}\.?\d{0,2}$/.test(v) && v !== "" && parseFloat(v) <= 100;
+
+// Picks shared via URL: ?t=Nebraska&p=90,85,,55&v=6.5
+function parseShareUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("t");
+    if (!t || !ALL_TEAMS[t]) return null;
+    const preds: Record<number, string> = {};
+    const p = params.get("p");
+    if (p) {
+      p.split(",").forEach((v, i) => {
+        if (isValidPct(v)) preds[i] = v;
+      });
+    }
+    const v = params.get("v");
+    const vegas = v && /^\d{0,2}\.?\d{0,1}$/.test(v) ? v : "";
+    return { team: t, preds, vegas, hasPreds: Object.keys(preds).length > 0 };
+  } catch {
+    return null;
+  }
+}
+
+function loadStore(key: string): Record<string, Record<number, string> | string> {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveStore(key: string, team: string, value: unknown) {
+  try {
+    const saved = loadStore(key);
+    saved[team] = value as Record<number, string> | string;
+    localStorage.setItem(key, JSON.stringify(saved));
+  } catch {
+    /* ignore */
+  }
+}
+
+const SHARED = parseShareUrl();
 
 const Index = () => {
   const confList = useMemo(() => Object.keys(CONFERENCES).sort(), []);
-  const [conf, setConf] = useState("Big Ten");
-  const [team, setTeam] = useState("Nebraska");
+  const initialTeam = SHARED?.team || "Nebraska";
+  const [conf, setConf] = useState(getTeamConference(initialTeam) || "Big Ten");
+  const [team, setTeam] = useState(initialTeam);
 
   const schedule = useMemo(() => getTeamSchedule(team), [team]);
   const teamConf = useMemo(() => getTeamConference(team), [team]);
 
-  // Load saved predictions for current team
-  const loadPreds = useCallback(
-    (t: string) => {
-      try {
-        const saved = JSON.parse(localStorage.getItem(PREDS_KEY) || "{}");
-        return saved[t] || {};
-      } catch {
-        return {};
-      }
-    },
-    []
+  const loadPreds = useCallback((t: string) => {
+    const saved = loadStore(PREDS_KEY);
+    return (saved[t] as Record<number, string>) || {};
+  }, []);
+
+  const loadVegas = useCallback((t: string) => {
+    const saved = loadStore(VEGAS_KEY);
+    const v = saved[t];
+    return typeof v === "string" ? v : t === "Nebraska" ? "6.5" : "";
+  }, []);
+
+  const [winPcts, setWinPcts] = useState<Record<number, string>>(() =>
+    SHARED?.hasPreds ? SHARED.preds : loadPreds(initialTeam)
   );
-
-  const [winPcts, setWinPcts] = useState<Record<number, string>>(() => loadPreds("Nebraska"));
-  const [vegasTotal, setVegasTotal] = useState("6.5");
-  const [vegasSource, setVegasSource] = useState<string | null>(null);
-  const [vegasLoading, setVegasLoading] = useState(true);
+  const [vegasTotal, setVegasTotal] = useState(() =>
+    SHARED?.vegas ? SHARED.vegas : loadVegas(initialTeam)
+  );
   const captureRef = useRef<HTMLDivElement>(null);
+  const skipNextTeamLoad = useRef(SHARED !== null);
 
-  // When team changes, load its predictions and fetch Vegas line
+  // When team changes, load its saved predictions and Vegas total
   useEffect(() => {
+    if (skipNextTeamLoad.current) {
+      skipNextTeamLoad.current = false;
+      return;
+    }
     setWinPcts(loadPreds(team));
-    setVegasLoading(true);
-    setVegasSource(null);
-    setVegasTotal("");
-    fetchVegasWinTotal(team)
-      .then((result) => {
-        if (result && result.total !== null) {
-          setVegasTotal(String(result.total));
-          setVegasSource(result.book || "The Odds API");
-        }
-        setVegasLoading(false);
-      })
-      .catch(() => setVegasLoading(false));
-  }, [team, loadPreds]);
+    setVegasTotal(loadVegas(team));
+  }, [team, loadPreds, loadVegas]);
 
   // Save predictions whenever they change
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(PREDS_KEY) || "{}");
-      saved[team] = winPcts;
-      localStorage.setItem(PREDS_KEY, JSON.stringify(saved));
-    } catch {
-      /* ignore */
-    }
+    saveStore(PREDS_KEY, team, winPcts);
   }, [winPcts, team]);
 
+  useEffect(() => {
+    saveStore(VEGAS_KEY, team, vegasTotal);
+  }, [vegasTotal, team]);
+
   // When conference changes, pick first team in that conference
-  const handleConfChange = useCallback(
-    (newConf: string) => {
-      setConf(newConf);
-      const teams = CONFERENCES[newConf];
-      if (teams && teams.length > 0) {
-        setTeam(teams[0]);
-      }
-    },
-    []
-  );
+  const handleConfChange = useCallback((newConf: string) => {
+    setConf(newConf);
+    const teams = CONFERENCES[newConf];
+    if (teams && teams.length > 0) {
+      setTeam(teams[0]);
+    }
+  }, []);
 
   const handleSaveImage = useCallback(async () => {
     if (!captureRef.current) return;
@@ -133,6 +169,106 @@ const Index = () => {
     const n = parseFloat(winPcts[i] || "");
     return sum + (isNaN(n) ? 0 : n / 100);
   }, 0);
+
+  const buildShareUrl = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set("t", team);
+    params.set(
+      "p",
+      schedule.map((_g, i) => winPcts[i] || "").join(",")
+    );
+    if (vegasTotal) params.set("v", vegasTotal);
+    return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+  }, [team, schedule, winPcts, vegasTotal]);
+
+  const copyToClipboard = useCallback(async (text: string, message: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(message);
+    } catch {
+      // Fallback for browsers that block the async clipboard API
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        if (ok) toast.success(message);
+        else toast.error("Couldn't copy — your browser blocked clipboard access");
+      } catch {
+        toast.error("Couldn't copy — your browser blocked clipboard access");
+      }
+    }
+  }, []);
+
+  const handleCopyLink = useCallback(() => {
+    copyToClipboard(
+      buildShareUrl(),
+      "Link copied — anyone who opens it sees your picks"
+    );
+  }, [buildShareUrl, copyToClipboard]);
+
+  const handleCopyForumPost = useCallback(() => {
+    const vegasNum = parseFloat(vegasTotal);
+    // Derive losses from the rounded win display so the record sums to the game count
+    const winsDisplay = parseFloat(totalExpectedWins.toFixed(1));
+    const lossTotal = schedule.length - winsDisplay;
+
+    const probs = schedule.map((_g, i) => {
+      const v = parseFloat(winPcts[i] || "");
+      return isNaN(v) ? 0 : Math.min(Math.max(v / 100, 0), 1);
+    });
+    const dist = computeDistribution(probs);
+    const bowlProb = dist.slice(6).reduce((s, p) => s + p, 0);
+
+    const gameLines = schedule.map((g, i) => {
+      const v = winPcts[i];
+      const date = g.date.split(" ").slice(-2).join(" ");
+      const site = g.loc === "HOME" ? "vs" : g.loc === "AWAY" ? "at" : "vs*";
+      return `${date.padEnd(7)} ${site} ${g.opponent}`.padEnd(32) + (v ? `${v}%` : "—");
+    });
+
+    const lines: string[] = [];
+    lines.push(
+      `🏈 MY 2026 ${team.toUpperCase()} PROJECTION: ${totalExpectedWins.toFixed(1)} WINS`
+    );
+    if (!isNaN(vegasNum) && filledCount === schedule.length) {
+      const diff = totalExpectedWins - vegasNum;
+      const lean =
+        diff > 0.5 ? "I'm taking the OVER" : diff < -0.5 ? "I'm taking the UNDER" : "dead on the number";
+      lines.push(`Vegas win total: ${vegasTotal} → ${lean}`);
+    }
+    lines.push("");
+    lines.push(...gameLines);
+    lines.push("");
+    lines.push(
+      `Projected record: ${totalExpectedWins.toFixed(1)}–${lossTotal.toFixed(1)} (${confWins.toFixed(1)} ${CONF_ABBR[teamConf] || teamConf} wins)`
+    );
+    if (filledCount === schedule.length) {
+      lines.push(`Bowl eligibility odds: ${(bowlProb * 100).toFixed(0)}%`);
+    }
+    lines.push("");
+    lines.push(`Think I'm wrong? Post your own numbers: ${buildShareUrl()}`);
+
+    copyToClipboard(
+      lines.join("\n"),
+      "Forum post copied — paste it on the board"
+    );
+  }, [
+    team,
+    teamConf,
+    schedule,
+    winPcts,
+    vegasTotal,
+    totalExpectedWins,
+    confWins,
+    filledCount,
+    buildShareUrl,
+    copyToClipboard,
+  ]);
 
   return (
     <div className="min-h-screen gradient-page pb-20">
@@ -218,12 +354,7 @@ const Index = () => {
           confGameCount={confGameCount}
           confAbbr={CONF_ABBR[teamConf] || teamConf}
           vegasTotal={vegasTotal}
-          onVegasTotalChange={(v) => {
-            setVegasTotal(v);
-            setVegasSource(null);
-          }}
-          vegasLoading={vegasLoading}
-          vegasSource={vegasSource}
+          onVegasTotalChange={setVegasTotal}
         />
 
         {/* Win Distribution */}
@@ -231,13 +362,25 @@ const Index = () => {
       </div>
       {/* End capturable region */}
 
-      {/* Save as Image button */}
-      <div className="max-w-[900px] mx-auto mt-8 px-4 flex justify-center">
+      {/* Share buttons */}
+      <div className="max-w-[900px] mx-auto mt-8 px-4 flex flex-wrap justify-center gap-3">
+        <button
+          onClick={handleCopyForumPost}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary text-primary-foreground hover:opacity-90 font-bold text-sm tracking-wide transition-opacity duration-200 font-display"
+        >
+          📋 Copy Forum Post
+        </button>
+        <button
+          onClick={handleCopyLink}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          🔗 Copy Link to My Picks
+        </button>
         <button
           onClick={handleSaveImage}
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
         >
-          📷 Save &amp; Share
+          📷 Save as Image
         </button>
       </div>
 
@@ -278,6 +421,8 @@ const Index = () => {
           where p is your win probability. Then we apply a{" "}
           <strong className="text-foreground/60">2.75-point home-field advantage</strong>.
           Predictions save locally per team — switch between schools without losing your work.
+          Use <strong className="text-foreground/60">Copy Link to My Picks</strong> to challenge
+          others: anyone who opens your link sees your exact numbers and can post their own back.
         </div>
       </div>
 

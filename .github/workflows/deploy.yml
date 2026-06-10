@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          DEPLOY_BASE_PATH: /nebraskawinprojection/
       # SPA fallback so /analytics resolves on GitHub Pages
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5

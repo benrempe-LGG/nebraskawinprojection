@@ -7,7 +7,7 @@ Pick any Power 4 team, set your win probability for each game, and get:
 - **Win distribution** — the probability of every possible final record, including bowl-eligibility odds
 - **Vegas comparison** — enter the sportsbook season win total and see whether your model says over or under
 
-**Live app:** https://benrempe-lgg.github.io/nebraskawinprojection/
+**Live app:** https://nebraskawinprojection.lovable.app/ (mirror: https://benrempe-lgg.github.io/nebraskawinprojection/)
 
 ## Sharing your projection
 

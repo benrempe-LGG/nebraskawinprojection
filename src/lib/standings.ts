@@ -15,6 +15,9 @@ export interface ProjectedStanding {
   wins: number;
   losses: number;
   undecided: number;
+  overallWins: number;
+  overallLosses: number;
+  overallUndecided: number;
   projectedGames: number;
   totalConferenceGames: number;
   winPercentage: number;
@@ -34,6 +37,9 @@ export function computeConferenceStandings(
       wins: 0,
       losses: 0,
       undecided: 0,
+      overallWins: 0,
+      overallLosses: 0,
+      overallUndecided: 0,
       projectedGames: 0,
       totalConferenceGames: ALL_TEAMS[team].schedule.filter((game) =>
         isConferenceGame(game.opponent, team)
@@ -77,6 +83,23 @@ export function computeConferenceStandings(
         teamRow.losses += 1;
         opponentRow.wins += 1;
       }
+    }
+  }
+
+  // Overall records are calculated team-by-team from all scheduled games.
+  // Conference standings remain sorted exclusively by conference results.
+  for (const [team, info] of Object.entries(ALL_TEAMS)) {
+    const row = byTeam.get(team);
+    if (!row) continue;
+
+    for (const game of info.schedule) {
+      const value = getTeamGamePrediction(predictions, team, game);
+      if (value === "") continue;
+
+      const winner = getProjectedWinner(team, game, value);
+      if (!winner) row.overallUndecided += 1;
+      else if (winner === team) row.overallWins += 1;
+      else row.overallLosses += 1;
     }
   }
 

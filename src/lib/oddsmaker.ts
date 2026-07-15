@@ -115,3 +115,23 @@ export function getSpreadSentiment(spread: number | null): SpreadSentiment {
   if (spread < 0) return "positive";
   return "negative";
 }
+
+
+// Resolve a predicted winner from a team's probability. At exactly 50%,
+// home-field advantage supplies the default favorite; neutral games remain open.
+export function getProjectedWinner(
+  teamName: string,
+  game: Game,
+  winPct: string | number
+): string | null {
+  const probability =
+    typeof winPct === "number" ? winPct : Number.parseFloat(winPct);
+  if (!Number.isFinite(probability) || probability < 0 || probability > 100) {
+    return null;
+  }
+  if (probability > 50) return teamName;
+  if (probability < 50) return game.opponent;
+  if (game.loc === "HOME") return teamName;
+  if (game.loc === "AWAY") return game.opponent;
+  return null;
+}

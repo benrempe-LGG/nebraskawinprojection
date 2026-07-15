@@ -111,9 +111,10 @@ const Playoff = () => {
 
         <section className="mt-6 rounded-xl border border-border bg-surface-alt p-5 text-sm leading-relaxed text-muted-foreground">
           <strong className="text-foreground">How this projection works:</strong>{" "}
-          projected records receive a strength adjustment of +0.08 for SEC and
-          Big Ten teams and +0.04 for Notre Dame. ACC and Big 12 teams are capped
-          at four combined selections, including their champions. Notre Dame is
+          projected records receive a committee-style strength adjustment of +0.12 for
+          SEC and Big Ten teams and +0.06 for Notre Dame, with -0.03 for ACC and
+          -0.01 for Big 12 teams. ACC and Big 12 are normally capped at three
+          combined selections, including their champions. Notre Dame is
           tracked against ten P4 opponents with assumed wins over Rice and Navy.
           Conference leaders are treated as projected champions. Actual selection
           and seeding belong to the CFP committee and use more information than

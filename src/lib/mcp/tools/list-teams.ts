@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { ALL_TEAMS, CONFERENCES } from "@/lib/oddsmaker";
+import { ALL_TEAMS, CONFERENCES } from "../../oddsmaker";
 
 export default defineTool({
   name: "list_teams",

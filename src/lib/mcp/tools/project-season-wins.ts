@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { ALL_TEAMS, computeDistribution, isConferenceGame } from "@/lib/oddsmaker";
+import { ALL_TEAMS, computeDistribution, isConferenceGame } from "../../oddsmaker";
 
 export default defineTool({
   name: "project_season_wins",

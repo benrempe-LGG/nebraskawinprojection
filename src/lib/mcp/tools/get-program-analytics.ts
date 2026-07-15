@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { ANALYTICS_DATA } from "@/lib/analyticsData";
+import { ANALYTICS_DATA } from "../../analyticsData";
 
 export default defineTool({
   name: "get_program_analytics",

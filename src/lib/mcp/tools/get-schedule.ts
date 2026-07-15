@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { ALL_TEAMS } from "@/lib/oddsmaker";
+import { ALL_TEAMS } from "../../oddsmaker";
 
 export default defineTool({
   name: "get_schedule",

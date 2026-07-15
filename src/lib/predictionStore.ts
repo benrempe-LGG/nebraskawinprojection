@@ -17,22 +17,21 @@ interface StorageLike {
   setItem(key: string, value: string): void;
 }
 
-function normalizedDate(date: string): string {
-  return date.trim().toUpperCase().split(/\s+/).slice(-2).join("-");
-}
-
 function orderedTeams(team: string, opponent: string): [string, string] {
   return [team, opponent].sort((a, b) => a.localeCompare(b));
 }
 
-export function getGameId(team: string, game: Game): string {
-  const [firstTeam, secondTeam] = orderedTeams(team, game.opponent);
+function getIdForTeams(team: string, opponent: string): string {
+  const [firstTeam, secondTeam] = orderedTeams(team, opponent);
   return [
     SEASON,
-    normalizedDate(game.date),
     encodeURIComponent(firstTeam),
     encodeURIComponent(secondTeam),
   ].join(":");
+}
+
+export function getGameId(team: string, game: Game): string {
+  return getIdForTeams(team, game.opponent);
 }
 
 function complement(value: string): string {
@@ -41,12 +40,37 @@ function complement(value: string): string {
   return Number((100 - number).toFixed(2)).toString();
 }
 
+function matchesTeams(
+  prediction: StoredGamePrediction,
+  team: string,
+  opponent: string
+): boolean {
+  const [firstTeam, secondTeam] = orderedTeams(team, opponent);
+  return (
+    prediction.firstTeam === firstTeam &&
+    prediction.secondTeam === secondTeam
+  );
+}
+
+function findPrediction(
+  store: GamePredictionStore,
+  team: string,
+  game: Game
+): StoredGamePrediction | undefined {
+  return (
+    store[getGameId(team, game)] ||
+    Object.values(store).find((prediction) =>
+      matchesTeams(prediction, team, game.opponent)
+    )
+  );
+}
+
 export function getTeamGamePrediction(
   store: GamePredictionStore,
   team: string,
   game: Game
 ): string {
-  const prediction = store[getGameId(team, game)];
+  const prediction = findPrediction(store, team, game);
   if (!prediction) return "";
   return prediction.firstTeam === team
     ? prediction.pctForFirstTeam
@@ -60,12 +84,13 @@ export function setTeamGamePrediction(
   value: string
 ): GamePredictionStore {
   const id = getGameId(team, game);
-  const next = { ...store };
+  const next = Object.fromEntries(
+    Object.entries(store).filter(
+      ([, prediction]) => !matchesTeams(prediction, team, game.opponent)
+    )
+  ) as GamePredictionStore;
 
-  if (value === "") {
-    delete next[id];
-    return next;
-  }
+  if (value === "") return next;
 
   const [firstTeam, secondTeam] = orderedTeams(team, game.opponent);
   next[id] = {
@@ -85,7 +110,27 @@ function readJson<T>(storage: StorageLike, key: string, fallback: T): T {
 }
 
 export function loadPredictionStore(storage: StorageLike): GamePredictionStore {
-  return readJson<GamePredictionStore>(storage, GAME_PREDS_KEY, {});
+  const saved = readJson<GamePredictionStore>(storage, GAME_PREDS_KEY, {});
+  const normalized: GamePredictionStore = {};
+
+  Object.values(saved).forEach((prediction) => {
+    if (
+      !prediction?.firstTeam ||
+      !prediction?.secondTeam ||
+      prediction.pctForFirstTeam === undefined
+    ) {
+      return;
+    }
+
+    const id = getIdForTeams(prediction.firstTeam, prediction.secondTeam);
+    if (!normalized[id]) normalized[id] = prediction;
+  });
+
+  if (JSON.stringify(saved) !== JSON.stringify(normalized)) {
+    storage.setItem(GAME_PREDS_KEY, JSON.stringify(normalized));
+  }
+
+  return normalized;
 }
 
 export function loadTeamPredictions(
@@ -130,6 +175,11 @@ export function saveTeamGamePrediction(
   game: Game,
   value: string
 ): void {
-  const next = setTeamGamePrediction(loadPredictionStore(storage), team, game, value);
+  const next = setTeamGamePrediction(
+    loadPredictionStore(storage),
+    team,
+    game,
+    value
+  );
   storage.setItem(GAME_PREDS_KEY, JSON.stringify(next));
 }

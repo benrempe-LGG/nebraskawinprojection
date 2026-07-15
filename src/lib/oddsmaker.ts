@@ -22,9 +22,13 @@ const RAW: Record<string, [string, [string, string, string][]]> ={"Illinois":["B
 // Build structured data from compact format
 const ALL_TEAMS: Record<string, TeamInfo> = {};
 const CONFERENCES: Record<string, string[]> = {};
+const locMap: Record<string, "HOME" | "AWAY" | "NEUTRAL"> = {
+  H: "HOME",
+  A: "AWAY",
+  N: "NEUTRAL",
+};
 
 for (const [name, [conf, games]] of Object.entries(RAW)) {
-  const locMap: Record<string, "HOME" | "AWAY" | "NEUTRAL"> = { H: "HOME", A: "AWAY", N: "NEUTRAL" };
   ALL_TEAMS[name] = {
     conference: conf,
     schedule: games.map((g, i) => ({

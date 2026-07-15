@@ -14,6 +14,7 @@ import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 import WinDistribution from "@/components/WinDistribution";
+import SeasonBallot from "@/components/SeasonBallot";
 import {
   loadTeamPredictions,
   saveTeamGamePrediction,
@@ -320,6 +321,8 @@ const Index = () => {
             ))}
           </select>
         </div>
+
+        <SeasonBallot revision={team + JSON.stringify(winPcts)} />
 
         {/* Schedule table */}
         <div className="max-w-[900px] mx-auto px-4 mt-6">

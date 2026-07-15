@@ -111,11 +111,14 @@ const Playoff = () => {
 
         <section className="mt-6 rounded-xl border border-border bg-surface-alt p-5 text-sm leading-relaxed text-muted-foreground">
           <strong className="text-foreground">How this projection works:</strong>{" "}
-          teams are ranked by projected winning percentage, wins, then losses.
-          Conference standings leaders are treated as projected P4 champions.
-          Actual selection and seeding belong to the CFP committee and use more
-          information than predicted records. The app does not yet contain G6
-          schedules, so seed 12 is reserved rather than invented.{" "}
+          projected records receive a strength adjustment of +0.08 for SEC and
+          Big Ten teams and +0.04 for Notre Dame. ACC and Big 12 teams are capped
+          at four combined selections, including their champions. Notre Dame is
+          tracked against ten P4 opponents with assumed wins over Rice and Navy.
+          Conference leaders are treated as projected champions. Actual selection
+          and seeding belong to the CFP committee and use more information than
+          this model. The app does not yet contain G6 schedules, so seed 12 is
+          reserved rather than invented.{" "}
           <a
             href="https://collegefootballplayoff.com/sports/2024/5/29/12-team-format.aspx"
             target="_blank"

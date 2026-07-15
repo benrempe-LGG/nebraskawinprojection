@@ -176,6 +176,38 @@ for (const [team, games] of Object.entries(OFFICIAL_BIG12_SCHEDULES)) {
   }));
 }
 
+// Complete ACC schedules published by the conference:
+// https://theacc.com/documents/2026/1/26/2026_ACC_Football_Schedule_Team_by_Team.pdf
+const OFFICIAL_ACC_SCHEDULES: Record<string, [string, string, string][]> = {
+  "Boston College": [["SEP 5","Cincinnati","A"],["SEP 11","Rutgers","H"],["SEP 19","Maine","H"],["SEP 26","Virginia Tech","H"],["OCT 3","SMU","A"],["OCT 17","Pittsburgh","H"],["OCT 24","Georgia Tech","A"],["OCT 31","Duke","A"],["NOV 7","Florida State","H"],["NOV 14","Notre Dame","A"],["NOV 21","Syracuse","H"],["NOV 28","Miami","A"]],
+  Cal: [["SEP 5","UCLA","H"],["SEP 12","Syracuse","A"],["SEP 19","Wagner","H"],["SEP 25","Clemson","H"],["OCT 3","UNLV","A"],["OCT 10","Virginia Tech","H"],["OCT 17","Wake Forest","H"],["OCT 24","SMU","A"],["OCT 31","NC State","A"],["NOV 14","Virginia","A"],["NOV 21","Stanford","H"],["NOV 28","Pittsburgh","H"]],
+  Clemson: [["SEP 5","LSU","A"],["SEP 12","Georgia Southern","H"],["SEP 19","North Carolina","H"],["SEP 25","Cal","A"],["OCT 3","Miami","H"],["OCT 17","Charleston Southern","H"],["OCT 24","Virginia Tech","H"],["OCT 31","Florida State","A"],["NOV 7","Syracuse","A"],["NOV 14","Georgia Tech","H"],["NOV 20","Duke","A"],["NOV 28","South Carolina","H"]],
+  Duke: [["SEP 5","Tulane","H"],["SEP 12","Illinois","A"],["SEP 19","Stanford","H"],["SEP 26","William & Mary","H"],["OCT 10","Georgia Tech","A"],["OCT 17","North Carolina","H"],["OCT 23","Virginia","A"],["OCT 31","Boston College","H"],["NOV 7","NC State","A"],["NOV 14","Miami","A"],["NOV 20","Clemson","H"],["NOV 28","Wake Forest","A"]],
+  "Florida State": [["AUG 29","New Mexico State","H"],["SEP 7","SMU","H"],["SEP 19","Alabama","A"],["SEP 26","Central Arkansas","H"],["OCT 3","Virginia","H"],["OCT 9","Louisville","A"],["OCT 17","Miami","A"],["OCT 31","Clemson","H"],["NOV 7","Boston College","A"],["NOV 13","Pittsburgh","A"],["NOV 21","NC State","H"],["NOV 27","Florida","H"]],
+  "Georgia Tech": [["SEP 3","Colorado","H"],["SEP 12","Tennessee","H"],["SEP 19","Mercer","H"],["SEP 26","Stanford","A"],["OCT 10","Duke","H"],["OCT 17","Virginia Tech","A"],["OCT 24","Boston College","H"],["OCT 31","Pittsburgh","A"],["NOV 7","Louisville","H"],["NOV 14","Clemson","A"],["NOV 21","Wake Forest","H"],["NOV 28","Georgia","A"]],
+  Louisville: [["SEP 6","Ole Miss","N"],["SEP 11","Villanova","H"],["SEP 19","SMU","H"],["SEP 26","Wake Forest","H"],["OCT 3","NC State","A"],["OCT 9","Florida State","H"],["OCT 17","Syracuse","A"],["OCT 31","Stanford","H"],["NOV 7","Georgia Tech","A"],["NOV 14","North Carolina","A"],["NOV 21","Pittsburgh","H"],["NOV 28","Kentucky","A"]],
+  Miami: [["SEP 4","Stanford","A"],["SEP 10","Florida A&M","H"],["SEP 18","Wake Forest","A"],["SEP 26","Central Michigan","H"],["OCT 3","Clemson","A"],["OCT 17","Florida State","H"],["OCT 24","Pittsburgh","H"],["OCT 31","North Carolina","A"],["NOV 7","Notre Dame","A"],["NOV 14","Duke","H"],["NOV 21","Virginia Tech","H"],["NOV 28","Boston College","H"]],
+  "North Carolina": [["AUG 29","TCU","N"],["SEP 12","East Tennessee State","H"],["SEP 19","Clemson","A"],["OCT 3","Notre Dame","H"],["OCT 10","Pittsburgh","A"],["OCT 17","Duke","A"],["OCT 24","Syracuse","H"],["OCT 31","Miami","H"],["NOV 7","UConn","A"],["NOV 14","Louisville","H"],["NOV 21","Virginia","A"],["NOV 28","NC State","H"]],
+  "NC State": [["AUG 29","Virginia","A"],["SEP 11","Richmond","H"],["SEP 19","Vanderbilt","A"],["SEP 26","Appalachian State","H"],["OCT 3","Louisville","H"],["OCT 10","Wake Forest","H"],["OCT 23","Stanford","A"],["OCT 31","Cal","H"],["NOV 7","Duke","H"],["NOV 14","Syracuse","H"],["NOV 21","Florida State","A"],["NOV 28","North Carolina","A"]],
+  Pittsburgh: [["SEP 5","Miami (OH)","H"],["SEP 12","UCF","H"],["SEP 17","Syracuse","H"],["SEP 26","Bucknell","H"],["OCT 2","Virginia Tech","A"],["OCT 10","North Carolina","H"],["OCT 17","Boston College","A"],["OCT 24","Miami","A"],["OCT 31","Georgia Tech","H"],["NOV 13","Florida State","H"],["NOV 21","Louisville","A"],["NOV 28","Cal","A"]],
+  SMU: [["SEP 7","Florida State","A"],["SEP 12","UC Davis","H"],["SEP 19","Louisville","A"],["SEP 26","Missouri State","H"],["OCT 3","Boston College","H"],["OCT 17","Virginia","H"],["OCT 24","Cal","H"],["OCT 31","Syracuse","A"],["NOV 6","Virginia Tech","H"],["NOV 14","Wake Forest","H"],["NOV 21","Notre Dame","A"],["NOV 28","Stanford","A"]],
+  Stanford: [["AUG 29","Hawaii","H"],["SEP 4","Miami","H"],["SEP 19","Duke","A"],["SEP 26","Georgia Tech","H"],["OCT 3","Wake Forest","A"],["OCT 10","Notre Dame","A"],["OCT 17","Elon","H"],["OCT 23","NC State","H"],["OCT 31","Louisville","A"],["NOV 14","Virginia Tech","A"],["NOV 21","Cal","A"],["NOV 28","SMU","H"]],
+  Syracuse: [["SEP 5","New Hampshire","H"],["SEP 12","Cal","H"],["SEP 17","Pittsburgh","A"],["OCT 3","UConn","A"],["OCT 10","Virginia","A"],["OCT 17","Louisville","H"],["OCT 24","North Carolina","A"],["OCT 31","SMU","H"],["NOV 7","Clemson","H"],["NOV 14","NC State","A"],["NOV 21","Boston College","A"],["NOV 28","Notre Dame","H"]],
+  Virginia: [["AUG 29","NC State","H"],["SEP 11","Norfolk State","H"],["SEP 19","West Virginia","N"],["SEP 26","Delaware","H"],["OCT 3","Florida State","A"],["OCT 10","Syracuse","H"],["OCT 17","SMU","A"],["OCT 23","Duke","H"],["OCT 31","Wake Forest","A"],["NOV 14","Cal","H"],["NOV 21","North Carolina","H"],["NOV 28","Virginia Tech","A"]],
+  "Virginia Tech": [["SEP 5","VMI","H"],["SEP 12","Old Dominion","H"],["SEP 19","Maryland","A"],["SEP 26","Boston College","A"],["OCT 2","Pittsburgh","H"],["OCT 10","Cal","A"],["OCT 17","Georgia Tech","H"],["OCT 24","Clemson","A"],["NOV 6","SMU","A"],["NOV 14","Stanford","H"],["NOV 21","Miami","A"],["NOV 28","Virginia","H"]],
+  "Wake Forest": [["SEP 3","Akron","H"],["SEP 12","Purdue","A"],["SEP 18","Miami","H"],["SEP 26","Louisville","A"],["OCT 3","Stanford","H"],["OCT 10","NC State","A"],["OCT 17","Cal","A"],["OCT 31","Virginia","H"],["NOV 7","Merrimack","H"],["NOV 14","SMU","A"],["NOV 21","Georgia Tech","A"],["NOV 28","Duke","H"]],
+};
+
+for (const [team, games] of Object.entries(OFFICIAL_ACC_SCHEDULES)) {
+  ALL_TEAMS[team].schedule = games.map(([date, opponent, loc], index) => ({
+    week: index + 1,
+    date,
+    opponent,
+    loc: locMap[loc] || "HOME",
+    venue: loc === "A" ? "Away" : loc === "N" ? "Neutral Site" : "Home",
+  }));
+}
+
 // Sort conference lists
 for (const c of Object.keys(CONFERENCES)) {
   CONFERENCES[c].sort();

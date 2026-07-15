@@ -64,7 +64,7 @@ const Standings = () => {
                   <div className="grid grid-cols-[30px_minmax(82px,1fr)_58px_58px_48px] border-b border-border bg-surface-alt px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     <span>#</span>
                     <span>Team</span>
-                    <span className="text-center">ACC</span>
+                    <span className="text-center">Conf</span>
                     <span className="text-center">Overall</span>
                     <span className="text-right">Done</span>
                   </div>

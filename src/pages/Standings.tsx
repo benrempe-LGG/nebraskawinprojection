@@ -61,17 +61,18 @@ const Standings = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[36px_1fr_64px_62px] border-b border-border bg-surface-alt px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <div className="grid grid-cols-[30px_minmax(82px,1fr)_58px_58px_48px] border-b border-border bg-surface-alt px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     <span>#</span>
                     <span>Team</span>
-                    <span className="text-center">Record</span>
+                    <span className="text-center">ACC</span>
+                    <span className="text-center">Overall</span>
                     <span className="text-right">Done</span>
                   </div>
 
                   {rows.map((row, index) => (
                     <div
                       key={row.team}
-                      className="grid grid-cols-[36px_1fr_64px_62px] items-center border-b border-border/70 px-4 py-2.5 last:border-0"
+                      className="grid grid-cols-[30px_minmax(82px,1fr)_58px_58px_48px] items-center border-b border-border/70 px-4 py-2.5 last:border-0"
                     >
                       <span className="text-xs font-bold text-muted-foreground font-mono-data">
                         {index + 1}
@@ -82,6 +83,10 @@ const Standings = () => {
                       <span className="text-center text-sm font-black text-accent font-mono-data">
                         {row.wins}-{row.losses}
                         {row.undecided ? "-" + row.undecided : ""}
+                      </span>
+                      <span className="text-center text-sm font-bold text-foreground font-mono-data">
+                        {row.overallWins}-{row.overallLosses}
+                        {row.overallUndecided ? "-" + row.overallUndecided : ""}
                       </span>
                       <span className="text-right text-xs text-muted-foreground font-mono-data">
                         {row.projectedGames}/{row.totalConferenceGames}

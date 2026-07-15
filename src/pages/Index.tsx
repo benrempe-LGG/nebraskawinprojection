@@ -387,13 +387,19 @@ const Index = () => {
         </button>
       </div>
 
-      {/* Analytics link */}
-      <div className="max-w-[900px] mx-auto mt-8 px-4 flex justify-center">
+      {/* Season tools */}
+      <div className="max-w-[900px] mx-auto mt-8 px-4 flex flex-wrap justify-center gap-3">
+        <Link
+          to="/standings"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          🏆 Projected Conference Standings
+        </Link>
         <Link
           to="/analytics"
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
         >
-          📊 Program Analytics — Calibrate Your Predictions
+          📊 Program Analytics
         </Link>
       </div>
 

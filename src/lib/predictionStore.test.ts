@@ -29,6 +29,29 @@ describe("canonical matchup predictions", () => {
     );
   });
 
+  it("synchronizes a matchup even when source schedules disagree on date", () => {
+    const dukeGame: Game = {
+      week: 7,
+      date: "OCT 17",
+      opponent: "Virginia",
+      loc: "AWAY",
+      venue: "Away",
+    };
+    const virginiaGame: Game = {
+      week: 8,
+      date: "OCT 23",
+      opponent: "Duke",
+      loc: "HOME",
+      venue: "Home",
+    };
+    const store = setTeamGamePrediction({}, "Duke", dukeGame, "42");
+
+    expect(getGameId("Duke", dukeGame)).toBe(
+      getGameId("Virginia", virginiaGame)
+    );
+    expect(getTeamGamePrediction(store, "Virginia", virginiaGame)).toBe("58");
+  });
+
   it("shows the complementary probability to the opponent", () => {
     const store = setTeamGamePrediction({}, "Nebraska", nebraskaGame, "65");
 

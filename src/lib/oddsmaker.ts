@@ -65,7 +65,7 @@ const OFFICIAL_CONFERENCE_HOME_GAMES: Record<string, Record<string, string[]>> =
   },
   "Big 12": {
     Arizona: ["Cincinnati", "Iowa State", "TCU", "Utah", "Arizona State"],
-    "Arizona State": ["Baylor", "Kansas State", "Colorado", "Oklahoma State"],
+    "Arizona State": ["Kansas", "Baylor", "Kansas State", "Colorado", "Oklahoma State"],
     Baylor: ["Colorado", "TCU", "Iowa State", "Texas Tech"],
     BYU: ["Arizona", "Iowa State", "Arizona State", "Baylor", "Cincinnati"],
     Cincinnati: ["Kansas State", "Texas Tech", "Utah", "Colorado"],

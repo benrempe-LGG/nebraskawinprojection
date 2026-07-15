@@ -24,9 +24,12 @@ describe("2026 conference schedule integrity", () => {
     ]);
 
     for (const team of CONFERENCES.ACC) {
-      const games = ALL_TEAMS[team].schedule.filter((game) =>
+      const schedule = ALL_TEAMS[team].schedule;
+      const games = schedule.filter((game) =>
         isConferenceGame(game.opponent, team)
       );
+      expect(schedule, team).toHaveLength(12);
+      expect(schedule.some((game) => game.date === "TBD"), team).toBe(false);
       expect(games, team).toHaveLength(eightGameTeams.has(team) ? 8 : 9);
     }
   });

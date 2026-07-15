@@ -156,7 +156,9 @@ export function projectPlayoffField(
     .map((conference) => standings[conference]?.[0]?.team)
     .filter((team): team is string => Boolean(team));
   const champions = new Set(championNames);
-  const selectedRecords = championNames.map((team) => ({
+  const selectedRecords: Array<
+    ProjectedTeamRecord & { qualification: PlayoffTeam["qualification"] }
+  > = championNames.map((team) => ({
     ...recordByTeam.get(team)!,
     qualification: "P4 champion" as const,
   }));

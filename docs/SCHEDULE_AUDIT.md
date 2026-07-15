@@ -45,22 +45,46 @@ Result:
 - No ACC schedule contains `TBD`.
 - Every tracked cross-conference game now appears on both schedules.
 
-## Big Ten and SEC — structural pass complete, source audit continuing
+## Big Ten — complete
 
-Every tracked Big Ten and SEC team now has 12 dated games, reciprocal tracked P4 opponents, matching dates, and complementary locations.
+Official sources:
 
-Official corrections applied at this checkpoint:
+- https://bigten.org/fb/article/60083/
+- https://bigten.org/fb/article/59999/
+- Official school schedule pages where the conference release did not enumerate a nonconference game.
 
-- Added USC's Aug. 29 San Jose State opener and moved Fresno State to Sept. 4 from the official USC schedule.
-- Corrected Missouri at Kansas to Sept. 11 from Missouri's official schedule.
-- Corrected Florida at Florida State to Nov. 27 using the current official game pages.
-- Corrected Ole Miss vs. Louisville to Sept. 6 from both schools' current official releases.
+Result:
 
-The remaining work is a source-by-source verification of every Big Ten and SEC row, not a known structural repair.
+- All 18 teams have 12 dated games and nine conference games.
+- Official Thursday/Friday dates are reflected on both sides of tracked matchups.
+- Maryland's opener is correctly listed as Hampton.
+- USC's Aug. 29 San Jose State opener and Sept. 4 Fresno State game are included.
 
-## Notre Dame — pending final source comparison
+## SEC — complete
 
-Notre Dame's 12-game tracked schedule and assumed Rice/Navy wins still require a final comparison against its official current schedule.
+Official sources:
+
+- https://www.secsports.com/news/2025/09/southeastern-conference-announces-2026-29-football-opponents
+- https://www.secsports.com/news/2026/06/espn-announces-remaining-windows-for-2026-sec-football-season
+- Current official school schedule pages for all 16 teams.
+
+Result:
+
+- All 16 teams have 12 dated games and nine conference games.
+- Opponents, sites, and reciprocal tracked entries match.
+- Missouri at Kansas is Sept. 11; Missouri's opener is Thursday, Sept. 3.
+- Florida at Florida State is Nov. 27.
+- Ole Miss vs. Louisville is Sept. 6.
+
+## Notre Dame — complete
+
+Official source: https://fightingirish.com/sports/football/schedule/
+
+Result:
+
+- All 12 official opponents and dates are represented by the predictor model.
+- The ten tracked P4 games align with the opposing team schedules.
+- Rice and Navy remain the two assumed non-P4 wins used by the playoff predictor.
 
 ## Current automated result
 
@@ -75,4 +99,4 @@ All tracked P4 teams now satisfy:
 
 ## Next checkpoint
 
-Finish the official row-by-row Big Ten, SEC, and Notre Dame comparison, then record final source coverage and run release validation.
+Run final release validation and review the draft pull request for merge readiness.

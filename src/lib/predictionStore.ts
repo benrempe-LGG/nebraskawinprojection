@@ -18,7 +18,8 @@ interface StorageLike {
 }
 
 function orderedTeams(team: string, opponent: string): [string, string] {
-  return [team, opponent].sort((a, b) => a.localeCompare(b));
+  const sorted = [team, opponent].sort((a, b) => a.localeCompare(b));
+  return [sorted[0], sorted[1]];
 }
 
 function getIdForTeams(team: string, opponent: string): string {

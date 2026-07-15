@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "p4-oddsmaker-mcp",
+      "version": "0.1.0",
+      "title": "P4 Oddsmaker (2026)"
+    },
+    "tools": [
+      {
+        "name": "list_teams",
+        "title": "List P4 teams",
+        "description": "List the 67 Power 4 (ACC, Big 12, Big Ten, SEC) college football teams covered by this app, optionally filtered by conference.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "conference": {
+              "description": "Optional conference filter.",
+              "type": "string",
+              "enum": [
+                "ACC",
+                "Big 12",
+                "Big Ten",
+                "SEC"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_schedule",
+        "title": "Get 2026 schedule",
+        "description": "Return the 2026 regular-season schedule for a Power 4 team: week, date, opponent, and home/away/neutral location.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Team name exactly as returned by list_teams, e.g. \"Nebraska\"."
+            }
+          },
+          "required": [
+            "team"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "project_season_wins",
+        "title": "Project season wins",
+        "description": "Given per-game win percentages (0-100) for a team's 12 regular-season games, return expected wins, the full 0-12 win distribution (dynamic programming over Bernoulli trials), and conference win totals.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Team name (see list_teams)."
+            },
+            "win_percentages": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "description": "Win percentage per game in schedule order (see get_schedule). Length must match the team's schedule (typically 12)."
+            }
+          },
+          "required": [
+            "team",
+            "win_percentages"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_program_analytics",
+        "title": "Get program analytics",
+        "description": "Return 2016-2025 program analytics for a Power 4 team: SP+ ranks, 247Sports recruiting composite ranks, and the Delta (recruiting minus performance) metric with average and standard deviation.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Team name (see list_teams)."
+            }
+          },
+          "required": [
+            "team"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

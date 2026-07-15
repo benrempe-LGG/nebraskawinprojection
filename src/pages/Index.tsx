@@ -14,6 +14,10 @@ import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 import WinDistribution from "@/components/WinDistribution";
+import {
+  loadTeamPredictions,
+  saveTeamGamePrediction,
+} from "@/lib/predictionStore";
 
 const CONF_ABBR: Record<string, string> = {
   "Big Ten": "B1G",
@@ -22,7 +26,6 @@ const CONF_ABBR: Record<string, string> = {
   "Big 12": "Big 12",
 };
 
-const PREDS_KEY = "oddsmaker_preds";
 const VEGAS_KEY = "oddsmaker_vegas_totals";
 
 const isValidPct = (v: string) =>
@@ -78,10 +81,10 @@ const Index = () => {
   const schedule = useMemo(() => getTeamSchedule(team), [team]);
   const teamConf = useMemo(() => getTeamConference(team), [team]);
 
-  const loadPreds = useCallback((t: string) => {
-    const saved = loadStore(PREDS_KEY);
-    return (saved[t] as Record<number, string>) || {};
-  }, []);
+  const loadPreds = useCallback(
+    (t: string) => loadTeamPredictions(localStorage, t, getTeamSchedule(t)),
+    []
+  );
 
   const loadVegas = useCallback((t: string) => {
     const saved = loadStore(VEGAS_KEY);
@@ -107,11 +110,6 @@ const Index = () => {
     setWinPcts(loadPreds(team));
     setVegasTotal(loadVegas(team));
   }, [team, loadPreds, loadVegas]);
-
-  // Save predictions whenever they change
-  useEffect(() => {
-    saveStore(PREDS_KEY, team, winPcts);
-  }, [winPcts, team]);
 
   useEffect(() => {
     saveStore(VEGAS_KEY, team, vegasTotal);
@@ -143,14 +141,19 @@ const Index = () => {
     }
   }, [team]);
 
-  const handleChange = useCallback((idx: number, val: string) => {
-    if (
-      val === "" ||
-      (/^\d{0,3}\.?\d{0,2}$/.test(val) && (val === "" || parseFloat(val) <= 100))
-    ) {
-      setWinPcts((prev) => ({ ...prev, [idx]: val }));
-    }
-  }, []);
+  const handleChange = useCallback(
+    (idx: number, val: string) => {
+      if (
+        val === "" ||
+        (/^\d{0,3}\.?\d{0,2}$/.test(val) &&
+          (val === "" || parseFloat(val) <= 100))
+      ) {
+        setWinPcts((prev) => ({ ...prev, [idx]: val }));
+        saveTeamGamePrediction(localStorage, team, schedule[idx], val);
+      }
+    },
+    [team, schedule]
+  );
 
   const totalExpectedWins = schedule.reduce((sum, _g, i) => {
     const n = parseFloat(winPcts[i] || "");
@@ -420,7 +423,8 @@ const Index = () => {
           </code>{" "}
           where p is your win probability. Then we apply a{" "}
           <strong className="text-foreground/60">2.75-point home-field advantage</strong>.
-          Predictions save locally per team — switch between schools without losing your work.
+          Predictions save once per matchup — enter a percentage for either team and the opponent's
+          schedule updates automatically with the complementary probability.
           Use <strong className="text-foreground/60">Copy Link to My Picks</strong> to challenge
           others: anyone who opens your link sees your exact numbers and can post their own back.
         </div>

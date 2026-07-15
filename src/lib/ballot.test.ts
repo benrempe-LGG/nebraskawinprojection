@@ -41,9 +41,10 @@ describe("season ballots", () => {
     const progress = getBallotProgress(predictions);
 
     expect(progress.remainingGames).toBe(0);
-    expect(progress.undecidedGames).toBe(progress.totalGames);
+    expect(progress.decidedGames).toBeGreaterThan(0);
+    expect(progress.undecidedGames).toBeGreaterThan(0);
     expect(progress.canLock).toBe(false);
-    expect(() => createLockedBallot(predictions)).toThrow(/choose a side/i);
+    expect(() => createLockedBallot(predictions)).toThrow(/neutral 50%/i);
   });
 
   it("creates an immutable snapshot of a complete ballot", () => {

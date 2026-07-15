@@ -31,7 +31,7 @@ describe("conference standings", () => {
     });
   });
 
-  it("keeps a 50 percent game undecided", () => {
+  it("defaults a 50 percent game to the home favorite", () => {
     const predictions = setTeamGamePrediction(
       {},
       "Nebraska",
@@ -42,9 +42,9 @@ describe("conference standings", () => {
     const nebraska = rows.find((row) => row.team === "Nebraska")!;
 
     expect(nebraska).toMatchObject({
-      wins: 0,
+      wins: 1,
       losses: 0,
-      undecided: 1,
+      undecided: 0,
       projectedGames: 1,
     });
   });

@@ -1,4 +1,9 @@
-import { ALL_TEAMS, CONFERENCES, isConferenceGame } from "@/lib/oddsmaker";
+import {
+  ALL_TEAMS,
+  CONFERENCES,
+  getProjectedWinner,
+  isConferenceGame,
+} from "@/lib/oddsmaker";
 import {
   getGameId,
   getTeamGamePrediction,
@@ -61,10 +66,11 @@ export function computeConferenceStandings(
       teamRow.projectedGames += 1;
       opponentRow.projectedGames += 1;
 
-      if (probability === 50) {
+      const winner = getProjectedWinner(team, game, probability);
+      if (!winner) {
         teamRow.undecided += 1;
         opponentRow.undecided += 1;
-      } else if (probability > 50) {
+      } else if (winner === team) {
         teamRow.wins += 1;
         opponentRow.losses += 1;
       } else {

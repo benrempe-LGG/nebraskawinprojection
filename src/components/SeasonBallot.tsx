@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   getBallotProgress,
@@ -87,8 +88,14 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
           />
         </div>
 
-        <div className="mt-2 flex justify-between text-xs text-muted-foreground font-mono-data">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground font-mono-data">
           <span>{percent}% complete</span>
+          <Link
+            to="/review"
+            className="font-bold text-accent underline underline-offset-2"
+          >
+            Review 50% games
+          </Link>
           <span>
             {lockedCount
               ? lockedCount + " locked snapshot" + (lockedCount === 1 ? "" : "s")

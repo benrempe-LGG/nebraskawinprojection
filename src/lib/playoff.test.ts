@@ -23,10 +23,35 @@ function completeSeason(): GamePredictionStore {
     }
   }
 
+  predictions = setTeamGamePrediction(
+    predictions,
+    "Notre Dame",
+    {
+      week: 5,
+      date: "OCT 3",
+      opponent: "North Carolina",
+      loc: "AWAY",
+      venue: "Away",
+    },
+    "60"
+  );
+
   return predictions;
 }
 
 describe("playoff outlook", () => {
+  it("tracks Notre Dame with assumed wins over Rice and Navy", () => {
+    const records = computeProjectedTeamRecords({});
+    const notreDame = records.find((record) => record.team === "Notre Dame")!;
+
+    expect(notreDame).toMatchObject({
+      conference: "Independent",
+      wins: 2,
+      pickedGames: 2,
+      totalGames: 12,
+    });
+  });
+
   it("computes overall records from each team's perspective", () => {
     const game = ALL_TEAMS.Nebraska.schedule.find(
       (item) => item.opponent === "Ohio State"
@@ -56,6 +81,11 @@ describe("playoff outlook", () => {
       outlook.teams.filter((team) => team.qualification === "At-large")
     ).toHaveLength(7);
     expect(new Set(outlook.teams.map((team) => team.team)).size).toBe(11);
+    expect(
+      outlook.teams.filter(
+        (team) => team.conference === "ACC" || team.conference === "Big 12"
+      ).length
+    ).toBeLessThanOrEqual(4);
     expect(outlook.groupOfSixSeed).toBe(12);
     expect(outlook.complete).toBe(true);
   });

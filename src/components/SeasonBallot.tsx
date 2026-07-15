@@ -90,12 +90,20 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
 
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground font-mono-data">
           <span>{percent}% complete</span>
-          <Link
-            to="/review"
-            className="font-bold text-accent underline underline-offset-2"
-          >
-            Review 50% games
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/review#remaining"
+              className="font-bold text-accent underline underline-offset-2"
+            >
+              Review {progress.remainingGames} remaining games
+            </Link>
+            <Link
+              to="/review#fifty"
+              className="font-bold text-accent underline underline-offset-2"
+            >
+              Review 50% games
+            </Link>
+          </div>
           <span>
             {lockedCount
               ? lockedCount + " locked snapshot" + (lockedCount === 1 ? "" : "s")

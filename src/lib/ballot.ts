@@ -1,6 +1,11 @@
-import { ALL_TEAMS } from "@/lib/oddsmaker";
+import {
+  ALL_TEAMS,
+  getProjectedWinner,
+  type Game,
+} from "@/lib/oddsmaker";
 import {
   getGameId,
+  getTeamGamePrediction,
   type GamePredictionStore,
 } from "@/lib/predictionStore";
 
@@ -15,6 +20,12 @@ export interface BallotProgress {
   canLock: boolean;
 }
 
+export interface SeasonGame {
+  id: string;
+  team: string;
+  game: Game;
+}
+
 export interface LockedBallot {
   id: string;
   season: 2026;
@@ -27,38 +38,45 @@ interface StorageLike {
   setItem(key: string, value: string): void;
 }
 
-export function getSeasonGameIds(): string[] {
-  const ids = new Set<string>();
+export function getSeasonGames(): SeasonGame[] {
+  const games = new Map<string, SeasonGame>();
 
   for (const [team, info] of Object.entries(ALL_TEAMS)) {
-    info.schedule.forEach((game) => ids.add(getGameId(team, game)));
+    info.schedule.forEach((game) => {
+      const id = getGameId(team, game);
+      if (!games.has(id)) games.set(id, { id, team, game });
+    });
   }
 
-  return [...ids].sort();
+  return [...games.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
+export function getSeasonGameIds(): string[] {
+  return getSeasonGames().map((game) => game.id);
 }
 
 export function getBallotProgress(
   predictions: GamePredictionStore
 ): BallotProgress {
-  const gameIds = getSeasonGameIds();
+  const games = getSeasonGames();
   let pickedGames = 0;
   let decidedGames = 0;
 
-  gameIds.forEach((id) => {
-    const value = predictions[id]?.pctForFirstTeam;
-    if (value === undefined || value === "") return;
+  games.forEach(({ team, game }) => {
+    const value = getTeamGamePrediction(predictions, team, game);
+    if (value === "") return;
 
     pickedGames += 1;
-    if (Number.parseFloat(value) !== 50) decidedGames += 1;
+    if (getProjectedWinner(team, game, value)) decidedGames += 1;
   });
 
   return {
-    totalGames: gameIds.length,
+    totalGames: games.length,
     pickedGames,
     decidedGames,
-    remainingGames: gameIds.length - pickedGames,
+    remainingGames: games.length - pickedGames,
     undecidedGames: pickedGames - decidedGames,
-    canLock: decidedGames === gameIds.length,
+    canLock: decidedGames === games.length,
   };
 }
 
@@ -76,7 +94,7 @@ export function createLockedBallot(
   const progress = getBallotProgress(predictions);
   if (!progress.canLock) {
     throw new Error(
-      "Complete every game and choose a side for each 50% matchup before locking."
+      "Complete every game and choose a favorite for each neutral 50% matchup before locking."
     );
   }
 

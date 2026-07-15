@@ -11,26 +11,24 @@ const PickReview = () => {
   const review = useMemo(() => {
     const predictions = loadPredictionStore(localStorage);
     const games = getSeasonGames();
-    const fiftyPercent = games
-      .map(({ id, team, game }) => {
-        const value = getTeamGamePrediction(predictions, team, game);
-        return {
-          id,
-          team,
-          game,
-          value,
-          winner: value === "50" ? getProjectedWinner(team, game, value) : null,
-        };
-      })
-      .filter((item) => item.value === "50")
-      .sort((a, b) => a.team.localeCompare(b.team));
+    const evaluated = games.map(({ id, team, game }) => {
+      const value = getTeamGamePrediction(predictions, team, game);
+      return {
+        id,
+        team,
+        game,
+        value,
+        winner: value === "50" ? getProjectedWinner(team, game, value) : null,
+      };
+    });
 
     return {
-      fiftyPercent,
-      unpicked: games.filter(
-        ({ team, game }) =>
-          getTeamGamePrediction(predictions, team, game) === ""
-      ).length,
+      fiftyPercent: evaluated
+        .filter((item) => item.value === "50")
+        .sort((a, b) => a.team.localeCompare(b.team)),
+      unpicked: evaluated
+        .filter((item) => item.value === "")
+        .sort((a, b) => a.team.localeCompare(b.team)),
     };
   }, []);
 
@@ -41,11 +39,10 @@ const PickReview = () => {
           Full-season quality check
         </p>
         <h1 className="mt-2 text-3xl font-black text-primary-foreground font-display">
-          Review 50% Games
+          Review Season Picks
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-          Home teams are treated as the default favorite at 50%. Neutral-site
-          games still require you to choose a side.
+          Find every missing prediction and inspect games left at 50%.
         </p>
       </header>
 
@@ -57,58 +54,107 @@ const PickReview = () => {
           >
             ← Predictions
           </Link>
-          <div className="text-sm text-muted-foreground">
-            <strong className="text-accent">{review.fiftyPercent.length}</strong>{" "}
-            at 50% ·{" "}
-            <strong className="text-accent">{review.unpicked}</strong> unpicked
+          <div className="flex gap-4 text-sm text-muted-foreground">
+            <a href="#remaining" className="font-bold text-accent underline">
+              {review.unpicked.length} remaining
+            </a>
+            <a href="#fifty" className="font-bold text-accent underline">
+              {review.fiftyPercent.length} at 50%
+            </a>
           </div>
         </div>
 
-        {review.fiftyPercent.length === 0 ? (
-          <div className="rounded-xl border border-positive/40 bg-positive/10 p-8 text-center">
-            <h2 className="text-xl font-black text-foreground">
-              No 50% games to review
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Every entered matchup has a probability above or below 50%.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-xl border border-border bg-surface">
-            {review.fiftyPercent.map(({ id, team, game, winner }) => (
-              <div
-                key={id}
-                className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4 last:border-0"
-              >
-                <div>
-                  <div className="font-black text-foreground">
-                    {team} vs. {game.opponent}
+        <section id="remaining" className="scroll-mt-5">
+          <h2 className="text-xl font-black text-foreground font-display">
+            Remaining games
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            These matchups do not have a probability yet.
+          </p>
+
+          {review.unpicked.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-positive/40 bg-positive/10 p-6 text-center">
+              <strong className="text-foreground">Every game has a prediction.</strong>
+            </div>
+          ) : (
+            <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+              {review.unpicked.map(({ id, team, game }) => (
+                <div
+                  key={id}
+                  className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4 last:border-0"
+                >
+                  <div>
+                    <div className="font-black text-foreground">
+                      {team} vs. {game.opponent}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {game.date} · {game.venue}
+                    </div>
                   </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {game.date} · {game.venue}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={
-                      winner
-                        ? "text-sm font-bold text-positive"
-                        : "text-sm font-bold text-accent"
-                    }
-                  >
-                    {winner ? winner + " defaults as favorite" : "Choose a winner"}
-                  </span>
                   <Link
                     to={"/?t=" + encodeURIComponent(team)}
                     className="rounded-md border border-primary px-3 py-1.5 text-xs font-black text-accent hover:bg-primary hover:text-primary-foreground"
                   >
-                    Edit
+                    Add prediction
                   </Link>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section id="fifty" className="mt-10 scroll-mt-5">
+          <h2 className="text-xl font-black text-foreground font-display">
+            50% games
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Home teams default as the point-spread favorite. Neutral-site games
+            still need you to choose a side.
+          </p>
+
+          {review.fiftyPercent.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-positive/40 bg-positive/10 p-6 text-center">
+              <strong className="text-foreground">No 50% games to review.</strong>
+            </div>
+          ) : (
+            <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+              {review.fiftyPercent.map(({ id, team, game, winner }) => (
+                <div
+                  key={id}
+                  className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4 last:border-0"
+                >
+                  <div>
+                    <div className="font-black text-foreground">
+                      {team} vs. {game.opponent}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {game.date} · {game.venue}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={
+                        winner
+                          ? "text-sm font-bold text-positive"
+                          : "text-sm font-bold text-accent"
+                      }
+                    >
+                      {winner
+                        ? winner + " defaults as favorite"
+                        : "Choose a winner"}
+                    </span>
+                    <Link
+                      to={"/?t=" + encodeURIComponent(team)}
+                      className="rounded-md border border-primary px-3 py-1.5 text-xs font-black text-accent hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Edit
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

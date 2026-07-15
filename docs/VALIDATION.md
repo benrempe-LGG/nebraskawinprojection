@@ -5,7 +5,7 @@
 Branch: `feature/season-prediction-foundation`  
 PR: [#1](https://github.com/benrempe-LGG/nebraskawinprojection/pull/1)
 
-GitHub Actions run 42 completed successfully at commit `3d1aacd2c8a04241d5c9455cac00d60b65e1ffab`.
+GitHub Actions run 60 completed successfully at release-candidate commit `d834e0511556529d50c6fb533acfc1cd065462a7`.
 
 CI commands:
 
@@ -14,7 +14,7 @@ CI commands:
 - `npm run build` — passed
 - production artifact upload — passed
 
-Coverage added during the session includes canonical cross-team prediction behavior, date-disagreement synchronization, ballot completion and locking, and ACC/Big 12 conference schedule counts, uniqueness, and reciprocity.
+Coverage includes canonical cross-team prediction behavior, date-disagreement synchronization, ballot completion and locking, conference schedule counts, uniqueness, reciprocity, and all-P4 schedule integrity. The official 2026 schedule audit is recorded in `docs/SCHEDULE_AUDIT.md`.
 
 Not validated in this environment:
 

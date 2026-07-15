@@ -1,31 +1,69 @@
-# The P4 Oddsmaker — 2026 Expected Win Calculator
+# The P4 Oddsmaker — 2026 Season Predictor
 
-Pick any Power 4 team, set your win probability for each game, and get:
+A browser-based college football prediction tool for the 2026 Power Four season. Set a win probability for each matchup once, then use the same canonical picks across team schedules, conference standings, ballot review, and the playoff outlook.
 
-- **Expected wins** (overall + conference) from your own numbers
-- **Implied point spreads** for every game (logit model + 2.75 home-field advantage)
-- **Win distribution** — the probability of every possible final record, including bowl-eligibility odds
-- **Vegas comparison** — enter the sportsbook season win total and see whether your model says over or under
+## Status
 
-**Live app:** https://nebraskawinprojection.lovable.app/ (mirror: https://benrempe-lgg.github.io/nebraskawinprojection/)
+**Public-beta candidate.** Development is on `feature/season-prediction-foundation` in draft PR [#1](https://github.com/benrempe-LGG/nebraskawinprojection/pull/1). CI runs tests and a production build. Before a production release, complete the official-source schedule/date audit and manual mobile/desktop QA described in [Known Issues](docs/KNOWN_ISSUES.md).
 
-## Sharing your projection
+Live production currently reflects `main`:
 
-- **📋 Copy Forum Post** — copies a ready-to-paste text breakdown of your picks (with a challenge link) for message boards.
-- **🔗 Copy Link to My Picks** — your team, all win percentages, and the Vegas total are encoded in the URL. Anyone who opens it sees your exact projection and can tweak it and fire back their own link.
-- **📷 Save as Image** — exports the full card as a PNG for posts that allow images.
+- Lovable: https://nebraskawinprojection.lovable.app/
+- GitHub Pages: https://benrempe-lgg.github.io/nebraskawinprojection/
 
-Predictions also save locally per team, so you can switch schools without losing work.
+## Current features
+
+- Team-by-team win probability entry for every tracked P4 schedule
+- Canonical matchup storage: entering a game from either team updates both schedules
+- Implied point spreads and expected-win distributions
+- Season-wide progress, missing-pick review, and 50% game review
+- Immutable locked ballot snapshots stored in the browser
+- Projected conference and overall records
+- Weighted 12-team playoff outlook with Notre Dame tracking and a reserved G6 slot
+- Copyable links, forum text, and image exports for team projections
+- Automated schedule-integrity, prediction-store, ballot, test, and build validation
+
+## Persistence and privacy
+
+Predictions and locked ballots use browser `localStorage`. There is no account system, server database, or cross-device synchronization yet. Clearing browser storage removes local data. No application environment variables are currently required.
 
 ## Development
 
+Requires Node.js 20.
+
 ```sh
-npm install
-npm run dev    # dev server on :8080
-npm run build  # production build
-npm test       # vitest
+npm ci
+npm run dev
+npm run lint
+npm test
+npm run build
+npm run preview
 ```
 
-Built with Vite, React, TypeScript, Tailwind, and shadcn/ui. Deploys to GitHub Pages automatically on push to `main` (see `.github/workflows/deploy.yml`).
+The development server defaults to port 8080. GitHub Pages builds with `DEPLOY_BASE_PATH=/nebraskawinprojection/`; root-hosted previews use `/`.
 
-For entertainment & analysis purposes only. Not affiliated with any university.
+## Repository map
+
+- `src/pages/` — calculator, analytics, standings, review, playoff, and fallback routes
+- `src/components/` — season ballot and UI components
+- `src/lib/oddsmaker.ts` — schedule data, conference normalization, and spread math
+- `src/lib/predictionStore.ts` — canonical matchup identifiers, persistence, and migration
+- `src/lib/ballot.ts` — season progress and locked snapshots
+- `src/lib/standings.ts` — projected conference and overall records
+- `src/lib/playoff.ts` — transparent committee-proxy model
+- `.github/workflows/ci.yml` — pull-request tests and build
+- `.github/workflows/deploy.yml` — GitHub Pages deployment from `main`
+
+## Project documents
+
+Read these in order when restarting work:
+
+1. [Current handoff](docs/HANDOFF.md)
+2. [Roadmap](docs/ROADMAP.md)
+3. [Known issues](docs/KNOWN_ISSUES.md)
+4. [Architecture](docs/ARCHITECTURE.md)
+5. [Decision log](docs/DECISIONS.md)
+6. [Validation record](docs/VALIDATION.md)
+7. [Changelog](CHANGELOG.md)
+
+For entertainment and analysis purposes only. Not affiliated with any university, conference, or sportsbook.

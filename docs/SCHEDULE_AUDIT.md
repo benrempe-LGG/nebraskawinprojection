@@ -34,22 +34,45 @@ Result:
 - Big 12 conference matchups are reciprocal with matching dates and complementary locations.
 - Integrity tests enforce these conditions.
 
-## ACC — in progress
+## ACC — complete
 
-The official opponent matrix is installed, including the transition-year split of twelve nine-game teams and five eight-game teams.
+Official source: https://theacc.com/documents/2026/1/26/2026_ACC_Football_Schedule_Team_by_Team.pdf
 
-Remaining at this checkpoint:
+Result:
 
-- 14 reciprocal schedule entries still display `TBD` across seven ACC matchups.
-- Florida State, NC State, and Pittsburgh contain 11 games.
-- North Carolina contains nine games.
-- Vanderbilt lists NC State, but NC State does not yet list Vanderbilt.
-- Colorado lists Georgia Tech, but Georgia Tech does not yet list Colorado.
+- All 17 teams have complete dated 12-game schedules.
+- Twelve teams have nine ACC games; Boston College, Clemson, Florida State, Georgia Tech, and North Carolina have eight.
+- No ACC schedule contains `TBD`.
+- Every tracked cross-conference game now appears on both schedules.
 
-## Big Ten, SEC, and Notre Dame — pending source audit
+## Big Ten and SEC — structural pass complete, source audit continuing
 
-Known baseline item: USC currently contains 11 games. Nebraska weekday prefixes differ cosmetically from reciprocal entries but represent the same dates. Missouri-Kansas requires confirmation because the current sources differ by one day.
+Every tracked Big Ten and SEC team now has 12 dated games, reciprocal tracked P4 opponents, matching dates, and complementary locations.
+
+Official corrections applied at this checkpoint:
+
+- Added USC's Aug. 29 San Jose State opener and moved Fresno State to Sept. 4 from the official USC schedule.
+- Corrected Missouri at Kansas to Sept. 11 from Missouri's official schedule.
+- Corrected Florida at Florida State to Nov. 27 using the current official game pages.
+- Corrected Ole Miss vs. Louisville to Sept. 6 from both schools' current official releases.
+
+The remaining work is a source-by-source verification of every Big Ten and SEC row, not a known structural repair.
+
+## Notre Dame — pending final source comparison
+
+Notre Dame's 12-game tracked schedule and assumed Rice/Navy wins still require a final comparison against its official current schedule.
+
+## Current automated result
+
+All tracked P4 teams now satisfy:
+
+- exactly 12 games
+- no duplicate opponents
+- no `TBD` dates
+- reciprocal tracked P4 matchups
+- matching reciprocal dates after cosmetic weekday-prefix normalization
+- complementary home/away or matching neutral designations
 
 ## Next checkpoint
 
-Replace the ACC with complete official dated schedules, rerun the audit, then verify Big Ten, SEC, Notre Dame, and every cross-conference P4 matchup.
+Finish the official row-by-row Big Ten, SEC, and Notre Dame comparison, then record final source coverage and run release validation.

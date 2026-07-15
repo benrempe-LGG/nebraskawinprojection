@@ -4,9 +4,12 @@ import { ALL_TEAMS, CONFERENCES, isConferenceGame } from "@/lib/oddsmaker";
 describe("2026 conference schedule integrity", () => {
   it("gives every Big 12 team nine reciprocal conference games", () => {
     for (const team of CONFERENCES["Big 12"]) {
-      const games = ALL_TEAMS[team].schedule.filter((game) =>
+      const schedule = ALL_TEAMS[team].schedule;
+      const games = schedule.filter((game) =>
         isConferenceGame(game.opponent, team)
       );
+      expect(schedule, team).toHaveLength(12);
+      expect(schedule.some((game) => game.date === "TBD"), team).toBe(false);
       expect(games, team).toHaveLength(9);
     }
   });

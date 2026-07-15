@@ -39,6 +39,111 @@ for (const [name, [conf, games]] of Object.entries(RAW)) {
   if (!CONFERENCES[conf].includes(name)) CONFERENCES[conf].push(name);
 }
 
+// The original compact schedules were assembled from team-by-team sources and
+// contained duplicate and one-sided conference matchups. Normalize ACC and Big
+// 12 league slates from the conferences' official 2026 opponent matrices so a
+// matchup exists exactly once on each team's schedule.
+const OFFICIAL_CONFERENCE_HOME_GAMES: Record<string, Record<string, string[]>> = {
+  ACC: {
+    "Boston College": ["Florida State", "Pittsburgh", "Syracuse", "Virginia Tech"],
+    Cal: ["Clemson", "Pittsburgh", "Stanford", "Virginia Tech", "Wake Forest"],
+    Clemson: ["Georgia Tech", "Miami", "North Carolina", "Virginia Tech"],
+    Duke: ["Boston College", "Clemson", "North Carolina", "Stanford"],
+    "Florida State": ["Clemson", "NC State", "SMU", "Virginia"],
+    "Georgia Tech": ["Boston College", "Duke", "Louisville", "Wake Forest"],
+    Louisville: ["Florida State", "Pittsburgh", "SMU", "Stanford", "Wake Forest"],
+    Miami: ["Boston College", "Duke", "Florida State", "Pittsburgh", "Virginia Tech"],
+    "NC State": ["Cal", "Duke", "Louisville", "Syracuse", "Wake Forest"],
+    "North Carolina": ["Louisville", "Miami", "NC State", "Syracuse"],
+    Pittsburgh: ["Florida State", "Georgia Tech", "North Carolina", "Syracuse"],
+    SMU: ["Boston College", "Cal", "Virginia", "Virginia Tech", "Wake Forest"],
+    Stanford: ["Georgia Tech", "Miami", "NC State", "SMU"],
+    Syracuse: ["Cal", "Clemson", "Louisville", "SMU"],
+    Virginia: ["Cal", "Duke", "North Carolina", "NC State", "Syracuse"],
+    "Virginia Tech": ["Georgia Tech", "Pittsburgh", "Stanford", "Virginia"],
+    "Wake Forest": ["Duke", "Miami", "Stanford", "Virginia"],
+  },
+  "Big 12": {
+    Arizona: ["Cincinnati", "Iowa State", "TCU", "Utah", "Arizona State"],
+    "Arizona State": ["Baylor", "Kansas State", "Colorado", "Oklahoma State"],
+    Baylor: ["Colorado", "TCU", "Iowa State", "Texas Tech"],
+    BYU: ["Arizona", "Iowa State", "Arizona State", "Baylor", "Cincinnati"],
+    Cincinnati: ["Kansas State", "Texas Tech", "Utah", "Colorado"],
+    Colorado: ["Texas Tech", "Utah", "Kansas State", "Houston", "UCF"],
+    Houston: ["UCF", "Oklahoma State", "Cincinnati", "Baylor"],
+    "Iowa State": ["Utah", "West Virginia", "Oklahoma State", "Cincinnati", "Kansas State"],
+    Kansas: ["Baylor", "UCF", "BYU"],
+    "Kansas State": ["Houston", "Kansas", "Oklahoma State", "Arizona"],
+    "Oklahoma State": ["UCF", "Colorado", "Texas Tech", "Kansas"],
+    TCU: ["BYU", "West Virginia", "Kansas", "Kansas State", "Utah"],
+    "Texas Tech": ["Houston", "Arizona State", "Arizona", "West Virginia", "TCU"],
+    UCF: ["TCU", "BYU", "Baylor", "Arizona State", "Iowa State"],
+    Utah: ["Kansas", "Houston", "BYU", "West Virginia"],
+    "West Virginia": ["Oklahoma State", "Arizona", "Cincinnati", "Kansas", "Houston"],
+  },
+};
+
+const OFFICIAL_NEUTRAL_GAMES = new Set([
+  ["Arizona State", "Kansas"].sort().join("|"),
+]);
+
+function normalizeConferenceSchedule(
+  conference: string,
+  homeGames: Record<string, string[]>
+) {
+  const teams = Object.keys(homeGames);
+  const teamSet = new Set(teams);
+  const oldSchedules = new Map(
+    teams.map((team) => [team, ALL_TEAMS[team].schedule])
+  );
+  const normalized = new Map(
+    teams.map((team) => [
+      team,
+      ALL_TEAMS[team].schedule.filter(
+        (game) => !teamSet.has(game.opponent)
+      ),
+    ])
+  );
+
+  for (const [homeTeam, opponents] of Object.entries(homeGames)) {
+    for (const awayTeam of opponents) {
+      const matchupId = [homeTeam, awayTeam].sort().join("|");
+      const prior =
+        oldSchedules.get(homeTeam)?.find((game) => game.opponent === awayTeam) ||
+        oldSchedules.get(awayTeam)?.find((game) => game.opponent === homeTeam);
+      const date = prior?.date || "TBD";
+      const neutral = OFFICIAL_NEUTRAL_GAMES.has(matchupId);
+
+      normalized.get(homeTeam)!.push({
+        week: 0,
+        date,
+        opponent: awayTeam,
+        loc: neutral ? "NEUTRAL" : "HOME",
+        venue: neutral ? "Neutral Site" : "Home",
+      });
+      normalized.get(awayTeam)!.push({
+        week: 0,
+        date,
+        opponent: homeTeam,
+        loc: neutral ? "NEUTRAL" : "AWAY",
+        venue: neutral ? "Neutral Site" : "Away",
+      });
+    }
+  }
+
+  for (const team of teams) {
+    ALL_TEAMS[team].schedule = normalized
+      .get(team)!
+      .map((game, index) => ({ ...game, week: index + 1 }));
+  }
+}
+
+for (const [conference, homeGames] of Object.entries(
+  OFFICIAL_CONFERENCE_HOME_GAMES
+)) {
+  normalizeConferenceSchedule(conference, homeGames);
+}
+
 // Sort conference lists
 for (const c of Object.keys(CONFERENCES)) {
   CONFERENCES[c].sort();

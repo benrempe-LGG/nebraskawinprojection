@@ -144,6 +144,38 @@ for (const [conference, homeGames] of Object.entries(
   normalizeConferenceSchedule(conference, homeGames);
 }
 
+// Complete Big 12 schedules published by the conference:
+// https://big12sports.com/news/2026/1/21/big-12-conference-announces-2026-football-schedule.aspx
+// These replace the earlier mixed-source schedules and remove runtime TBD dates.
+const OFFICIAL_BIG12_SCHEDULES: Record<string, [string, string, string][]> = {
+  Arizona: [["SEP 5","Northern Arizona","H"],["SEP 12","BYU","A"],["SEP 19","Northern Illinois","H"],["SEP 26","Washington State","A"],["OCT 3","Cincinnati","H"],["OCT 10","West Virginia","A"],["OCT 24","Iowa State","H"],["OCT 31","Texas Tech","A"],["NOV 6","TCU","H"],["NOV 14","Utah","H"],["NOV 21","Kansas State","A"],["NOV 28","Arizona State","H"]],
+  "Arizona State": [["SEP 5","Morgan State","H"],["SEP 12","Texas A&M","A"],["SEP 19","Kansas","N"],["OCT 3","Baylor","H"],["OCT 10","Hawaii","H"],["OCT 17","Texas Tech","A"],["OCT 24","Kansas State","H"],["OCT 31","BYU","A"],["NOV 7","Colorado","H"],["NOV 14","UCF","A"],["NOV 21","Oklahoma State","H"],["NOV 28","Arizona","A"]],
+  Baylor: [["SEP 5","Auburn","N"],["SEP 12","Prairie View A&M","H"],["SEP 19","Louisiana Tech","H"],["SEP 26","Colorado","H"],["OCT 3","Arizona State","A"],["OCT 17","TCU","H"],["OCT 24","Kansas","A"],["OCT 30","UCF","A"],["NOV 7","Iowa State","H"],["NOV 14","BYU","A"],["NOV 21","Texas Tech","H"],["NOV 28","Houston","A"]],
+  BYU: [["SEP 5","Utah Tech","H"],["SEP 12","Arizona","H"],["SEP 19","Colorado State","A"],["OCT 3","TCU","A"],["OCT 9","Iowa State","H"],["OCT 17","Notre Dame","H"],["OCT 24","UCF","A"],["OCT 31","Arizona State","H"],["NOV 7","Utah","A"],["NOV 14","Baylor","H"],["NOV 21","Kansas","A"],["NOV 28","Cincinnati","H"]],
+  Cincinnati: [["SEP 5","Boston College","H"],["SEP 12","Western Carolina","H"],["SEP 19","Miami (OH)","H"],["SEP 26","Kansas State","H"],["OCT 3","Arizona","A"],["OCT 17","West Virginia","A"],["OCT 24","Texas Tech","H"],["OCT 31","Utah","H"],["NOV 7","Houston","A"],["NOV 14","Iowa State","A"],["NOV 21","Colorado","H"],["NOV 28","BYU","A"]],
+  Colorado: [["SEP 3","Georgia Tech","A"],["SEP 12","Weber State","H"],["SEP 19","Northwestern","A"],["SEP 26","Baylor","A"],["OCT 3","Texas Tech","H"],["OCT 17","Utah","H"],["OCT 24","Oklahoma State","A"],["OCT 31","Kansas State","H"],["NOV 7","Arizona State","A"],["NOV 13","Houston","H"],["NOV 21","Cincinnati","A"],["NOV 28","UCF","H"]],
+  Houston: [["SEP 5","Oregon State","H"],["SEP 12","Southern","H"],["SEP 18","Texas Tech","A"],["SEP 26","Georgia Southern","A"],["OCT 3","UCF","H"],["OCT 10","Kansas State","A"],["OCT 17","Oklahoma State","H"],["OCT 24","Utah","A"],["NOV 7","Cincinnati","H"],["NOV 13","Colorado","A"],["NOV 21","West Virginia","A"],["NOV 28","Baylor","H"]],
+  "Iowa State": [["SEP 5","Southeast Missouri","H"],["SEP 12","Iowa","A"],["SEP 19","Bowling Green","H"],["SEP 26","Utah","H"],["OCT 3","West Virginia","H"],["OCT 9","BYU","A"],["OCT 24","Arizona","A"],["OCT 31","Oklahoma State","H"],["NOV 7","Baylor","A"],["NOV 14","Cincinnati","H"],["NOV 20","UCF","A"],["NOV 28","Kansas State","H"]],
+  Kansas: [["SEP 4","LIU","H"],["SEP 11","Missouri","H"],["SEP 19","Arizona State","N"],["OCT 3","Middle Tennessee","H"],["OCT 10","Utah","A"],["OCT 17","Kansas State","A"],["OCT 24","Baylor","H"],["OCT 31","TCU","A"],["NOV 7","UCF","H"],["NOV 14","West Virginia","A"],["NOV 21","BYU","H"],["NOV 28","Oklahoma State","A"]],
+  "Kansas State": [["SEP 5","Nicholls","H"],["SEP 12","Washington State","H"],["SEP 19","Tulane","H"],["SEP 26","Cincinnati","A"],["OCT 10","Houston","H"],["OCT 17","Kansas","H"],["OCT 24","Arizona State","A"],["OCT 31","Colorado","A"],["NOV 7","Oklahoma State","H"],["NOV 14","TCU","A"],["NOV 21","Arizona","H"],["NOV 28","Iowa State","A"]],
+  "Oklahoma State": [["SEP 5","Tulsa","A"],["SEP 12","Oregon","H"],["SEP 19","Murray State","H"],["SEP 26","West Virginia","A"],["OCT 10","UCF","H"],["OCT 17","Houston","A"],["OCT 24","Colorado","H"],["OCT 31","Iowa State","A"],["NOV 7","Kansas State","A"],["NOV 14","Texas Tech","H"],["NOV 21","Arizona State","A"],["NOV 28","Kansas","H"]],
+  TCU: [["AUG 29","North Carolina","N"],["SEP 12","Grambling State","H"],["SEP 19","Arkansas State","H"],["SEP 26","UCF","A"],["OCT 3","BYU","H"],["OCT 17","Baylor","A"],["OCT 24","West Virginia","H"],["OCT 31","Kansas","H"],["NOV 6","Arizona","A"],["NOV 14","Kansas State","H"],["NOV 21","Utah","H"],["NOV 26","Texas Tech","A"]],
+  "Texas Tech": [["SEP 5","Abilene Christian","H"],["SEP 12","Oregon State","A"],["SEP 18","Houston","H"],["SEP 26","Sam Houston","H"],["OCT 3","Colorado","A"],["OCT 17","Arizona State","H"],["OCT 24","Cincinnati","A"],["OCT 31","Arizona","H"],["NOV 7","West Virginia","H"],["NOV 14","Oklahoma State","A"],["NOV 21","Baylor","A"],["NOV 26","TCU","H"]],
+  UCF: [["SEP 3","Bethune-Cookman","H"],["SEP 12","Pittsburgh","A"],["SEP 19","Georgia State","H"],["SEP 26","TCU","H"],["OCT 3","Houston","A"],["OCT 10","Oklahoma State","A"],["OCT 24","BYU","H"],["OCT 30","Baylor","H"],["NOV 7","Kansas","A"],["NOV 14","Arizona State","H"],["NOV 20","Iowa State","H"],["NOV 28","Colorado","A"]],
+  Utah: [["SEP 3","Idaho","H"],["SEP 12","Arkansas","H"],["SEP 19","Utah State","H"],["SEP 26","Iowa State","A"],["OCT 10","Kansas","H"],["OCT 17","Colorado","A"],["OCT 24","Houston","H"],["OCT 31","Cincinnati","A"],["NOV 7","BYU","H"],["NOV 14","Arizona","A"],["NOV 21","TCU","A"],["NOV 27","West Virginia","H"]],
+  "West Virginia": [["SEP 5","Coastal Carolina","H"],["SEP 12","UT Martin","H"],["SEP 19","Virginia","N"],["SEP 26","Oklahoma State","H"],["OCT 3","Iowa State","A"],["OCT 10","Arizona","H"],["OCT 17","Cincinnati","H"],["OCT 24","TCU","A"],["NOV 7","Texas Tech","A"],["NOV 14","Kansas","H"],["NOV 21","Houston","H"],["NOV 27","Utah","A"]],
+};
+
+for (const [team, games] of Object.entries(OFFICIAL_BIG12_SCHEDULES)) {
+  ALL_TEAMS[team].schedule = games.map(([date, opponent, loc], index) => ({
+    week: index + 1,
+    date,
+    opponent,
+    loc: locMap[loc] || "HOME",
+    venue: loc === "A" ? "Away" : loc === "N" ? "Neutral Site" : "Home",
+  }));
+}
+
 // Sort conference lists
 for (const c of Object.keys(CONFERENCES)) {
   CONFERENCES[c].sort();

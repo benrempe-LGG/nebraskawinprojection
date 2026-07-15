@@ -1,172 +1,61 @@
-# P4 Oddsmaker — Architecture & Design
+# P4 Oddsmaker — Architecture and Design
 
-## Overview
+Updated: 2026-07-15
 
-The P4 Oddsmaker is a single-page React app that lets college football fans set per-game win probabilities for any Power 4 team and generates expected wins, implied spreads, win distributions, and—crucially—shareable projections for message boards.
+## Runtime and routes
 
-**Stack:** Vite + React 18 + TypeScript + Tailwind CSS + shadcn/ui. Hosted on Lovable (nebraskawinprojection.lovable.app) with GitHub Pages mirror.
+The application is a Vite 5, React 18, and TypeScript single-page application styled with Tailwind and shadcn/ui. React Router exposes:
 
----
+- `/` — team calculator
+- `/analytics` — expected-win analytics
+- `/review` — missing and 50% game review
+- `/standings` — conference and overall projected records
+- `/playoff` — 12-team committee-proxy outlook
 
-## Core Features
+There is no application backend.
 
-### 1. Win Probability Input & Spread Math
+## Core data flow
 
-Users enter a win % (0–100) for each game. The app converts this to an implied point spread using the logit function:
-
-```
-neutral_spread = ln(p/(1-p)) × 8.0
-```
-
-Then applies a **2.75-point home-field advantage**:
-- Home game: `spread = neutral_spread - 2.75`
-- Away game: `spread = neutral_spread + 2.75`
-
-**File:** `src/lib/oddsmaker.ts`
-
-### 2. Win Distribution (Binomial Convolution)
-
-Given per-game probabilities, compute the probability of finishing with exactly k wins using dynamic programming:
-
-```
-dp[i][k] = probability of k wins in first i games
+```text
+2026 schedule data
+  -> canonical matchup ID (season + ordered team pair)
+  -> browser localStorage prediction
+  -> team calculator / review / standings / playoff / locked ballot
 ```
 
-Used to show:
-- Expected total wins (sum of per-game probs)
-- Bowl eligibility odds (P(wins ≥ 6))
-- Full distribution chart (most likely, bowl zone, .500 zone)
+`src/lib/oddsmaker.ts` contains compact team schedules, spread math, and ACC/Big 12 conference-opponent normalization. `predictionStore.ts` stores one percentage per matchup and returns the complementary value from the opponent's perspective. IDs intentionally exclude dates because source schedules previously disagreed and produced duplicate games.
 
-**File:** `src/components/WinDistribution.tsx`
+`ballot.ts` enumerates unique season matchups, calculates completion, and stores immutable snapshots. `standings.ts` derives conference and overall records. `playoff.ts` builds records, tracks Notre Dame, applies a transparent conference-strength proxy, selects projected champions and at-large teams, and reserves seed 12 for an unspecified G6 champion.
 
-### 3. Shareable Projections (URL Encoding)
+## Calculator and sharing
 
-The killer feature for board engagement: encode the team, all win %, and Vegas total into the query string.
+Per-game probabilities feed a logit-based implied spread with 2.75 points of home-field advantage and a dynamic-programming win distribution. Team projections can be shared through query parameters, copied as forum text, or exported as images.
 
-**Format:**
-```
-?t=Nebraska&p=90,85,95,55,70,60,30,55,45,75,25,40&v=6.5
-```
+## Persistence and migration
 
-**Implementation:**
-- On load: `parseShareUrl()` pulls params, hydrates the form if present, skips localStorage.
-- On save: `buildShareUrl()` encodes current state. User copies the link to challenge others.
-- **Key:** empty slots in the `p` array are omitted (e.g., `p=90,85,,55` → only indices 0,1,3 filled).
+All mutable state is local to the browser. Predictions and locked ballots use versioned localStorage keys. Migration code collapses legacy per-team and date-based records into canonical matchups. There is no user identity, remote database, telemetry, or server API.
 
-**File:** `src/pages/Index.tsx` (lines ~50–90, ~230–250)
+## Schedule data
 
-### 4. Forum Post Generator
+Schedules are hardcoded and expanded into `ALL_TEAMS` and `CONFERENCES`. Conference detection cross-references the opponent's conference. Official 2026 ACC and Big 12 opponent matrices are normalized at runtime and tested for expected counts, uniqueness, and reciprocal listings.
 
-**"Copy Forum Post"** button generates a text snapshot suitable for pasting on message boards:
-
-```
-🏈 MY 2026 NEBRASKA PROJECTION: 7.3 WINS
-Vegas win total: 6.5 → I'm taking the OVER
-
-SEP 5   vs Ohio                 90%
-...
-Projected record: 7.3–4.7 (4.6 B1G wins)
-Bowl eligibility odds: 88%
-
-Think I'm wrong? Post your own numbers: [challenge link]
-```
-
-**Record math:** `winsDisplay = round(totalExpectedWins, 1)`, then `losses = gameCount - winsDisplay` so the card always sums to game count (avoids 7.3–4.8 = 12.1).
-
-**File:** `src/pages/Index.tsx` (lines ~240–280)
-
-### 5. Persistence & Vegas Totals
-
-- **Per-team predictions:** localStorage keys are `oddsmaker_preds[teamName] = { gameIdx: winPct, ... }`.
-- **Vegas totals:** localStorage key `oddsmaker_vegas_totals[teamName] = "6.5"` (manual entry, no API).
-- **Clipboard fallback:** modern `navigator.clipboard` with execCommand fallback for browsers that block clipboard access.
-
-**File:** `src/pages/Index.tsx` (lines ~58–75, ~200–225)
-
----
+The full P4 opponent/date/location audit remains a production-beta blocker. See `KNOWN_ISSUES.md`.
 
 ## Deployment
 
-### GitHub Pages
+- `.github/workflows/ci.yml` runs `npm ci`, `npm test`, and `npm run build` for pull requests and `main`.
+- `.github/workflows/deploy.yml` deploys GitHub Pages from `main` using `DEPLOY_BASE_PATH=/nebraskawinprojection/`.
+- Lovable is a separate root-hosted preview/deployment surface.
 
-**Repo:** https://github.com/benrempe-LGG/nebraskawinprojection (public)
+## Security history
 
-**Workflow:** `.github/workflows/deploy.yml`
-- Triggers on push to `main`
-- Builds with `DEPLOY_BASE_PATH=/nebraskawinprojection/` (GitHub Pages serves from a repo subdirectory)
-- Creates `dist/404.html` as fallback for SPA routing on `/analytics`
-- Creates/updates Pages artifact; GitHub Pages automatically deploys
+An Odds API key was committed and removed from source and Git history in June 2026. The old integration was deleted because it returned game totals rather than season win totals. Confirm the key was rotated at the provider; no runtime API key is currently required.
 
-**Live:** https://benrempe-lgg.github.io/nebraskawinprojection/
+## Constraints
 
-### Lovable
-
-**Primary URL:** https://nebraskawinprojection.lovable.app/
-
-Lovable syncs from GitHub (main branch), builds with `DEPLOY_BASE_PATH` unset (defaults to `/`), and publishes at domain root.
-
----
-
-## Host-Agnostic Build
-
-**Challenge:** GitHub Pages serves from `/nebraskawinprojection/`; Lovable serves from `/`.
-
-**Solution:** `vite.config.ts` reads `process.env.DEPLOY_BASE_PATH`:
-```typescript
-base: process.env.DEPLOY_BASE_PATH || "/"
-```
-
-**Workflow sets it:** The GitHub Pages workflow exports `DEPLOY_BASE_PATH=/nebraskawinprojection/` during build. Lovable (and local dev) use the default `/`.
-
-**File:** `vite.config.ts`
-
----
-
-## Data & Schedules
-
-All 130 Power 4 teams' 2026 schedules are hardcoded in `src/lib/oddsmaker.ts` as a compact structure:
-
-```typescript
-const RAW: Record<string, [conf, [[date, opponent, loc], ...]]> = { ... }
-```
-
-Expanded at runtime into `ALL_TEAMS[teamName] = { conference, schedule: [...] }` and `CONFERENCES[conf] = [teams]`.
-
-Conference detection (`isConferenceGame`) cross-references opponent's conference.
-
-**Why hardcoded?** Schedules don't change mid-season; no need for an API. Reduces dependencies and cold-start time.
-
-**File:** `src/lib/oddsmaker.ts` (lines 1–65)
-
----
-
-## Security & API Key Incident
-
-**What happened:** An Odds API key was committed to `src/lib/vegasApi.ts` (removed June 2026). The key was scrubbed from all git history via `git filter-branch`, and the file was deleted entirely.
-
-**What to do:** Rotate the key at the-odds-api.com. GitHub's secret scanner should have flagged it; check if any API requests hit the account from unexpected IPs.
-
-**Why Vegas is now manual:** The Odds API's `/totals` market returned game point totals (e.g., 54.5), not season win totals. Manual entry is more reliable for board engagement anyway—users can compare multiple sportsbooks or use their own lines.
-
----
-
-## Testing
-
-Unit test placeholder in `src/test/example.test.ts`. No e2e tests yet; the app is simple enough that manual testing in browsers (Chrome, Safari, Firefox) covers the main flows:
-
-1. Load with share URL, verify hydration
-2. Enter win %, see spreads and distribution update
-3. Copy forum post, verify format and math
-4. Switch teams, verify persistence
-5. Check localStorage after reload
-
----
-
-## Next Steps / Ideas
-
-1. **Custom domain:** Point a vanity domain (e.g., `p4oddsmaker.com`) at the Lovable URL via DNS for cleaner sharing.
-2. **Team season records:** Prefill win % based on preseason expectations or prior season performance.
-3. **Shareable analytics:** Generate charts/images of the win distribution for posts.
-4. **Leaderboard:** Track user projections across users (would require a backend).
-5. **Mobile refinement:** Test on iPhone/Android, optimize input UX for small screens.
-6. **Analytics:** Track which teams users project on, which spreads are most contested.
+- Schedule accuracy is source-data dependent.
+- Conference tiebreakers and championship games are simplified.
+- The playoff output is an explainable heuristic, not an official ranking.
+- G6 schedules are absent.
+- Local-only storage prevents cross-device recovery.
+- A same-season rematch would require expanding the current canonical game ID.

@@ -14,6 +14,11 @@ import logoImg from "@/assets/logo.png";
 import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 import WinDistribution from "@/components/WinDistribution";
+import SeasonBallot from "@/components/SeasonBallot";
+import {
+  loadTeamPredictions,
+  saveTeamGamePrediction,
+} from "@/lib/predictionStore";
 
 const CONF_ABBR: Record<string, string> = {
   "Big Ten": "B1G",
@@ -22,7 +27,6 @@ const CONF_ABBR: Record<string, string> = {
   "Big 12": "Big 12",
 };
 
-const PREDS_KEY = "oddsmaker_preds";
 const VEGAS_KEY = "oddsmaker_vegas_totals";
 
 const isValidPct = (v: string) =>
@@ -78,10 +82,10 @@ const Index = () => {
   const schedule = useMemo(() => getTeamSchedule(team), [team]);
   const teamConf = useMemo(() => getTeamConference(team), [team]);
 
-  const loadPreds = useCallback((t: string) => {
-    const saved = loadStore(PREDS_KEY);
-    return (saved[t] as Record<number, string>) || {};
-  }, []);
+  const loadPreds = useCallback(
+    (t: string) => loadTeamPredictions(localStorage, t, getTeamSchedule(t)),
+    []
+  );
 
   const loadVegas = useCallback((t: string) => {
     const saved = loadStore(VEGAS_KEY);
@@ -107,11 +111,6 @@ const Index = () => {
     setWinPcts(loadPreds(team));
     setVegasTotal(loadVegas(team));
   }, [team, loadPreds, loadVegas]);
-
-  // Save predictions whenever they change
-  useEffect(() => {
-    saveStore(PREDS_KEY, team, winPcts);
-  }, [winPcts, team]);
 
   useEffect(() => {
     saveStore(VEGAS_KEY, team, vegasTotal);
@@ -143,14 +142,19 @@ const Index = () => {
     }
   }, [team]);
 
-  const handleChange = useCallback((idx: number, val: string) => {
-    if (
-      val === "" ||
-      (/^\d{0,3}\.?\d{0,2}$/.test(val) && (val === "" || parseFloat(val) <= 100))
-    ) {
-      setWinPcts((prev) => ({ ...prev, [idx]: val }));
-    }
-  }, []);
+  const handleChange = useCallback(
+    (idx: number, val: string) => {
+      if (
+        val === "" ||
+        (/^\d{0,3}\.?\d{0,2}$/.test(val) &&
+          (val === "" || parseFloat(val) <= 100))
+      ) {
+        setWinPcts((prev) => ({ ...prev, [idx]: val }));
+        saveTeamGamePrediction(localStorage, team, schedule[idx], val);
+      }
+    },
+    [team, schedule]
+  );
 
   const totalExpectedWins = schedule.reduce((sum, _g, i) => {
     const n = parseFloat(winPcts[i] || "");
@@ -318,6 +322,8 @@ const Index = () => {
           </select>
         </div>
 
+        <SeasonBallot revision={team + JSON.stringify(winPcts)} />
+
         {/* Schedule table */}
         <div className="max-w-[900px] mx-auto px-4 mt-6">
           {/* Table header */}
@@ -384,13 +390,25 @@ const Index = () => {
         </button>
       </div>
 
-      {/* Analytics link */}
-      <div className="max-w-[900px] mx-auto mt-8 px-4 flex justify-center">
+      {/* Season tools */}
+      <div className="max-w-[900px] mx-auto mt-8 px-4 flex flex-wrap justify-center gap-3">
+        <Link
+          to="/standings"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          🏆 Projected Conference Standings
+        </Link>
+        <Link
+          to="/playoff"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          🏈 2026 Playoff Outlook
+        </Link>
         <Link
           to="/analytics"
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
         >
-          📊 Program Analytics — Calibrate Your Predictions
+          📊 Program Analytics
         </Link>
       </div>
 
@@ -420,7 +438,8 @@ const Index = () => {
           </code>{" "}
           where p is your win probability. Then we apply a{" "}
           <strong className="text-foreground/60">2.75-point home-field advantage</strong>.
-          Predictions save locally per team — switch between schools without losing your work.
+          Predictions save once per matchup — enter a percentage for either team and the opponent's
+          schedule updates automatically with the complementary probability.
           Use <strong className="text-foreground/60">Copy Link to My Picks</strong> to challenge
           others: anyone who opens your link sees your exact numbers and can post their own back.
         </div>

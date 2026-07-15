@@ -54,4 +54,37 @@ describe("2026 conference schedule integrity", () => {
       }
     }
   });
+  it("gives every tracked P4 team a complete dated 12-game schedule", () => {
+    const normalizeDate = (date: string) =>
+      date.replace(/^(SAT|FRI) /, "");
+
+    for (const [team, info] of Object.entries(ALL_TEAMS)) {
+      expect(info.schedule, team).toHaveLength(12);
+      expect(info.schedule.some((game) => game.date === "TBD"), team).toBe(false);
+      expect(
+        new Set(info.schedule.map((game) => game.opponent)).size,
+        team
+      ).toBe(12);
+
+      for (const game of info.schedule) {
+        const opponent = ALL_TEAMS[game.opponent];
+        if (!opponent) continue;
+
+        const reverse = opponent.schedule.filter(
+          (candidate) => candidate.opponent === team
+        );
+        expect(reverse, team + " vs " + game.opponent).toHaveLength(1);
+        expect(normalizeDate(reverse[0].date), team + " vs " + game.opponent).toBe(
+          normalizeDate(game.date)
+        );
+
+        if (game.loc === "NEUTRAL") {
+          expect(reverse[0].loc).toBe("NEUTRAL");
+        } else {
+          expect(reverse[0].loc).toBe(game.loc === "HOME" ? "AWAY" : "HOME");
+        }
+      }
+    }
+  });
+
 });

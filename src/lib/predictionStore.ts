@@ -84,7 +84,7 @@ function readJson<T>(storage: StorageLike, key: string, fallback: T): T {
   }
 }
 
-function readStore(storage: StorageLike): GamePredictionStore {
+export function loadPredictionStore(storage: StorageLike): GamePredictionStore {
   return readJson<GamePredictionStore>(storage, GAME_PREDS_KEY, {});
 }
 
@@ -93,7 +93,7 @@ export function loadTeamPredictions(
   team: string,
   schedule: Game[]
 ): Record<number, string> {
-  let store = readStore(storage);
+  let store = loadPredictionStore(storage);
   const legacy = readJson<Record<string, Record<number, string>>>(
     storage,
     LEGACY_PREDS_KEY,
@@ -130,6 +130,6 @@ export function saveTeamGamePrediction(
   game: Game,
   value: string
 ): void {
-  const next = setTeamGamePrediction(readStore(storage), team, game, value);
+  const next = setTeamGamePrediction(loadPredictionStore(storage), team, game, value);
   storage.setItem(GAME_PREDS_KEY, JSON.stringify(next));
 }

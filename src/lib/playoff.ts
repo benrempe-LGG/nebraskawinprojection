@@ -34,11 +34,11 @@ export interface PlayoffOutlook {
 }
 
 const CONFERENCE_STRENGTH: Record<string, number> = {
-  SEC: 0.08,
-  "Big Ten": 0.08,
-  Independent: 0.04,
-  ACC: 0,
-  "Big 12": 0,
+  SEC: 0.12,
+  "Big Ten": 0.12,
+  Independent: 0.06,
+  ACC: -0.03,
+  "Big 12": -0.01,
 };
 
 const NOTRE_DAME_SCHEDULE: Game[] = [
@@ -167,7 +167,7 @@ export function projectPlayoffField(
   for (const record of records) {
     if (selectedRecords.length === 11) break;
     if (champions.has(record.team)) continue;
-    if (isAccOrBig12(record) && accBig12Count >= 4) continue;
+    if (isAccOrBig12(record) && accBig12Count >= 3) continue;
 
     selectedRecords.push({
       ...record,

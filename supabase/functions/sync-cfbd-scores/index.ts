@@ -49,6 +49,11 @@ Deno.serve(async (request) => {
     auth: { persistSession: false },
   });
 
+  const { data: entriesLocked, error: lockError } = await supabase.rpc("lock_due_entries");
+  if (lockError) {
+    return Response.json({ error: "Entry deadline lock failed: " + lockError.message }, { status: 500 });
+  }
+
   const [{ data: teams, error: teamError }, { data: existingGames, error: gameError }] = await Promise.all([
     supabase.from("teams").select("id, cfbd_team").not("cfbd_team", "is", null),
     supabase.from("games").select("id, home_team_id, away_team_id").eq("season", season),
@@ -98,5 +103,6 @@ Deno.serve(async (request) => {
     received: incoming.length,
     matched: rows.length,
     skipped: incoming.length - rows.length,
+    entries_locked: entriesLocked ?? 0,
   });
 });

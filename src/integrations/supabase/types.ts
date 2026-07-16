@@ -65,8 +65,10 @@ export type Database = {
         Row: {
           away_score: number | null
           away_team_id: string
+          canonical_key: string | null
           cfbd_game_id: number | null
           completed_at: string | null
+          date_label: string | null
           home_score: number | null
           home_team_id: string
           id: string
@@ -81,8 +83,10 @@ export type Database = {
         Insert: {
           away_score?: number | null
           away_team_id: string
+          canonical_key?: string | null
           cfbd_game_id?: number | null
           completed_at?: string | null
+          date_label?: string | null
           home_score?: number | null
           home_team_id: string
           id?: string
@@ -97,8 +101,10 @@ export type Database = {
         Update: {
           away_score?: number | null
           away_team_id?: string
+          canonical_key?: string | null
           cfbd_game_id?: number | null
           completed_at?: string | null
+          date_label?: string | null
           home_score?: number | null
           home_team_id?: string
           id?: string
@@ -523,6 +529,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sync_2026_catalog: { Args: { catalog: Json }; Returns: number }
     }
     Enums: {
       ballot_status: "draft" | "submitted" | "locked"

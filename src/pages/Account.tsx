@@ -55,6 +55,9 @@ export default function Account() {
               <Button asChild className="w-full">
                 <Link to="/scorecards">View weekly scorecards</Link>
               </Button>
+              <Button asChild className="w-full" variant="secondary">
+                <Link to="/groups">Private groups</Link>
+              </Button>
               <Button variant="outline" onClick={() => signOut().catch((error) => toast.error(error.message))}>
                 Sign out
               </Button>

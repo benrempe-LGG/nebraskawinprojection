@@ -450,7 +450,7 @@ export type Database = {
       }
     }
     Enums: {
-      ballot_status: "draft" | "locked"
+      ballot_status: "draft" | "submitted" | "locked"
       game_status:
         | "scheduled"
         | "in_progress"
@@ -585,7 +585,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      ballot_status: ["draft", "locked"],
+      ballot_status: ["draft", "submitted", "locked"],
       game_status: [
         "scheduled",
         "in_progress",

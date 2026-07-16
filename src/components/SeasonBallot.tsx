@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { getBallotProgress, getSeasonGameIds } from "@/lib/ballot";
+import { getBallotProgress, getSeasonGameIds, getSeasonGames } from "@/lib/ballot";
+import { getTeamConference } from "@/lib/oddsmaker";
 import {
   GAME_PREDS_KEY,
   loadPredictionStore,
@@ -38,6 +39,33 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
   const percent = progress.totalGames
     ? Math.round((progress.decidedGames / progress.totalGames) * 100)
     : 0;
+
+  useEffect(() => {
+    if (!user) return;
+
+    const catalog = getSeasonGames().map(({ id, team, game }) => {
+      const teamIsHome = game.loc !== "AWAY";
+      const home = teamIsHome ? team : game.opponent;
+      const away = teamIsHome ? game.opponent : team;
+      return {
+        key: id,
+        week: game.week,
+        dateLabel: game.date,
+        home,
+        away,
+        homeConference: getTeamConference(home) || "",
+        awayConference: getTeamConference(away) || "",
+        neutral: game.loc === "NEUTRAL",
+        venue: game.venue,
+      };
+    });
+
+    (supabase as any)
+      .rpc("sync_2026_catalog", { catalog })
+      .then(({ error }: { error: { message: string } | null }) => {
+        if (error) toast.error("Schedule sync failed: " + error.message);
+      });
+  }, [user]);
 
   useEffect(() => {
     if (!user) {

@@ -52,6 +52,9 @@ export default function Account() {
           {user ? (
             <>
               <p className="text-sm">Signed in as <strong>{user.email}</strong></p>
+              <Button asChild className="w-full">
+                <Link to="/scorecards">View weekly scorecards</Link>
+              </Button>
               <Button variant="outline" onClick={() => signOut().catch((error) => toast.error(error.message))}>
                 Sign out
               </Button>

@@ -49,19 +49,29 @@ Deno.serve(async (request) => {
     auth: { persistSession: false },
   });
 
-  const { data: teams, error: teamError } = await supabase
-    .from("teams")
-    .select("id, cfbd_team")
-    .not("cfbd_team", "is", null);
+  const [{ data: teams, error: teamError }, { data: existingGames, error: gameError }] = await Promise.all([
+    supabase.from("teams").select("id, cfbd_team").not("cfbd_team", "is", null),
+    supabase.from("games").select("id, home_team_id, away_team_id").eq("season", season),
+  ]);
   if (teamError) return Response.json({ error: teamError.message }, { status: 500 });
+  if (gameError) return Response.json({ error: gameError.message }, { status: 500 });
 
   const teamIds = new Map((teams ?? []).map((team) => [team.cfbd_team, team.id]));
+  const gameIds = new Map(
+    (existingGames ?? []).map((game) => [
+      `${game.home_team_id}|${game.away_team_id}`,
+      game.id,
+    ]),
+  );
+
   const rows = incoming.flatMap((game) => {
     const homeTeamId = teamIds.get(game.home_team);
     const awayTeamId = teamIds.get(game.away_team);
     if (!homeTeamId || !awayTeamId) return [];
 
+    const existingId = gameIds.get(`${homeTeamId}|${awayTeamId}`);
     return [{
+      ...(existingId ? { id: existingId } : {}),
       season: game.season,
       week: game.week,
       kickoff_at: game.start_date,
@@ -78,9 +88,7 @@ Deno.serve(async (request) => {
   });
 
   if (rows.length) {
-    const { error } = await supabase
-      .from("games")
-      .upsert(rows, { onConflict: "cfbd_game_id" });
+    const { error } = await supabase.from("games").upsert(rows, { onConflict: "id" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
   }
 

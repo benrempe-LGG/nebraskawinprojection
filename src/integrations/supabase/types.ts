@@ -125,6 +125,73 @@ export type Database = {
           },
         ]
       }
+      group_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["group_role"]
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["group_role"]
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["group_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "prediction_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_groups: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          name: string
+          owner_id: string
+          season: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          name: string
+          owner_id: string
+          season: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          name?: string
+          owner_id?: string
+          season?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_groups_season_fkey"
+            columns: ["season"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["year"]
+          },
+        ]
+      }
       predictions: {
         Row: {
           ballot_id: string
@@ -264,6 +331,27 @@ export type Database = {
       }
     }
     Views: {
+      group_leaderboard: {
+        Row: {
+          accuracy: number | null
+          correct_picks: number | null
+          display_name: string | null
+          games_final: number | null
+          group_id: string | null
+          role: Database["public"]["Enums"]["group_role"] | null
+          user_id: string | null
+          weeks_scored: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "prediction_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_scorecards: {
         Row: {
           ballot_id: string | null
@@ -286,6 +374,46 @@ export type Database = {
       }
     }
     Functions: {
+      create_private_group: {
+        Args: { group_name: string; target_season?: number }
+        Returns: {
+          created_at: string
+          id: string
+          invite_code: string
+          name: string
+          owner_id: string
+          season: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "prediction_groups"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      is_group_member: {
+        Args: { target_group: string; target_user?: string }
+        Returns: boolean
+      }
+      join_private_group: {
+        Args: { code: string }
+        Returns: {
+          created_at: string
+          id: string
+          invite_code: string
+          name: string
+          owner_id: string
+          season: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "prediction_groups"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       lock_ballot: {
         Args: { target_ballot: string }
         Returns: {
@@ -304,6 +432,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      regenerate_group_invite: {
+        Args: { target_group: string }
+        Returns: string
+      }
     }
     Enums: {
       ballot_status: "draft" | "locked"
@@ -313,6 +445,7 @@ export type Database = {
         | "final"
         | "postponed"
         | "canceled"
+      group_role: "owner" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -448,6 +581,7 @@ export const Constants = {
         "postponed",
         "canceled",
       ],
+      group_role: ["owner", "member"],
     },
   },
 } as const

@@ -462,6 +462,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      lock_due_entries: { Args: never; Returns: number }
       regenerate_group_invite: {
         Args: { target_group: string }
         Returns: string

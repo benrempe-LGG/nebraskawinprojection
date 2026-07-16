@@ -392,6 +392,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_group_leaderboard: {
+        Args: { target_group: string }
+        Returns: {
+          accuracy: number
+          correct_picks: number
+          display_name: string
+          games_final: number
+          role: Database["public"]["Enums"]["group_role"]
+          user_id: string
+          weeks_scored: number
+        }[]
+      }
       is_group_member: {
         Args: { target_group: string; target_user?: string }
         Returns: boolean

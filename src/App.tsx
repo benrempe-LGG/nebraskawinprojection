@@ -9,11 +9,14 @@ import Standings from "./pages/Standings.tsx";
 import Playoff from "./pages/Playoff.tsx";
 import PickReview from "./pages/PickReview.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Account from "./pages/Account.tsx";
+import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <AuthProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -24,11 +27,13 @@ const App = () => (
           <Route path="/standings" element={<Standings />} />
           <Route path="/playoff" element={<Playoff />} />
           <Route path="/review" element={<PickReview />} />
+          <Route path="/account" element={<Account />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

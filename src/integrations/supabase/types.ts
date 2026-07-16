@@ -17,28 +17,37 @@ export type Database = {
       ballots: {
         Row: {
           created_at: string
+          draft_payload: Json
           id: string
           locked_at: string | null
+          locked_payload: Json | null
           season: number
           status: Database["public"]["Enums"]["ballot_status"]
+          submitted_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          draft_payload?: Json
           id?: string
           locked_at?: string | null
+          locked_payload?: Json | null
           season: number
           status?: Database["public"]["Enums"]["ballot_status"]
+          submitted_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          draft_payload?: Json
           id?: string
           locked_at?: string | null
+          locked_payload?: Json | null
           season?: number
           status?: Database["public"]["Enums"]["ballot_status"]
+          submitted_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -430,10 +439,13 @@ export type Database = {
         Args: { target_ballot: string }
         Returns: {
           created_at: string
+          draft_payload: Json
           id: string
           locked_at: string | null
+          locked_payload: Json | null
           season: number
           status: Database["public"]["Enums"]["ballot_status"]
+          submitted_at: string | null
           updated_at: string
           user_id: string
         }
@@ -447,6 +459,69 @@ export type Database = {
       regenerate_group_invite: {
         Args: { target_group: string }
         Returns: string
+      }
+      reopen_entry: {
+        Args: { target_season?: number }
+        Returns: {
+          created_at: string
+          draft_payload: Json
+          id: string
+          locked_at: string | null
+          locked_payload: Json | null
+          season: number
+          status: Database["public"]["Enums"]["ballot_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ballots"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      save_entry_draft: {
+        Args: { payload: Json; target_season?: number }
+        Returns: {
+          created_at: string
+          draft_payload: Json
+          id: string
+          locked_at: string | null
+          locked_payload: Json | null
+          season: number
+          status: Database["public"]["Enums"]["ballot_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ballots"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      submit_entry: {
+        Args: { expected_games: number; payload: Json; target_season?: number }
+        Returns: {
+          created_at: string
+          draft_payload: Json
+          id: string
+          locked_at: string | null
+          locked_payload: Json | null
+          season: number
+          status: Database["public"]["Enums"]["ballot_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ballots"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {

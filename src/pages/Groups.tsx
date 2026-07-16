@@ -31,7 +31,7 @@ export default function Groups() {
   const [selected, setSelected] = useState<Group | null>(null);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [name, setName] = useState("");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
   const [busy, setBusy] = useState(false);
 
   const loadGroups = useCallback(async () => {

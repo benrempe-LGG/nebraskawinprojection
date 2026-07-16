@@ -11,6 +11,7 @@ import PickReview from "./pages/PickReview.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Account from "./pages/Account.tsx";
 import Scorecards from "./pages/Scorecards.tsx";
+import Groups from "./pages/Groups.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/review" element={<PickReview />} />
             <Route path="/account" element={<Account />} />
             <Route path="/scorecards" element={<Scorecards />} />
+            <Route path="/groups" element={<Groups />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

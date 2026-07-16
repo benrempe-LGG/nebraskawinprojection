@@ -116,6 +116,13 @@ const Index = () => {
     saveStore(VEGAS_KEY, team, vegasTotal);
   }, [vegasTotal, team]);
 
+  // A signed-in entry may be restored from Supabase after the page first renders.
+  useEffect(() => {
+    const restoreCloudEntry = () => setWinPcts(loadPreds(team));
+    window.addEventListener("cloud-entry-loaded", restoreCloudEntry);
+    return () => window.removeEventListener("cloud-entry-loaded", restoreCloudEntry);
+  }, [team, loadPreds]);
+
   // When conference changes, pick first team in that conference
   const handleConfChange = useCallback((newConf: string) => {
     setConf(newConf);

@@ -1,13 +1,19 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { loadPredictionStore } from "@/lib/predictionStore";
+import {
+  getChampionshipGames,
+  loadChampionshipPicks,
+} from "@/lib/championships";
 import { projectPlayoffField } from "@/lib/playoff";
 
 const Playoff = () => {
-  const outlook = useMemo(
-    () => projectPlayoffField(loadPredictionStore(localStorage)),
-    []
-  );
+  const outlook = useMemo(() => {
+    const predictions = loadPredictionStore(localStorage);
+    const games = getChampionshipGames(predictions);
+    const championshipPicks = loadChampionshipPicks(localStorage, games);
+    return projectPlayoffField(predictions, championshipPicks);
+  }, []);
   const bySeed = new Map(outlook.teams.map((team) => [team.seed, team]));
   const label = (seed: number) => {
     if (seed === outlook.groupOfSixSeed) return "Highest-ranked G6 team";
@@ -24,8 +30,8 @@ const Playoff = () => {
           2026 Playoff Outlook
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-          Four projected P4 champions, seven P4 at-large teams, and one reserved
-          Group-of-6 position form this 12-team outlook.
+          Four user-selected P4 champions, seven P4 at-large teams, and one reserved
+          Group-of-6 position form this 12-team outlook after Championship Week.
         </p>
       </header>
 
@@ -43,16 +49,31 @@ const Playoff = () => {
           >
             Conference standings
           </Link>
+          <Link
+            to="/championships"
+            className="rounded-lg border border-primary bg-primary/10 px-4 py-2 text-sm font-bold text-accent hover:bg-primary hover:text-primary-foreground"
+          >
+            Championship Week
+          </Link>
         </div>
 
-        {!outlook.complete && (
+        {!outlook.championshipsComplete ? (
+          <div className="mb-6 rounded-lg border border-accent/40 bg-accent/10 p-5 text-sm text-accent">
+            <strong className="block text-base">Championship Week is incomplete.</strong>
+            Pick the ACC, Big 12, Big Ten, and SEC champions before the final
+            12-team field is revealed.
+            <Link to="/championships" className="mt-3 block font-black underline">
+              Pick conference champions →
+            </Link>
+          </div>
+        ) : !outlook.complete ? (
           <div className="mb-6 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm text-accent">
             This is a live outlook from the games entered so far. Complete and
             lock the full-season ballot for a final projection.
           </div>
-        )}
+        ) : null}
 
-        <section className="rounded-xl border border-border bg-surface p-5 shadow-lg">
+        <section className={(outlook.championshipsComplete ? "" : "hidden ") + "rounded-xl border border-border bg-surface p-5 shadow-lg"}>
           <h2 className="text-xl font-black text-foreground font-display">
             First-round byes
           </h2>
@@ -77,7 +98,7 @@ const Playoff = () => {
           </div>
         </section>
 
-        <section className="mt-6 rounded-xl border border-border bg-surface p-5 shadow-lg">
+        <section className={(outlook.championshipsComplete ? "" : "hidden ") + "mt-6 rounded-xl border border-border bg-surface p-5 shadow-lg"}>
           <h2 className="text-xl font-black text-foreground font-display">
             Campus first round
           </h2>
@@ -116,7 +137,7 @@ const Playoff = () => {
           -0.01 for Big 12 teams. ACC and Big 12 are normally capped at three
           combined selections, including their champions. Notre Dame is
           tracked against ten P4 opponents with assumed wins over Rice and Navy.
-          Conference leaders are treated as projected champions. Actual selection
+          Championship Week winners receive the four projected P4 automatic bids. Actual selection
           and seeding belong to the CFP committee and use more information than
           this model. The app does not yet contain G6 schedules, so seed 12 is
           reserved rather than invented.{" "}

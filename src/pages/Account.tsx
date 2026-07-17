@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,19 @@ const TEAM_OPTIONS = Object.keys(ALL_TEAMS).sort((a, b) => a.localeCompare(b));
 
 export default function Account() {
   const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [favoriteTeam, setFavoriteTeam] = useState("");
   const [savingTeam, setSavingTeam] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const postAuthPath = sessionStorage.getItem("post_auth_path");
+    if (!postAuthPath) return;
+    sessionStorage.removeItem("post_auth_path");
+    navigate(postAuthPath, { replace: true });
+  }, [navigate, user]);
 
   useEffect(() => {
     if (!user) {

@@ -15,6 +15,7 @@ import GameRow from "@/components/GameRow";
 import SummaryCards from "@/components/SummaryCards";
 import WinDistribution from "@/components/WinDistribution";
 import SeasonBallot from "@/components/SeasonBallot";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   loadTeamPredictions,
   saveTeamGamePrediction,
@@ -28,6 +29,7 @@ const CONF_ABBR: Record<string, string> = {
 };
 
 const VEGAS_KEY = "oddsmaker_vegas_totals";
+const FAVORITE_TEAM_KEY = "oddsmaker_favorite_team";
 
 const isValidPct = (v: string) =>
   /^\d{0,3}\.?\d{0,2}$/.test(v) && v !== "" && parseFloat(v) <= 100;
@@ -73,9 +75,19 @@ function saveStore(key: string, team: string, value: unknown) {
 
 const SHARED = parseShareUrl();
 
+function getSavedFavoriteTeam() {
+  try {
+    const saved = localStorage.getItem(FAVORITE_TEAM_KEY);
+    return saved && ALL_TEAMS[saved] ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
 const Index = () => {
+  const { user } = useAuth();
   const confList = useMemo(() => Object.keys(CONFERENCES).sort(), []);
-  const initialTeam = SHARED?.team || "Nebraska";
+  const initialTeam = SHARED?.team || getSavedFavoriteTeam() || "Nebraska";
   const [conf, setConf] = useState(getTeamConference(initialTeam) || "Big Ten");
   const [team, setTeam] = useState(initialTeam);
 
@@ -122,6 +134,35 @@ const Index = () => {
     window.addEventListener("cloud-entry-loaded", restoreCloudEntry);
     return () => window.removeEventListener("cloud-entry-loaded", restoreCloudEntry);
   }, [team, loadPreds]);
+
+  useEffect(() => {
+    if (!user || SHARED) return;
+
+    let active = true;
+    supabase
+      .from("profiles")
+      .select("favorite_team")
+      .eq("id", user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (!active || error) return;
+
+        const favoriteTeam = data?.favorite_team;
+        if (favoriteTeam && ALL_TEAMS[favoriteTeam]) {
+          localStorage.setItem(FAVORITE_TEAM_KEY, favoriteTeam);
+          setConf(getTeamConference(favoriteTeam) || "Big Ten");
+          setTeam(favoriteTeam);
+        } else {
+          localStorage.removeItem(FAVORITE_TEAM_KEY);
+          setConf(getTeamConference("Nebraska") || "Big Ten");
+          setTeam("Nebraska");
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   // When conference changes, pick first team in that conference
   const handleConfChange = useCallback((newConf: string) => {

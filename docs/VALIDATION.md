@@ -1,28 +1,41 @@
 # Validation Record
 
-## 2026-07-15 — Feature branch
+## 2026-07-17 — Account integration branch
 
-Branch: `feature/season-prediction-foundation`  
-PR: [#1](https://github.com/benrempe-LGG/nebraskawinprojection/pull/1)
+Branch: `feature/accounts-scorecards-foundation`  
+PR: [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2)
 
-GitHub Actions run 60 completed successfully at release-candidate commit `d834e0511556529d50c6fb533acfc1cd065462a7`.
+GitHub Actions run 106 completed successfully at `94d60436148cfb80ef6c8bdd91694467f1d290a0`.
 
-CI commands:
+CI results:
 
-- `npm ci` — passed
+- `npm install` — passed
 - `npm test` — passed
 - `npm run build` — passed
-- production artifact upload — passed
+- preview artifact upload — passed
 
-Coverage includes canonical cross-team prediction behavior, date-disagreement synchronization, ballot completion and locking, conference schedule counts, uniqueness, reciprocity, and all-P4 schedule integrity. The official 2026 schedule audit is recorded in `docs/SCHEDULE_AUDIT.md`.
+Automated coverage includes canonical cross-team predictions, schedule integrity, standings, Notre Dame/playoff selection, and the requirement that the playoff remains incomplete until all four P4 championship games are picked.
 
-Not validated in this environment:
+Manual evidence recorded during the session:
 
+- Lovable production/live test was reported working before the later feature additions.
+- Google OAuth initially failed because Google lacked the exact Supabase callback.
+- Google OAuth passed after registering `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`.
+- Championship and private-group navigation changes built successfully, but were not yet recorded as live multi-account tests.
+
+Not validated:
+
+- exact set of applied Lovable migrations
+- cross-device draft restore and locked-entry restore
+- Apple and email-link authentication
+- two-account private-group create/join/leaderboard flow
+- championship cloud persistence
+- CFBD score ingestion and weekly scoring with real final games
+- deadline scheduler/automatic lock execution
+- manual mobile and desktop smoke suite
 - `npm run lint`
-- an explicit TypeScript-only check
-- end-to-end browser automation
-- manual mobile and desktop interaction
-- localStorage migration with a real pre-upgrade browser profile
-- GitHub Pages and Lovable production behavior after merge
+- a dedicated TypeScript-only command
+- browser end-to-end automation
+- post-merge GitHub Pages and Lovable deployments
 
-A green build is not treated as validation of these untested areas.
+A green build is not evidence that external OAuth, database migrations, Edge Functions, scheduled jobs, or cross-device behavior are configured.

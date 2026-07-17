@@ -18,6 +18,8 @@ export interface ProjectedStanding {
   overallWins: number;
   overallLosses: number;
   overallUndecided: number;
+  expectedWins: number;
+  expectedConferenceWins: number;
   projectedGames: number;
   totalConferenceGames: number;
   winPercentage: number;
@@ -40,6 +42,8 @@ export function computeConferenceStandings(
       overallWins: 0,
       overallLosses: 0,
       overallUndecided: 0,
+      expectedWins: 0,
+      expectedConferenceWins: 0,
       projectedGames: 0,
       totalConferenceGames: ALL_TEAMS[team].schedule.filter((game) =>
         isConferenceGame(game.opponent, team)
@@ -71,6 +75,8 @@ export function computeConferenceStandings(
 
       teamRow.projectedGames += 1;
       opponentRow.projectedGames += 1;
+      teamRow.expectedConferenceWins += probability / 100;
+      opponentRow.expectedConferenceWins += 1 - probability / 100;
 
       const winner = getProjectedWinner(team, game, probability);
       if (!winner) {
@@ -96,7 +102,11 @@ export function computeConferenceStandings(
       const value = getTeamGamePrediction(predictions, team, game);
       if (value === "") continue;
 
-      const winner = getProjectedWinner(team, game, value);
+      const probability = Number.parseFloat(value);
+      if (!Number.isFinite(probability)) continue;
+      row.expectedWins += probability / 100;
+
+      const winner = getProjectedWinner(team, game, probability);
       if (!winner) row.overallUndecided += 1;
       else if (winner === team) row.overallWins += 1;
       else row.overallLosses += 1;

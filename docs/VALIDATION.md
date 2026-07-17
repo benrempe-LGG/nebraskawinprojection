@@ -5,7 +5,7 @@
 Branch: `feature/accounts-scorecards-foundation`  
 PR: [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2)
 
-GitHub Actions run 106 completed successfully at `94d60436148cfb80ef6c8bdd91694467f1d290a0`.
+Feature-head GitHub Actions run 106 completed successfully at `94d60436148cfb80ef6c8bdd91694467f1d290a0`. Documentation-head run 113 also completed successfully at `c0f8743d75883195be6ab399ac81aad630d9a552`.
 
 CI results:
 

@@ -108,7 +108,13 @@ export default function Groups() {
   }
 
   if (authLoading) return <main className="container py-12">Loading groups…</main>;
-  if (!user) return <Navigate to="/account" replace />;
+  if (!user) {
+    const invitePath = code
+      ? `/groups?code=${encodeURIComponent(code)}`
+      : "/groups";
+    sessionStorage.setItem("post_auth_path", invitePath);
+    return <Navigate to="/account" replace />;
+  }
 
   return (
     <main className="container max-w-4xl py-12">

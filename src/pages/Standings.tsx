@@ -25,12 +25,18 @@ const Standings = () => {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-7">
+        <div className="mb-7 flex flex-wrap gap-3">
           <Link
             to="/"
             className="inline-flex rounded-lg border border-border bg-muted px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:text-accent"
           >
             ← Back to predictions
+          </Link>
+          <Link
+            to="/championships"
+            className="inline-flex rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Championship Week →
           </Link>
         </div>
 

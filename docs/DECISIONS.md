@@ -1,45 +1,67 @@
 # Decision Log
 
+## 2026-07-17 — Lovable Cloud as the application backend
+
+Decision: use Lovable's Supabase-compatible database and authentication rather than require a separately visible Supabase project.
+
+Rationale: it is native to the current deployment workflow and already supports authentication, RLS, migrations, RPCs, and Edge Functions.
+
+Consequences: database state and migrations must be verified through Lovable. A repository migration is not evidence that production has applied it.
+
+## 2026-07-17 — Entry lifecycle
+
+Decision: model a March Madness-style entry as draft, submitted, then locked at the deadline.
+
+Rationale: users understand an entry that can be revised before a deadline better than an immediate irreversible lock.
+
+Consequences: scorecards must use the immutable locked payload. Submitted entries may reopen only before the deadline.
+
+## 2026-07-17 — Favorite-team personalization
+
+Decision: store a signed-in user's favorite team in their profile and cache it locally.
+
+Rationale: the predictor should open on the user's team instead of always defaulting to Nebraska.
+
+## 2026-07-17 — Championship Week gates the playoff
+
+Decision: derive the top two teams from each P4 conference, require the user to pick all four championship games, adjust participant records, and only then reveal the playoff field.
+
+Rationale: the playoff field should reflect conference title-game outcomes rather than treating regular-season leaders as champions.
+
+Consequence: official conference tiebreakers remain simplified. Championship picks must be added to cloud entry persistence.
+
+## 2026-07-17 — Private groups use invitation codes
+
+Decision: groups are private by default and joined through an eight-character code or shareable link.
+
+Rationale: it provides a low-friction friends-and-family competition without public discovery or complex moderation.
+
+Consequence: commissioner controls are currently limited, and two-account production testing is required.
+
 ## 2026-07-15 — Canonical matchup identity
 
-Decision: identify a game by season and alphabetically ordered team pair, excluding date.
+Decision: identify a regular-season game by season and alphabetically ordered team pair, excluding date.
 
-Rationale: team schedule sources disagreed on dates and created duplicate records for the same matchup.
+Rationale: source schedules disagreed on dates and created duplicate records.
 
-Consequences: picks synchronize from either schedule and legacy records can collapse safely. A rematch in the same season would require an expanded identifier.
+Consequence: both team pages stay synchronized; same-season rematches require a distinct identity layer.
 
 ## 2026-07-15 — Home team breaks a 50% tie
 
 Decision: a 50% home game defaults to the home team; a neutral 50% game remains unresolved.
 
-Rationale: it gives an actionable default consistent with home-field advantage while preserving ambiguity at neutral sites.
-
-## 2026-07-15 — Local-first ballot snapshots
-
-Decision: store immutable locked ballots in browser localStorage for the foundation release.
-
-Rationale: it delivers the workflow without blocking on authentication and backend design.
-
-Consequence: ballots are not recoverable across devices or after storage is cleared.
-
-## 2026-07-15 — ACC transition schedule
-
-Decision: model the official 2026 transition with 12 ACC teams playing nine league games and Boston College, Clemson, Florida State, Georgia Tech, and North Carolina playing eight.
-
 ## 2026-07-15 — Transparent playoff proxy
 
-Decision: favor SEC and Big Ten résumés, track Notre Dame separately, normally cap ACC and Big 12 at three combined selections, and reserve a G6 slot.
+Decision: favor SEC and Big Ten résumés, track Notre Dame separately, normally constrain ACC/Big 12 representation, and reserve a G6 slot.
 
-Rationale: this matched the intended modern committee behavior better than conference-balanced selection.
+Consequence: coefficients are assumptions and require continued scenario testing.
 
-Consequence: the coefficients are product assumptions and need scenario tests before becoming a durable ranking model.
+## Decision required — Merge readiness
 
-## Decision required — Production positioning
+Conflict: feature code and CI are healthy, but live migration state, cross-device entries, private groups, Apple/email authentication, CFBD synchronization, and championship cloud persistence are not fully validated.
 
-Conflict: the feature set is compelling, but the full schedule/date audit and manual device QA are incomplete.
+Options: merge now as an explicitly incomplete beta, or complete integration testing and championship persistence first.
 
-Options: launch immediately as production, launch explicitly as beta after the audit, or keep the feature branch private.
+Recommendation: complete the integration-beta exit criteria before merging PR #2.
 
-Recommendation: complete the audit and QA, then launch as a labeled public beta.
-
-Impact of delay: the current production site remains on the older feature set, but avoids publishing known schedule uncertainty.
+Impact of delay: production remains stable while the feature branch receives validation and avoids exposing partially configured account workflows.

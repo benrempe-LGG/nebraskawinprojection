@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,11 +6,66 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ALL_TEAMS } from "@/lib/oddsmaker";
+
+const FAVORITE_TEAM_KEY = "oddsmaker_favorite_team";
+const TEAM_OPTIONS = Object.keys(ALL_TEAMS).sort((a, b) => a.localeCompare(b));
 
 export default function Account() {
   const { user, loading, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [favoriteTeam, setFavoriteTeam] = useState("");
+  const [savingTeam, setSavingTeam] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setFavoriteTeam("");
+      return;
+    }
+
+    let active = true;
+    supabase
+      .from("profiles")
+      .select("favorite_team")
+      .eq("id", user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) {
+          toast.error("Could not load your favorite team: " + error.message);
+          return;
+        }
+        const savedTeam = data?.favorite_team || "";
+        setFavoriteTeam(savedTeam);
+        if (savedTeam && ALL_TEAMS[savedTeam]) {
+          localStorage.setItem(FAVORITE_TEAM_KEY, savedTeam);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function saveFavoriteTeam() {
+    if (!user || !favoriteTeam) return;
+    setSavingTeam(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ favorite_team: favoriteTeam })
+      .eq("id", user.id);
+    setSavingTeam(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    localStorage.setItem(FAVORITE_TEAM_KEY, favoriteTeam);
+    window.dispatchEvent(new CustomEvent("favorite-team-changed", { detail: favoriteTeam }));
+    toast.success(favoriteTeam + " will open first when you sign in.");
+  }
 
   const redirectTo = new URL("account", new URL(import.meta.env.BASE_URL, window.location.origin)).toString();
 
@@ -60,6 +115,33 @@ export default function Account() {
           {user ? (
             <>
               <p className="text-sm">Signed in as <strong>{user.email}</strong></p>
+              <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4">
+                <label htmlFor="favorite-team" className="text-sm font-bold text-foreground">
+                  Your team
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  This team's schedule will open first whenever you sign in.
+                </p>
+                <select
+                  id="favorite-team"
+                  value={favoriteTeam}
+                  onChange={(event) => setFavoriteTeam(event.target.value)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="">Choose your team</option>
+                  {TEAM_OPTIONS.map((team) => (
+                    <option key={team} value={team}>{team}</option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  className="w-full"
+                  disabled={!favoriteTeam || savingTeam}
+                  onClick={saveFavoriteTeam}
+                >
+                  {savingTeam ? "Saving…" : "Save my team"}
+                </Button>
+              </div>
               <Button asChild className="w-full">
                 <Link to="/scorecards">View weekly scorecards</Link>
               </Button>

@@ -1,61 +1,62 @@
-# P4 Oddsmaker — Architecture and Design
+# Architecture
 
-Updated: 2026-07-15
+Updated: 2026-07-17
 
-## Runtime and routes
+## System boundary
 
-The application is a Vite 5, React 18, and TypeScript single-page application styled with Tailwind and shadcn/ui. React Router exposes:
+The product is a Vite/React/TypeScript single-page application deployed through Lovable and GitHub Pages. Lovable Cloud provides the Supabase-compatible authentication and PostgreSQL backend used by the feature branch. GitHub remains the source repository and CI surface.
 
-- `/` — team calculator
-- `/analytics` — expected-win analytics
-- `/review` — missing and 50% game review
-- `/standings` — conference and overall projected records
-- `/playoff` — 12-team committee-proxy outlook
+## Client
 
-There is no application backend.
+`src/pages/Index.tsx` drives team schedule picking. `predictionStore.ts` assigns a canonical season/team-pair key so one probability updates both schedules. LocalStorage remains the immediate client cache and supports unsigned use.
 
-## Core data flow
+Derived modules are intentionally one-way:
 
-```text
-2026 schedule data
-  -> canonical matchup ID (season + ordered team pair)
-  -> browser localStorage prediction
-  -> team calculator / review / standings / playoff / locked ballot
-```
+1. Canonical regular-season picks
+2. Conference and overall standings
+3. P4 Championship Week participants and winners
+4. Championship-adjusted playoff résumés
+5. Final playoff field
 
-`src/lib/oddsmaker.ts` contains compact team schedules, spread math, and ACC/Big 12 conference-opponent normalization. `predictionStore.ts` stores one percentage per matchup and returns the complementary value from the opponent's perspective. IDs intentionally exclude dates because source schedules previously disagreed and produced duplicate games.
+The playoff page remains gated until all four P4 championship winners are selected.
 
-`ballot.ts` enumerates unique season matchups, calculates completion, and stores immutable snapshots. `standings.ts` derives conference and overall records. `playoff.ts` builds records, tracks Notre Dame, applies a transparent conference-strength proxy, selects projected champions and at-large teams, and reserves seed 12 for an unspecified G6 champion.
+## Identity and cloud entries
 
-## Calculator and sharing
+`AuthContext.tsx` wraps Supabase session state. `Account.tsx` exposes Google, Apple, and email-link entry points plus favorite-team selection. Group invitation destinations are temporarily stored in sessionStorage so OAuth return can continue the invitation.
 
-Per-game probabilities feed a logit-based implied spread with 2.75 points of home-field advantage and a dynamic-programming win distribution. Team projections can be shared through query parameters, copied as forum text, or exported as images.
+`SeasonBallot.tsx` bridges local predictions and Supabase RPCs. The modeled lifecycle is:
 
-## Persistence and migration
+`draft -> submitted -> locked`
 
-All mutable state is local to the browser. Predictions and locked ballots use versioned localStorage keys. Migration code collapses legacy per-team and date-based records into canonical matchups. There is no user identity, remote database, telemetry, or server API.
+Submitted entries may reopen before the configured deadline. Locked entries preserve an immutable payload. Database RLS restricts users to their own mutable data.
 
-## Schedule data
+## Database
 
-Schedules are hardcoded and expanded into `ALL_TEAMS` and `CONFERENCES`. Conference detection cross-references the opponent's conference. Official 2026 ACC and Big 12 opponent matrices are normalized at runtime and tested for expected counts, uniqueness, and reciprocal listings.
+Migrations define profiles, seasons, teams, games, ballots, predictions, results, private groups, group membership, scorecards, RPCs, entry deadlines, and favorite-team preference. Migrations must be applied sequentially in Lovable Cloud; repository presence does not prove deployment.
 
-The full P4 opponent/date/location audit remains a production-beta blocker. See `KNOWN_ISSUES.md`.
+Private groups use generated invite codes. Membership gates group reads. A security-definer leaderboard RPC exposes only aggregate scorecard results to fellow group members.
 
-## Deployment
+## Scores
 
-- `.github/workflows/ci.yml` runs `npm ci`, `npm test`, and `npm run build` for pull requests and `main`.
-- `.github/workflows/deploy.yml` deploys GitHub Pages from `main` using `DEPLOY_BASE_PATH=/nebraskawinprojection/`.
-- Lovable is a separate root-hosted preview/deployment surface.
+`supabase/functions/sync-cfbd-scores/index.ts` is the score-ingestion foundation. Provider credentials must remain server-side. Weekly scorecards compare a locked entry's normalized predictions with final game results.
 
-## Security history
+## Persistence boundary
 
-An Odds API key was committed and removed from source and Git history in June 2026. The old integration was deleted because it returned game totals rather than season win totals. Confirm the key was rotated at the provider; no runtime API key is currently required.
+Regular-season picks use localStorage for responsive unsigned behavior and can be saved into the signed-in Supabase entry. Favorite team is stored in the profile and cached locally. Championship selections currently use localStorage only; this is the principal persistence gap before integration beta completion.
+
+## Deployment and configuration
+
+- Lovable: primary hosted application and database configuration surface
+- GitHub Pages: static mirror deployed from `main`
+- GitHub Actions: Node 22, install, tests, build, preview artifact
+- Google OAuth callback observed for the Lovable Cloud project: `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`
+
+Do not document or commit OAuth client secrets, CFBD keys, service-role keys, or private provider credentials.
 
 ## Constraints
 
-- Schedule accuracy is source-data dependent.
-- Conference tiebreakers and championship games are simplified.
-- The playoff output is an explainable heuristic, not an official ranking.
-- G6 schedules are absent.
-- Local-only storage prevents cross-device recovery.
-- A same-season rematch would require expanding the current canonical game ID.
+- The playoff model is an explainable heuristic, not an official ranking.
+- The top two conference rows determine title-game participants; official tiebreaker trees are not implemented.
+- G6 selection is a reserved slot, not a ranked G6 schedule.
+- The canonical team-pair key would need expansion for same-season rematches outside the generated championship layer.
+- CI does not replace live Lovable database, OAuth, mobile, or cross-device testing.

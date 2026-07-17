@@ -493,6 +493,12 @@ const Index = () => {
           🏈 2026 Playoff Outlook
         </Link>
         <Link
+          to="/groups"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          👥 Private Groups
+        </Link>
+        <Link
           to="/analytics"
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-muted hover:bg-primary hover:text-primary-foreground text-muted-foreground font-bold text-sm tracking-wide transition-colors duration-200 font-display"
         >

@@ -481,6 +481,12 @@ const Index = () => {
           🏆 Projected Conference Standings
         </Link>
         <Link
+          to="/championships"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
+        >
+          🏟️ Championship Week
+        </Link>
+        <Link
           to="/playoff"
           className="flex items-center gap-2 px-6 py-3 rounded-lg border border-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground text-accent font-bold text-sm tracking-wide transition-colors duration-200 font-display"
         >

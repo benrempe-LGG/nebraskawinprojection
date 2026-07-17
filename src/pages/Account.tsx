@@ -34,6 +34,14 @@ export default function Account() {
     if (error) toast.error(error.message);
   }
 
+  async function signInWithApple() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
+      options: { redirectTo },
+    });
+    if (error) toast.error(error.message);
+  }
+
   if (loading) return <main className="container py-12">Loading account…</main>;
 
   return (
@@ -65,6 +73,7 @@ export default function Account() {
           ) : (
             <>
               <Button className="w-full" onClick={signInWithGoogle}>Continue with Google</Button>
+              <Button className="w-full" variant="outline" onClick={signInWithApple}>Continue with Apple</Button>
               <div className="text-center text-xs text-muted-foreground">or use a secure email link</div>
               <form className="space-y-3" onSubmit={sendMagicLink}>
                 <Input

@@ -1,28 +1,34 @@
 # Changelog
 
-## [Unreleased] — 2026-07-15
+## [Unreleased] — 2026-07-17
 
 ### Added
 
-- Canonical season matchup storage with complementary cross-team probabilities
-- Legacy per-team and date-based prediction migration
-- Full-season progress, missing-game review, 50% review, and immutable local ballot locks
-- Projected conference standings and overall records
-- Weighted playoff outlook with Notre Dame and a reserved G6 slot
-- ACC and Big 12 conference schedule integrity validation
-- Pull-request CI for tests, production build, and preview artifact
-- Canonical roadmap, architecture, decisions, known issues, validation, and handoff documents
+- Lovable Cloud/Supabase schema for profiles, seasons, games, entries, predictions, results, and weekly scorecards
+- Google, Apple, and email-link authentication surfaces
+- Draft, submitted, reopen-before-deadline, and locked entry lifecycle
+- Cloud entry restore and scoreable canonical game catalog foundations
+- Private groups with invite codes, membership RLS, aggregate leaderboards, and OAuth return
+- Favorite-team profile preference and personalized default schedule
+- Next Team schedule navigation
+- Predicted overall and conference wins in standings
+- P4 Championship Week derived from conference standings
+- Playoff gating until all four championship winners are selected
+- CFBD score-sync Edge Function foundation
 
 ### Changed
 
-- A 50% home game now defaults to the home-field favorite; neutral 50% games remain unresolved
-- 2026 ACC and Big 12 league matchups are normalized to official opponent matrices
-- Playoff selection favors SEC and Big Ten résumés and normally caps ACC/Big 12 at three combined teams
+- Championship outcomes now adjust participant records and determine P4 champion bids
+- The account milestone uses Lovable's native Supabase-compatible backend
+- CI uses Node 22 and validates tests plus production build
+- Project documentation now distinguishes feature-branch code, applied migrations, preview state, and production deployment
 
 ### Known limitations
 
-- Full P4 opponent/date/location audit and manual release QA remain incomplete
-- Accounts, cloud saving, conference championship simulation, specific G6 selection, and week-by-week full-slate picking are not implemented
+- Championship selections remain browser-local and are not included in the cloud entry payload
+- Lovable migration state and two-account group behavior require recorded live verification
+- Apple/email authentication, CFBD score sync, automatic deadline locking, and cross-device restore remain incompletely validated
+- Week-by-week full-slate picking and a ranked G6 champion are not implemented
 
 ---
 

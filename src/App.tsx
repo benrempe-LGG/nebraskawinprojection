@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import Analytics from "./pages/Analytics.tsx";
 import Standings from "./pages/Standings.tsx";
 import Playoff from "./pages/Playoff.tsx";
+import ChampionshipWeek from "./pages/ChampionshipWeek.tsx";
 import PickReview from "./pages/PickReview.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Account from "./pages/Account.tsx";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/standings" element={<Standings />} />
+            <Route path="/championships" element={<ChampionshipWeek />} />
             <Route path="/playoff" element={<Playoff />} />
             <Route path="/review" element={<PickReview />} />
             <Route path="/account" element={<Account />} />

@@ -16,6 +16,7 @@ import SummaryCards from "@/components/SummaryCards";
 import WinDistribution from "@/components/WinDistribution";
 import SeasonBallot from "@/components/SeasonBallot";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   loadTeamPredictions,
   saveTeamGamePrediction,

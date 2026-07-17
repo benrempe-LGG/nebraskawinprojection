@@ -9,6 +9,12 @@ import {
   type GamePredictionStore,
 } from "@/lib/predictionStore";
 import { computeConferenceStandings } from "@/lib/standings";
+import {
+  championshipPicksComplete,
+  getChampionshipGames,
+  type ChampionshipGame,
+  type ChampionshipPicks,
+} from "@/lib/championships";
 
 export interface ProjectedTeamRecord {
   team: string;
@@ -31,6 +37,7 @@ export interface PlayoffOutlook {
   teams: PlayoffTeam[];
   groupOfSixSeed: 12;
   complete: boolean;
+  championshipsComplete: boolean;
 }
 
 const CONFERENCE_STRENGTH: Record<string, number> = {
@@ -145,15 +152,63 @@ function isAccOrBig12(record: ProjectedTeamRecord): boolean {
   return record.conference === "ACC" || record.conference === "Big 12";
 }
 
+function refreshRecord(record: ProjectedTeamRecord) {
+  const decided = record.wins + record.losses;
+  record.winPercentage = decided ? record.wins / decided : 0;
+  record.selectionScore =
+    record.winPercentage + (CONFERENCE_STRENGTH[record.conference] || 0);
+}
+
+function applyChampionshipResults(
+  records: ProjectedTeamRecord[],
+  games: ChampionshipGame[],
+  picks: ChampionshipPicks
+) {
+  const byTeam = new Map(records.map((record) => [record.team, record]));
+
+  games.forEach((game) => {
+    const winnerName = picks[game.conference];
+    if (winnerName !== game.firstTeam && winnerName !== game.secondTeam) return;
+
+    const loserName =
+      winnerName === game.firstTeam ? game.secondTeam : game.firstTeam;
+    const winner = byTeam.get(winnerName);
+    const loser = byTeam.get(loserName);
+    if (!winner || !loser) return;
+
+    winner.wins += 1;
+    winner.pickedGames += 1;
+    winner.totalGames += 1;
+    loser.losses += 1;
+    loser.pickedGames += 1;
+    loser.totalGames += 1;
+    refreshRecord(winner);
+    refreshRecord(loser);
+  });
+
+  records.sort(compareRecords);
+}
+
 export function projectPlayoffField(
-  predictions: GamePredictionStore
+  predictions: GamePredictionStore,
+  championshipPicks: ChampionshipPicks = {}
 ): PlayoffOutlook {
   const records = computeProjectedTeamRecords(predictions);
-  const recordByTeam = new Map(records.map((record) => [record.team, record]));
   const standings = computeConferenceStandings(predictions);
+  const championshipGames = getChampionshipGames(predictions);
+  const championshipsComplete = championshipPicksComplete(
+    championshipGames,
+    championshipPicks
+  );
+  applyChampionshipResults(records, championshipGames, championshipPicks);
+  const recordByTeam = new Map(records.map((record) => [record.team, record]));
 
-  const championNames = Object.keys(CONFERENCES)
-    .map((conference) => standings[conference]?.[0]?.team)
+  const championNames = championshipGames
+    .map(
+      (game) =>
+        championshipPicks[game.conference] ||
+        standings[game.conference]?.[0]?.team
+    )
     .filter((team): team is string => Boolean(team));
   const champions = new Set(championNames);
   const selectedRecords: Array<
@@ -184,7 +239,8 @@ export function projectPlayoffField(
       seed: index + 1,
     })),
     groupOfSixSeed: 12,
-    complete: records.every(
+    championshipsComplete,
+    complete: championshipsComplete && records.every(
       (record) =>
         record.pickedGames === record.totalGames && record.undecided === 0
     ),

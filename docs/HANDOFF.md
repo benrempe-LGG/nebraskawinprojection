@@ -1,19 +1,24 @@
 # Engineering Handoff
 
-Updated: 2026-07-15
+Updated: 2026-07-17
 
 ## Exact stopping point
 
-Draft PR [#1](https://github.com/benrempe-LGG/nebraskawinprojection/pull/1) is open and mergeable from `feature/season-prediction-foundation` into `main`. Latest reviewed commit before documentation reconciliation was `3d1aacd2c8a04241d5c9455cac00d60b65e1ffab`; CI run 42 passed tests and production build.
+Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable from `feature/accounts-scorecards-foundation` into `main`. The last feature commit before this documentation reconciliation was `94d60436148cfb80ef6c8bdd91694467f1d290a0`.
 
-The feature foundation is implemented: canonical shared matchups, migration, season progress, locked local ballots, missing/50% review, conference and overall records, normalized ACC/Big 12 conference schedules, Notre Dame tracking, and weighted playoff projection.
+The feature branch contains accounts, cloud entry RPCs, weekly scorecard foundations, private groups, favorite-team defaults, Next Team navigation, projected wins, and a Championship Week step that gates the playoff.
 
 ## Working state
 
-- GitHub connector writes directly to the remote feature branch; no local checkout was available in the working directory.
-- The PR remains draft and production `main` has not been changed.
-- GitHub Pages deploys on pushes to `main`; Lovable is a separate preview/deployment surface.
-- Current persistence is localStorage only.
+- GitHub connector writes directly to the remote feature branch; this Codex workspace is not a local checkout of the repository.
+- PR #2 remains draft. Do not merge solely because CI is green.
+- Latest pre-handoff CI run 106 passed tests and production build.
+- Google OAuth was manually confirmed working after registering the exact Lovable Cloud callback.
+- Regular-season entry persistence is implemented in code; live cross-device behavior still needs recorded validation.
+- Championship picks remain localStorage-only.
+- Private-group UI and RPCs exist, but two-account live testing is outstanding.
+- Lovable database migration state must be checked rather than inferred from Git.
+- Production deployment state may lag this branch.
 
 ## Read first
 
@@ -23,27 +28,33 @@ The feature foundation is implemented: canonical shared matchups, migration, sea
 4. `docs/ARCHITECTURE.md`
 5. `docs/DECISIONS.md`
 6. `docs/VALIDATION.md`
+7. PR #2
 
 ## Recommended next tasks
 
-1. Audit all 2026 P4 opponents, dates, locations, and neutral-site flags against official sources; eliminate `TBD` normalized dates.
-2. Add final schedule fixtures and migration regression tests.
-3. Run lint plus manual desktop/mobile smoke tests, recording results in `docs/VALIDATION.md`.
-4. Update PR #1 body, mark ready, merge, and verify both production deployments.
-5. Start the Next milestone: a week-by-week full P4 slate that reuses canonical matchup storage.
+1. Reconcile and apply all Lovable migrations.
+2. Persist Championship Week picks in versioned cloud entry payloads and locked snapshots.
+3. Run two-account group and cross-device entry tests.
+4. Validate Apple/email auth, CFBD score sync, deadline locking, and weekly scorecards.
+5. Run mobile/desktop smoke tests, update PR #2, mark ready, merge, and verify both hosted surfaces.
 
-## Unvalidated state
+## Restart instructions
 
-See `docs/VALIDATION.md`. Do not infer that CI covers mobile layout, sharing/export, real-browser migration, or deployment after merge.
+Repository: `benrempe-LGG/nebraskawinprojection`  
+Branch: `feature/accounts-scorecards-foundation`  
+PR: https://github.com/benrempe-LGG/nebraskawinprojection/pull/2  
+Lovable project: https://lovable.dev/projects/aa959e7e-80e8-43d4-b07c-fd05e6b0a950
 
-## Restart commands
+Local commands:
 
 ```sh
 git clone https://github.com/benrempe-LGG/nebraskawinprojection.git
 cd nebraskawinprojection
-git switch feature/season-prediction-foundation
-npm ci
+git switch feature/accounts-scorecards-foundation
+npm install
+npm test
+npm run build
 npm run dev
 ```
 
-Then run `npm run lint`, `npm test`, and `npm run build` before making release decisions.
+Then inspect the Lovable migration/database state before changing application behavior.

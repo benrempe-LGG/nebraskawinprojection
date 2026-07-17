@@ -1,45 +1,39 @@
 # Product Roadmap
 
-Updated: 2026-07-15
+Updated: 2026-07-17
 
-## Now — Production beta readiness
+## Now — Finish the account integration beta
 
-Goal: make the current season predictor safe to merge and label as a public beta.
+Goal: prove that the feature branch works against the actual Lovable Cloud database before merging PR #2.
 
-- Complete an official-source audit of every 2026 P4 opponent, date, location, and neutral-site designation.
-- Remove all temporary `TBD` normalized schedule dates.
-- Verify saved prediction migration after the final schedule dataset is installed.
-- Run manual desktop and mobile QA for picking, shared games, review, standings, playoff, locking, and sharing.
-- Reconcile PR #1 description with the implemented model and documentation.
-- Merge the draft PR and verify both GitHub Pages and Lovable production deployments.
+- Apply and verify every migration in `supabase/migrations/`, including `202607170001_profile_favorite_team.sql`.
+- Test account creation and return sign-in with Google; verify Apple and email-link flows separately.
+- Test draft save, cross-device restore, submit, reopen-before-deadline, and automatic lock behavior.
+- Test private-group create, invite, join, leaderboard visibility, and invite regeneration with two accounts.
+- Persist Championship Week selections in the cloud entry rather than only localStorage.
+- Verify CFBD secret configuration and score synchronization without exposing credentials.
+- Run desktop/mobile smoke tests and update the validation record.
+- Reconcile PR #2, mark ready, merge, and verify Lovable plus GitHub Pages deployments.
 
-Exit criteria: CI is green, no known schedule mismatch remains, existing local predictions migrate, primary flows pass manual QA, and production deployment is verified.
+Exit criteria: migrations are confirmed applied, two-account integration flows pass, all entry data survives a second browser, CI is green, and production is smoke-tested after merge.
 
-## Next — Full-slate picking
+## Next — Week-by-week full slate
 
-Goal: let users predict chronologically instead of only by team.
+Goal: support chronological picking across the complete tracked P4 slate.
 
-- Add a week-by-week route covering the complete tracked P4 slate.
-- Provide week, conference, picked/unpicked, and 50% filters.
-- Reuse canonical matchup storage so week and team pages always stay synchronized.
-- Show weekly progress and direct navigation to the next unfinished game.
-- Preserve team schedule, standings, review, and playoff behavior.
+- Add a weekly route using the canonical game catalog.
+- Provide conference, picked/unpicked, 50%, and remaining-game filters.
+- Synchronize weekly picks with team pages, standings, championships, and playoff projections.
+- Show weekly completion and direct navigation to the next unfinished game.
+- Prepare scorecards to compare locked picks with final results.
 
-Exit criteria: every canonical matchup appears exactly once in the weekly view and edits are immediately reflected everywhere else.
+Exit criteria: every canonical matchup appears exactly once in the weekly slate and all existing projections remain consistent.
 
-## Later — Accounts and simulation depth
+## Later
 
-- Authentication, cloud drafts, cross-device persistence, and named locked ballots
-- Ballot history, comparison, public links, and prediction scoring
-- Conference tiebreakers and championship-game simulation
-- Résumé model using schedule strength, ranked wins, head-to-head, and bad losses
-- Specific Group-of-Six team schedules and selection
-- Live results, frozen completed games, accuracy tracking, and community consensus
-
-## Product milestones
-
-1. Public beta
-2. Full-slate weekly picker
-3. Account-backed ballots
-4. Championship and committee simulation
-5. Live-season prediction platform
+- Rank an actual G6 champion instead of reserving an unnamed seed.
+- Add official conference tiebreaker procedures.
+- Import and maintain preseason win totals from a reliable licensed/free source.
+- Add commissioner controls, member removal, group lifecycle, and public groups.
+- Add notifications, product analytics, error monitoring, and browser end-to-end tests.
+- Calibrate the playoff heuristic with historical committee outcomes.

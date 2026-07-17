@@ -1,38 +1,44 @@
 # The P4 Oddsmaker — 2026 Season Predictor
 
-A browser-based college football prediction tool for the 2026 Power Four season. Set a win probability for each matchup once, then use the same canonical picks across team schedules, conference standings, ballot review, and the playoff outlook.
+A browser-based college football season prediction game. Users make one canonical pick per matchup, review a full-season entry, project conference standings and championship games, and generate a 12-team playoff outlook.
 
 ## Status
 
-**Public-beta candidate.** Development is on `feature/season-prediction-foundation` in draft PR [#1](https://github.com/benrempe-LGG/nebraskawinprojection/pull/1). CI runs tests and a production build. Before a production release, complete the official-source schedule/date audit and manual mobile/desktop QA described in [Known Issues](docs/KNOWN_ISSUES.md).
+**Integration beta on draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2).** The season foundation is on `main`; accounts, cloud entries, scorecards, private groups, favorite teams, and Championship Week are on `feature/accounts-scorecards-foundation`.
 
-Live production currently reflects `main`:
+Production: https://nebraskawinprojection.lovable.app/  
+GitHub Pages mirror: https://benrempe-lgg.github.io/nebraskawinprojection/
 
-- Lovable: https://nebraskawinprojection.lovable.app/
-- GitHub Pages: https://benrempe-lgg.github.io/nebraskawinprojection/
+Do not equate code on the feature branch with an applied Lovable database migration or production deployment. See [Handoff](docs/HANDOFF.md).
 
-## Current features
+## Current feature-branch capabilities
 
-- Team-by-team win probability entry for every tracked P4 schedule
-- Canonical matchup storage: entering a game from either team updates both schedules
-- Implied point spreads and expected-win distributions
-- Season-wide progress, missing-pick review, and 50% game review
-- Immutable locked ballot snapshots stored in the browser
-- Projected conference and overall records
-- Weighted 12-team playoff outlook with Notre Dame tracking and a reserved G6 slot
-- Copyable links, forum text, and image exports for team projections
-- Automated schedule-integrity, prediction-store, ballot, test, and build validation
+- Canonical matchup storage synchronizes a pick across both team schedules
+- Team schedule and Next Team navigation
+- Missing-pick and 50% review
+- Projected overall and conference records
+- P4 Championship Week generated from conference standings
+- Playoff field withheld until all four P4 title games are picked
+- Notre Dame tracking, P4 weighting, and a reserved G6 slot
+- Google, Apple, and email-link authentication surfaces
+- Supabase-backed profiles, entries, locking, games, results, and weekly scorecard schema
+- Favorite-team schedule default
+- Private groups with invite codes, sign-in return, and aggregate leaderboards
+- CFBD score-sync Edge Function foundation
+- Team projection links, forum text, and image export
 
-## Persistence and privacy
+## Persistence
 
-Predictions and locked ballots use browser `localStorage`. There is no account system, server database, or cross-device synchronization yet. Clearing browser storage removes local data. No application environment variables are currently required.
+Canonical predictions remain in browser `localStorage` for immediate calculator behavior. Signed-in regular-season entries can be mirrored to Supabase through the entry lifecycle. Championship selections currently remain browser-local and are not yet part of the cloud entry payload.
+
+Supabase schema changes live in `supabase/migrations/`. The target Lovable Cloud/Supabase project must apply them in order. OAuth provider secrets belong in provider/Lovable configuration and must never be committed.
 
 ## Development
 
-Requires Node.js 20.
+Requires Node.js 22.
 
 ```sh
-npm ci
+npm install
 npm run dev
 npm run lint
 npm test
@@ -40,30 +46,29 @@ npm run build
 npm run preview
 ```
 
-The development server defaults to port 8080. GitHub Pages builds with `DEPLOY_BASE_PATH=/nebraskawinprojection/`; root-hosted previews use `/`.
+CI currently runs `npm install`, `npm test`, and `npm run build`. Lint and browser end-to-end tests are not CI gates.
 
 ## Repository map
 
-- `src/pages/` — calculator, analytics, standings, review, playoff, and fallback routes
-- `src/components/` — season ballot and UI components
-- `src/lib/oddsmaker.ts` — schedule data, conference normalization, and spread math
-- `src/lib/predictionStore.ts` — canonical matchup identifiers, persistence, and migration
-- `src/lib/ballot.ts` — season progress and locked snapshots
-- `src/lib/standings.ts` — projected conference and overall records
-- `src/lib/playoff.ts` — transparent committee-proxy model
-- `.github/workflows/ci.yml` — pull-request tests and build
-- `.github/workflows/deploy.yml` — GitHub Pages deployment from `main`
+- `src/pages/` — predictor, review, standings, championships, playoff, account, scorecards, and groups
+- `src/components/SeasonBallot.tsx` — local/cloud entry lifecycle
+- `src/contexts/AuthContext.tsx` — Supabase session state
+- `src/lib/predictionStore.ts` — canonical matchup persistence
+- `src/lib/standings.ts` — conference and overall records
+- `src/lib/championships.ts` — P4 title-game participants and picks
+- `src/lib/playoff.ts` — committee-proxy playoff model
+- `supabase/migrations/` — database schema, RLS, RPCs, deadline, and profile preference
+- `supabase/functions/sync-cfbd-scores/` — actual-result ingestion foundation
+- `.github/workflows/ci.yml` — tests, build, and preview artifact
 
-## Project documents
-
-Read these in order when restarting work:
+## Restart order
 
 1. [Current handoff](docs/HANDOFF.md)
 2. [Roadmap](docs/ROADMAP.md)
 3. [Known issues](docs/KNOWN_ISSUES.md)
 4. [Architecture](docs/ARCHITECTURE.md)
 5. [Decision log](docs/DECISIONS.md)
-6. [Validation record](docs/VALIDATION.md)
+6. [Validation](docs/VALIDATION.md)
 7. [Changelog](CHANGELOG.md)
 
-For entertainment and analysis purposes only. Not affiliated with any university, conference, or sportsbook.
+For entertainment and analysis only. Not affiliated with any university, conference, sportsbook, Google, CFBD, Supabase, or Lovable.

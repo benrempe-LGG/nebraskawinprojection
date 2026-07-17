@@ -1,47 +1,46 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-15
+Updated: 2026-07-17
 
-## P0 before production beta
+## P0 before merging PR #2
 
-### Full schedule/date audit is incomplete
+### Lovable migration state is not fully reconciled
 
-Risk: incorrect opponents, dates, venues, or home/away designations can distort picks, records, and navigation. ACC and Big 12 opponent matrices are normalized and integrity-tested, but some normalized matchups can display `TBD` dates. The broader P4 dataset still needs official-source verification.
+Risk: UI code may call tables, columns, or RPCs that are present in Git but absent from the live Lovable database.
 
-Next action: replace the compact source data with an audited canonical dataset and add fixture tests for every conference's expected game counts and reciprocal matchups.
+Next action: verify each migration in order and specifically confirm favorite-team, group, scorecard, catalog, and deadline objects.
 
-### Manual release QA is unrecorded
+### Championship picks are browser-local
 
-Risk: CI does not prove responsive layout, localStorage migration, sharing, image export, or deployment behavior.
+Risk: a signed-in user's regular-season entry can restore across devices while Championship Week and the resulting playoff can differ.
 
-Next action: run and record desktop/mobile smoke tests and verify both production hosts after merge.
+Next action: version the entry payload and persist championship winners with the user's draft/submitted/locked entry.
+
+### Two-account group testing is incomplete
+
+Risk: create/join links, RLS visibility, leaderboard aggregation, and OAuth return may work for the owner but fail for an invited account.
+
+Next action: run a documented owner/member test using two accounts and separate browsers.
+
+### Entry lifecycle needs live deadline testing
+
+Risk: submit, reopen, and automatic locking depend on deployed RPCs, catalog completeness, deadline configuration, and scheduled invocation.
+
+Next action: validate against a temporary deadline in a non-production test path, then restore the official deadline.
 
 ## P1
 
-### Accounts and cloud persistence are absent
-
-Predictions and locks exist only in localStorage. Clearing storage or changing devices loses access.
-
-### Conference championships are not simulated
-
-Conference leaders are treated as champions. Full tiebreakers, championship participants, and title-game outcomes are not modeled.
-
-### Playoff model is heuristic
-
-Conference coefficients and the ACC/Big 12 cap are transparent assumptions but lack a formal scenario-test suite.
-
-### G6 team is a placeholder
-
-Seed 12 is reserved without tracking or ranking actual Group-of-Six schedules.
-
-### Week-by-week full slate is absent
-
-Users must navigate through team schedules rather than predict each week's complete P4 slate.
+- CFBD score sync and provider secret configuration require live validation.
+- Apple and email-link authentication have not been recorded as passing.
+- Championship participants use simplified standings tiebreakers.
+- The G6 playoff team is still an unnamed reserved slot.
+- Week-by-week full-slate picking is not implemented.
+- Vegas season win totals remain manual; the removed Odds API returned the wrong market.
+- CI does not run lint, TypeScript-only checks, or browser end-to-end tests.
 
 ## P2
 
-- README and PR description can drift when model coefficients change.
-- CI does not currently run `npm run lint`.
-- No dedicated TypeScript `typecheck` script exists.
-- No end-to-end browser test suite is configured despite Playwright being installed.
+- Commissioner controls do not yet cover removing members, transferring ownership, leaving/deleting groups, or renaming groups.
 - No error monitoring or product analytics is configured.
+- Bundle-size optimization has not been prioritized.
+- OAuth and deployment configuration are partly external to Git and require an operations checklist.

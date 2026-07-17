@@ -132,6 +132,31 @@ const Index = () => {
     }
   }, []);
 
+  const nextTeam = useMemo(() => {
+    const currentTeams = CONFERENCES[conf] || [];
+    const currentIndex = currentTeams.indexOf(team);
+    if (currentIndex >= 0 && currentIndex < currentTeams.length - 1) {
+      return { conf, team: currentTeams[currentIndex + 1] };
+    }
+
+    const confIndex = confList.indexOf(conf);
+    for (let offset = 1; offset <= confList.length; offset += 1) {
+      const nextConf = confList[(confIndex + offset) % confList.length];
+      const nextConfTeams = CONFERENCES[nextConf] || [];
+      if (nextConfTeams.length > 0) {
+        return { conf: nextConf, team: nextConfTeams[0] };
+      }
+    }
+
+    return { conf, team };
+  }, [conf, confList, team]);
+
+  const handleNextTeam = useCallback(() => {
+    setConf(nextTeam.conf);
+    setTeam(nextTeam.team);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [nextTeam]);
+
   const handleSaveImage = useCallback(async () => {
     if (!captureRef.current) return;
     try {
@@ -327,6 +352,14 @@ const Index = () => {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            onClick={handleNextTeam}
+            className="ml-auto px-4 py-2.5 rounded-lg border border-primary bg-primary text-primary-foreground text-sm font-bold font-display transition-opacity hover:opacity-90"
+            aria-label={`Go to next team, ${nextTeam.team}`}
+          >
+            Next team: {nextTeam.team} →
+          </button>
         </div>
 
         <SeasonBallot revision={team + JSON.stringify(winPcts)} />

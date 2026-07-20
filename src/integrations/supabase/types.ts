@@ -271,6 +271,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          favorite_team: string | null
           id: string
           is_public: boolean
           updated_at: string
@@ -279,6 +280,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          favorite_team?: string | null
           id: string
           is_public?: boolean
           updated_at?: string
@@ -287,6 +289,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          favorite_team?: string | null
           id?: string
           is_public?: boolean
           updated_at?: string

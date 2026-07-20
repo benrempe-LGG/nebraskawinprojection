@@ -1,6 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadPredictionStore } from "@/lib/predictionStore";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  createCloudEntryPayload,
+  restoreCloudEntryPayload,
+} from "@/lib/cloudEntry";
+import { loadPredictionStore, type GamePredictionStore } from "@/lib/predictionStore";
 import {
   championshipPicksComplete,
   getChampionshipGames,
@@ -10,17 +17,105 @@ import {
   type P4Conference,
 } from "@/lib/championships";
 
+type EntryStatus = "draft" | "submitted" | "locked";
+
 const ChampionshipWeek = () => {
-  const predictions = useMemo(() => loadPredictionStore(localStorage), []);
+  const { user } = useAuth();
+  const [predictions, setPredictions] = useState<GamePredictionStore>(() =>
+    loadPredictionStore(localStorage)
+  );
   const games = useMemo(() => getChampionshipGames(predictions), [predictions]);
   const [picks, setPicks] = useState<ChampionshipPicks>(() =>
     loadChampionshipPicks(localStorage, games)
   );
+  const [entryStatus, setEntryStatus] = useState<EntryStatus>("draft");
+  const [cloudReady, setCloudReady] = useState(!user);
   const complete = championshipPicksComplete(games, picks);
 
-  function pickWinner(conference: P4Conference, winner: string) {
-    setPicks(saveChampionshipPick(localStorage, games, conference, winner));
+  useEffect(() => {
+    setPicks(loadChampionshipPicks(localStorage, games));
+  }, [games]);
+
+  useEffect(() => {
+    if (!user) {
+      setCloudReady(true);
+      setEntryStatus("draft");
+      return;
+    }
+
+    let active = true;
+    setCloudReady(false);
+
+    (supabase as any)
+      .from("ballots")
+      .select("status, draft_payload, locked_payload")
+      .eq("user_id", user.id)
+      .eq("season", 2026)
+      .maybeSingle()
+      .then(({
+        data,
+        error,
+      }: {
+        data: {
+          status: EntryStatus;
+          draft_payload: unknown;
+          locked_payload: unknown;
+        } | null;
+        error: { message: string } | null;
+      }) => {
+        if (!active) return;
+        if (error) {
+          toast.error("Could not load Championship Week: " + error.message);
+          setCloudReady(true);
+          return;
+        }
+
+        if (data) {
+          const storedPayload =
+            data.status === "locked" && data.locked_payload
+              ? data.locked_payload
+              : data.draft_payload;
+          const restored = restoreCloudEntryPayload(
+            localStorage,
+            storedPayload
+          );
+          setPredictions(restored.predictions);
+          setPicks(restored.championshipPicks);
+          setEntryStatus(data.status);
+        }
+        setCloudReady(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function pickWinner(conference: P4Conference, winner: string) {
+    if (entryStatus === "locked") {
+      toast.error("This entry is locked for the season.");
+      return;
+    }
+
+    const next = saveChampionshipPick(
+      localStorage,
+      games,
+      conference,
+      winner
+    );
+    setPicks(next);
+
+    if (!user) return;
+    const payload = createCloudEntryPayload(predictions, next);
+    const { error } = await (supabase as any).rpc("save_entry_draft", {
+      payload,
+      target_season: 2026,
+    });
+    if (error) toast.error("Championship pick did not save: " + error.message);
   }
+
+  const picksDisabled =
+    entryStatus === "locked" || (!!user && !cloudReady);
 
   return (
     <div className="min-h-screen gradient-page pb-20">
@@ -47,6 +142,16 @@ const ChampionshipWeek = () => {
           </Link>
         </div>
 
+        {user && (
+          <div className="mb-5 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-muted-foreground">
+            {!cloudReady
+              ? "Loading Championship Week from your account…"
+              : entryStatus === "locked"
+                ? "These championship picks are part of your locked 2026 entry."
+                : "Championship picks save automatically to your account."}
+          </div>
+        )}
+
         <div className="grid gap-5 md:grid-cols-2">
           {games.map((game) => {
             const selected = picks[game.conference];
@@ -63,9 +168,10 @@ const ChampionshipWeek = () => {
                       )}
                       <button
                         type="button"
+                        disabled={picksDisabled}
                         onClick={() => pickWinner(game.conference, team)}
                         className={
-                          "rounded-lg border px-3 py-5 text-center font-black transition-colors " +
+                          "rounded-lg border px-3 py-5 text-center font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 " +
                           (selected === team
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-border bg-surface-alt text-foreground hover:border-primary")

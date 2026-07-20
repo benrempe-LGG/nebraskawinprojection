@@ -4,9 +4,14 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getBallotProgress, getSeasonGameIds, getSeasonGames } from "@/lib/ballot";
+import {
+  createCloudEntryPayload,
+  restoreCloudEntryPayload,
+  type CloudEntryPayloadV2,
+} from "@/lib/cloudEntry";
+import { getChampionshipGames, loadChampionshipPicks } from "@/lib/championships";
 import { getTeamConference } from "@/lib/oddsmaker";
 import {
-  GAME_PREDS_KEY,
   loadPredictionStore,
   type GamePredictionStore,
 } from "@/lib/predictionStore";
@@ -17,12 +22,17 @@ interface SeasonBallotProps {
 
 type EntryStatus = "draft" | "submitted" | "locked";
 
-function currentEntryPayload(): GamePredictionStore {
+function currentEntryPayload(): CloudEntryPayloadV2 {
   const store = loadPredictionStore(localStorage);
   const currentIds = new Set(getSeasonGameIds());
-  return Object.fromEntries(
+  const predictions = Object.fromEntries(
     Object.entries(store).filter(([id]) => currentIds.has(id))
+  ) as GamePredictionStore;
+  const championshipPicks = loadChampionshipPicks(
+    localStorage,
+    getChampionshipGames(predictions)
   );
+  return createCloudEntryPayload(predictions, championshipPicks);
 }
 
 const SeasonBallot = ({ revision }: SeasonBallotProps) => {
@@ -77,20 +87,42 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     let active = true;
     (supabase as any)
       .from("ballots")
-      .select("status, submitted_at, draft_payload")
+      .select("status, submitted_at, draft_payload, locked_payload")
       .eq("user_id", user.id)
       .eq("season", 2026)
       .maybeSingle()
-      .then(async ({ data, error }: { data: { status: EntryStatus; submitted_at: string | null; draft_payload: GamePredictionStore } | null; error: { message: string } | null }) => {
+      .then(async ({
+        data,
+        error,
+      }: {
+        data: {
+          status: EntryStatus;
+          submitted_at: string | null;
+          draft_payload: unknown;
+          locked_payload: unknown;
+        } | null;
+        error: { message: string } | null;
+      }) => {
         if (!active) return;
         if (error) {
           toast.error("Could not load your entry: " + error.message);
           return;
         }
 
-        if (data?.draft_payload && Object.keys(data.draft_payload).length) {
-          localStorage.setItem(GAME_PREDS_KEY, JSON.stringify(data.draft_payload));
-          lastSaved.current = JSON.stringify(data.draft_payload);
+        const storedPayload =
+          data?.status === "locked" && data.locked_payload
+            ? data.locked_payload
+            : data?.draft_payload;
+        const restored = data
+          ? restoreCloudEntryPayload(localStorage, storedPayload)
+          : null;
+
+        if (
+          restored &&
+          (data?.status === "locked" ||
+            Object.keys(restored.predictions).length > 0)
+        ) {
+          lastSaved.current = JSON.stringify(restored);
           window.dispatchEvent(new CustomEvent("cloud-entry-loaded"));
         } else {
           const payload = currentEntryPayload();

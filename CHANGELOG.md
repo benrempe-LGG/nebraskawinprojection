@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] — 2026-07-20
+## [Unreleased] — 2026-07-21
 
 ### Added
 
@@ -17,6 +17,10 @@
 - Playoff gating until all four championship winners are selected
 - My Entry dashboard and persistent site navigation
 - CFBD score-sync Edge Function foundation
+- Account-isolated browser storage and fresh-account zero state
+- Group display names and dedicated owner/member QC coverage
+- Ordered cloud-save queue with visible save status and race-condition tests
+- Beta operations and entry-recovery runbook
 
 ### Changed
 
@@ -25,7 +29,10 @@
 - Mobile navigation uses a compact two-row phone layout
 - Review hash links scroll after React rendering
 - Account, predictor, and analytics pages expose improved landmark and heading structure
-- CI uses Node 22 and validates tests plus production build
+- CI uses Node 22 and gates lint, typecheck, unit tests, migration validation, and production build
+- My Entry refreshes after authenticated cloud hydration
+- Automatic saves serialize writes and preserve the newest queued payload
+- Production now runs the complete private-beta feature set
 - Documentation distinguishes feature-branch code, applied migrations, preview state, and production deployment
 
 ### Security
@@ -33,20 +40,27 @@
 - Removed client-side invocation of the global catalog synchronization RPC
 - Added a forward-only migration restricting `sync_2026_catalog` to service-role JWTs
 - Made `sync-cfbd-scores` fail closed when `SYNC_SECRET` is absent or blank
+- Enforced entry deadlines in RPCs and at the ballot write boundary
+- Added scheduled locking for draft and submitted entries
+- Validated submission completeness and four P4 championship winners server-side
+- Repaired PostgreSQL-17 submission counting and added a CI compatibility guard
 
 ### Validation
 
-- GitHub Actions run 132 passed for feature head `aeb8ad9`
-- Lovable reported all 22 tests and the production build passing
-- Desktop, 390-pixel phone navigation, review anchoring, route guards, and page landmarks passed preview QC
+- GitHub Actions run 157 passed lint, typecheck, unit tests, migration validation, and production build
+- Lovable production published and reported up to date
+- Google OAuth and email-link authentication passed
+- Fresh-account zero state and two-account private-group isolation passed
+- A 476-game, four-champion entry submitted through the production RPC
+- Production automatic save showed saving, saved, revert, and reload behavior without changing the final QC entry
 
 ### Known limitations
 
-- Final July 20 corrections remain unpublished in production
-- Lovable migration history and duplicate versioned-payload migration files require reconciliation
-- Two-account groups, cross-device locked restore, Apple/email auth, CFBD sync, automatic locking, and real weekly scoring remain incompletely validated
-- The CFBD sync endpoint does not fail closed when `SYNC_SECRET` is absent
-- Week-by-week full-slate picking and a ranked G6 champion are not implemented
+- True simultaneous-device edits lack server-side conflict detection
+- Apple authentication, successful live CFBD ingestion, real weekly scoring, and real-deadline locking remain unvalidated
+- Browser end-to-end automation is not configured as a repeatable CI command
+- Week-by-week full-slate picking, aggregate fan insights, multiple entries, and a ranked G6 champion are not implemented
+- Dependency audit findings require production-impact triage
 
 ---
 

@@ -1,4 +1,4 @@
-export type CloudSaveStatus = "idle" | "pending" | "saving" | "saved" | "error";
+export type CloudSaveStatus = "idle" | "loading" | "pending" | "saving" | "saved" | "error";
 
 type StatusListener = (status: CloudSaveStatus, error?: Error) => void;
 

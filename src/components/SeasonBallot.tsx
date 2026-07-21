@@ -39,11 +39,22 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
   const [cloudReady, setCloudReady] = useState(false);
   const [entryStatus, setEntryStatus] = useState<EntryStatus>("draft");
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
+  const [storageRevision, setStorageRevision] = useState(0);
   const lastSaved = useRef("");
+
+  useEffect(() => {
+    const refreshProgress = () => setStorageRevision((value) => value + 1);
+    window.addEventListener("account-storage-reset", refreshProgress);
+    window.addEventListener("cloud-entry-loaded", refreshProgress);
+    return () => {
+      window.removeEventListener("account-storage-reset", refreshProgress);
+      window.removeEventListener("cloud-entry-loaded", refreshProgress);
+    };
+  }, []);
 
   const progress = useMemo(
     () => getBallotProgress(loadPredictionStore(localStorage)),
-    [revision]
+    [revision, storageRevision]
   );
   const percent = progress.totalGames
     ? Math.round((progress.decidedGames / progress.totalGames) * 100)

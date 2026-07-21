@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
@@ -21,8 +25,16 @@ jobs:
       # Lovable may update package.json before its generated lockfile lands.
       # npm install reconciles the lock while still using pinned transitive versions.
       - run: npm install
-      - run: npm test
-      - run: npm run build
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:ci
+      - name: Migration history validation
+        run: npm run migrations:validate
+      - name: Production build
+        run: npm run build
       - uses: actions/upload-artifact@v4
         with:
           name: preview-dist

@@ -1,3 +1,28 @@
+
+## 2026-07-21 — One official entry per account during beta
+
+Decision: each authenticated account has one official 2026 entry, and that same entry appears in every private group the user joins.
+
+Rationale: one-person, one-prediction keeps identity, locking, scoring, and beta support understandable.
+
+Consequences: multiple March Madness-style named entries are deferred until entry identity, group standings, and scorecards can distinguish them safely.
+
+## 2026-07-21 — Serialize automatic browser saves
+
+Decision: queue cloud writes from each active page and write the newest queued payload last while exposing truthful save states.
+
+Rationale: overlapping asynchronous requests could otherwise finish out of order and silently replace newer picks.
+
+Consequences: one-page races are protected and users can see failure. Simultaneous editing from separate devices still needs server-side concurrency or revisions.
+
+## 2026-07-21 — Friends-and-family beta before merge
+
+Decision: keep PR #2 draft while inviting a small group of real users into the live production experience.
+
+Rationale: authentication, groups, complete submission, and cloud saves pass controlled QC, while real-device restoration, scoring, and locking still benefit from beta evidence.
+
+Consequences: Google and email are supported beta paths; Apple remains unadvertised; beta findings take priority over new feature work.
+
 # Decision Log
 
 ## 2026-07-20 — Version cloud entries

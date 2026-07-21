@@ -349,7 +349,7 @@ const Index = () => {
   ]);
 
   return (
-    <div className="min-h-screen gradient-page pb-20">
+    <main className="min-h-screen gradient-page pb-20">
 
       {/* Capturable region */}
       <div ref={captureRef}>
@@ -543,7 +543,7 @@ const Index = () => {
       <div className="max-w-[900px] mx-auto mt-6 px-4 text-center text-[11px] text-muted-foreground/50">
         For entertainment &amp; analysis purposes only. Not affiliated with any university.
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -26,8 +26,12 @@ export class LatestSaveQueue<T> {
   }
 
   enqueue(key: string, value: T) {
-    if (this.disposed || key === this.savedKey) return;
+    if (this.disposed) return;
     this.desired = { key, value };
+    if (key === this.savedKey && !this.running) {
+      this.onStatus("saved");
+      return;
+    }
     this.onStatus("pending");
     void this.drain();
   }

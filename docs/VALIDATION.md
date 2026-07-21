@@ -62,3 +62,32 @@ Source changes prepared on PR #2:
 - changed `sync-cfbd-scores` to return 500 when `SYNC_SECRET` is unset or blank and 401 when the supplied secret does not match
 
 Automated tests and build must pass on the resulting commit. Live authorization remains unvalidated until Lovable applies the migration, deploys the Edge Function, and exercises authenticated-user, missing-secret, wrong-secret, and valid-secret paths.
+
+
+## 2026-07-21 — Cloud-save and submission hardening
+
+Branch head: `50de7647f6dde9893cee066835be34ec50912854`  
+GitHub Actions: [CI run 156](https://github.com/benrempe-LGG/nebraskawinprojection/actions/runs/29858951662) — passed.
+
+### Automated validation
+
+- lint — passed
+- TypeScript typecheck — passed
+- unit tests — passed, including serialization, stale-write skipping, failure retry, and in-flight reversion coverage
+- migration-history validation — passed and now rejects a latest `submit_entry` definition that uses unsupported `jsonb_object_length(jsonb)`
+- production build — passed
+
+### Production smoke test
+
+- Lovable production publish completed and reported `Up to date`.
+- Signed-in QC member restored a submitted version 2 entry with 476 of 476 games and four Championship Week picks.
+- Editing one prediction displayed `Saving changes…`, then `Submitted · Saved`.
+- The QC value was reverted to its original value, the page was fully reloaded, and the original value restored from cloud storage.
+- No `Save failed` state appeared.
+- The QC member's final prediction value remained unchanged after the test.
+
+Operational safeguards and recovery steps are documented in [Beta Operations and Entry Recovery](BETA_OPERATIONS.md).
+
+### Remaining boundary
+
+The browser queue ensures ordered writes from one active page. Server-side optimistic concurrency or immutable ballot revisions are still recommended before supporting simultaneous editing from multiple devices.

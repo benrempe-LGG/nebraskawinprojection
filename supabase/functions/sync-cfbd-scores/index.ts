@@ -18,7 +18,11 @@ interface CfbdGame {
 
 Deno.serve(async (request) => {
   const expectedSecret = Deno.env.get("SYNC_SECRET");
-  if (expectedSecret && request.headers.get("x-sync-secret") !== expectedSecret) {
+  if (!expectedSecret?.trim()) {
+    return new Response("Missing SYNC_SECRET configuration", { status: 500 });
+  }
+
+  if (request.headers.get("x-sync-secret") !== expectedSecret) {
     return new Response("Unauthorized", { status: 401 });
   }
 

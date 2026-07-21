@@ -4,6 +4,15 @@ Updated: 2026-07-20
 
 ## P0 before merging PR #2
 
+### Security fixes require Lovable deployment
+
+Status: the feature branch removes the browser call to `sync_2026_catalog`, adds a forward-only migration restricting that RPC to service-role JWTs, and makes `sync-cfbd-scores` fail closed when `SYNC_SECRET` is missing.
+
+Risk: source control is fixed, but production remains vulnerable until Lovable applies `202607210001_secure_catalog_and_score_sync.sql`, deploys the updated Edge Function, and confirms `SYNC_SECRET` is configured.
+
+Next action: apply and verify those changes in Lovable, then confirm authenticated users receive permission denied from `sync_2026_catalog` and missing/incorrect sync secrets receive 500/401 responses.
+
+
 ### Lovable migration history needs reconciliation
 
 Risk: the repository contains manual and Lovable-generated copies of the versioned Championship Week payload migration. Git contents do not prove which migration identifiers production recorded.
@@ -15,12 +24,6 @@ Next action: inspect Lovable's migration ledger and database RPC definitions. Do
 Risk: production can lag the branch even when CI and Lovable preview pass.
 
 Next action: publish the current branch through Lovable, then repeat signed-out desktop and phone smoke tests and signed-in entry checks.
-
-### Score-sync authentication fails open when the secret is absent
-
-Risk: `sync-cfbd-scores` accepts an unauthenticated trigger if `SYNC_SECRET` is not configured while using service-role access internally.
-
-Next action: make the secret mandatory or place the function behind a verified authenticated scheduler, then test rejection and success paths.
 
 ### Two-account and cross-device testing is incomplete
 

@@ -52,3 +52,13 @@ Validated against the current feature head:
 - post-merge GitHub Pages and Lovable verification
 
 A green build is not evidence that external OAuth, migrations, Edge Functions, scheduled jobs, or cross-device behavior are configured.
+
+## 2026-07-21 — Authorization remediation
+
+Source changes prepared on PR #2:
+
+- removed the authenticated-client invocation of `sync_2026_catalog`
+- added a forward-only migration that requires a service-role JWT and revokes catalog RPC execution from public, anon, and authenticated roles
+- changed `sync-cfbd-scores` to return 500 when `SYNC_SECRET` is unset or blank and 401 when the supplied secret does not match
+
+Automated tests and build must pass on the resulting commit. Live authorization remains unvalidated until Lovable applies the migration, deploys the Edge Function, and exercises authenticated-user, missing-secret, wrong-secret, and valid-secret paths.

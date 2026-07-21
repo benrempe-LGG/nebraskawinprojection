@@ -28,6 +28,12 @@
 - CI uses Node 22 and validates tests plus production build
 - Documentation distinguishes feature-branch code, applied migrations, preview state, and production deployment
 
+### Security
+
+- Removed client-side invocation of the global catalog synchronization RPC
+- Added a forward-only migration restricting `sync_2026_catalog` to service-role JWTs
+- Made `sync-cfbd-scores` fail closed when `SYNC_SECRET` is absent or blank
+
 ### Validation
 
 - GitHub Actions run 132 passed for feature head `aeb8ad9`

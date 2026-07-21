@@ -46,7 +46,7 @@ The score-sync Edge Function expects these server-side values:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SYNC_SECRET`
 
-The sync endpoint must fail closed if `SYNC_SECRET` is missing before it is scheduled or exposed.
+The feature-branch function now fails closed if `SYNC_SECRET` is missing. Lovable must deploy the updated function and confirm the secret is configured before scheduling or exposing it.
 
 ## Development
 

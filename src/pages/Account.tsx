@@ -110,6 +110,9 @@ export default function Account() {
 
   return (
     <main className="container max-w-2xl py-12">
+      <h1 className="sr-only">
+        {user ? "Account and entry settings" : "Save your 2026 entry"}
+      </h1>
       <Card>
         <CardHeader>
           <CardTitle>{user ? "Account & entry settings" : "Save your 2026 entry"}</CardTitle>

@@ -57,6 +57,7 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     }
 
     let active = true;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any)
       .from("ballots")
       .select("status, submitted_at, draft_payload, locked_payload")
@@ -99,7 +100,8 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
         } else {
           const payload = currentEntryPayload();
           lastSaved.current = JSON.stringify(payload);
-          await (supabase as any).rpc("save_entry_draft", {
+          await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("save_entry_draft", {
             payload,
             target_season: 2026,
           });
@@ -122,7 +124,8 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     if (serialized === lastSaved.current) return;
 
     const timer = window.setTimeout(async () => {
-      const { error } = await (supabase as any).rpc("save_entry_draft", {
+      const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("save_entry_draft", {
         payload,
         target_season: 2026,
       });
@@ -143,7 +146,8 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     if (!confirmed) return;
 
     const payload = currentEntryPayload();
-    const { data, error } = await (supabase as any).rpc("submit_entry", {
+    const { data, error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("submit_entry", {
       payload,
       expected_games: progress.totalGames,
       target_season: 2026,

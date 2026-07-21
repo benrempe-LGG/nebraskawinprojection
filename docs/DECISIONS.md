@@ -1,12 +1,28 @@
 # Decision Log
 
+## 2026-07-20 — Version cloud entries
+
+Decision: use a version 2 cloud payload containing canonical regular-season predictions and Championship Week winners.
+
+Rationale: one official entry must restore and lock every selection that affects the playoff field.
+
+Consequences: legacy flat payloads remain readable, Championship Week can restore across devices, and the Lovable migration ledger must include the versioned-payload RPC changes.
+
+## 2026-07-20 — Persistent entry navigation
+
+Decision: add a persistent site navigation bar and a dedicated My Entry dashboard.
+
+Rationale: authenticated users need an obvious place to sign in, resume their entry, reach Championship Week, review scorecards, and manage private groups.
+
+Consequences: responsive navigation and route accessibility are release criteria.
+
 ## 2026-07-17 — Lovable Cloud as the application backend
 
 Decision: use Lovable's Supabase-compatible database and authentication rather than require a separately visible Supabase project.
 
-Rationale: it is native to the current deployment workflow and already supports authentication, RLS, migrations, RPCs, and Edge Functions.
+Rationale: it is native to the deployment workflow and supports authentication, RLS, migrations, RPCs, and Edge Functions.
 
-Consequences: database state and migrations must be verified through Lovable. A repository migration is not evidence that production has applied it.
+Consequences: database state and migrations must be verified through Lovable. A repository migration is not evidence that production applied it.
 
 ## 2026-07-17 — Entry lifecycle
 
@@ -14,7 +30,7 @@ Decision: model a March Madness-style entry as draft, submitted, then locked at 
 
 Rationale: users understand an entry that can be revised before a deadline better than an immediate irreversible lock.
 
-Consequences: scorecards must use the immutable locked payload. Submitted entries may reopen only before the deadline.
+Consequences: scorecards use the immutable locked payload. Submitted entries may reopen only before the deadline.
 
 ## 2026-07-17 — Favorite-team personalization
 
@@ -28,7 +44,7 @@ Decision: derive the top two teams from each P4 conference, require the user to 
 
 Rationale: the playoff field should reflect conference title-game outcomes rather than treating regular-season leaders as champions.
 
-Consequence: official conference tiebreakers remain simplified. Championship picks must be added to cloud entry persistence.
+Consequence: official conference tiebreakers remain simplified.
 
 ## 2026-07-17 — Private groups use invitation codes
 
@@ -36,7 +52,7 @@ Decision: groups are private by default and joined through an eight-character co
 
 Rationale: it provides a low-friction friends-and-family competition without public discovery or complex moderation.
 
-Consequence: commissioner controls are currently limited, and two-account production testing is required.
+Consequence: commissioner controls are limited, and two-account production testing is required.
 
 ## 2026-07-15 — Canonical matchup identity
 
@@ -52,16 +68,30 @@ Decision: a 50% home game defaults to the home team; a neutral 50% game remains 
 
 ## 2026-07-15 — Transparent playoff proxy
 
-Decision: favor SEC and Big Ten résumés, track Notre Dame separately, normally constrain ACC/Big 12 representation, and reserve a G6 slot.
+Decision: favor SEC and Big Ten résumés, track Notre Dame separately, normally constrain ACC and Big 12 representation, and reserve a G6 slot.
 
 Consequence: coefficients are assumptions and require continued scenario testing.
 
-## Decision required — Merge readiness
+## Decision Required — Score-sync authentication
 
-Conflict: feature code and CI are healthy, but live migration state, cross-device entries, private groups, Apple/email authentication, CFBD synchronization, and championship cloud persistence are not fully validated.
+Conflict: the score-sync function uses service-role access but accepts unauthenticated triggers when `SYNC_SECRET` is absent.
 
-Options: merge now as an explicitly incomplete beta, or complete integration testing and championship persistence first.
+Options:
 
-Recommendation: complete the integration-beta exit criteria before merging PR #2.
+1. Fail closed unless the secret exists and matches.
+2. Restrict invocation through another authenticated scheduler mechanism.
+3. Leave the current optional-secret behavior.
 
-Impact of delay: production remains stable while the feature branch receives validation and avoids exposing partially configured account workflows.
+Recommendation: fail closed and test the configured scheduler before enabling score ingestion.
+
+Impact of delay: an accidentally unconfigured deployment could expose a privileged, resource-consuming endpoint.
+
+## Decision Required — Merge readiness
+
+Conflict: feature code, versioned entry persistence, preview QC, and CI are healthy, but migration-ledger reconciliation, production publication, two-account groups, cross-device locked-entry restore, Apple/email auth, CFBD sync, and deadline locking remain incomplete.
+
+Options: merge as an explicitly incomplete beta, or complete the integration-beta exit criteria first.
+
+Recommendation: keep PR #2 in draft until the Now roadmap exit criteria are recorded.
+
+Impact of delay: production remains on a known state while the team avoids merging partially verified external integrations.

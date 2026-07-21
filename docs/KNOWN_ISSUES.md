@@ -1,46 +1,54 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-17
+Updated: 2026-07-20
 
 ## P0 before merging PR #2
 
-### Lovable migration state is not fully reconciled
+### Lovable migration history needs reconciliation
 
-Risk: UI code may call tables, columns, or RPCs that are present in Git but absent from the live Lovable database.
+Risk: the repository contains manual and Lovable-generated copies of the versioned Championship Week payload migration. Git contents do not prove which migration identifiers production recorded.
 
-Next action: verify each migration in order and specifically confirm favorite-team, group, scorecard, catalog, and deadline objects.
+Next action: inspect Lovable's migration ledger and database RPC definitions. Do not delete an applied migration merely to make the repository look cleaner.
 
-### Championship picks are browser-local
+### Final preview corrections are not published
 
-Risk: a signed-in user's regular-season entry can restore across devices while Championship Week and the resulting playoff can differ.
+Risk: production can lag the branch even when CI and Lovable preview pass.
 
-Next action: version the entry payload and persist championship winners with the user's draft/submitted/locked entry.
+Next action: publish the current branch through Lovable, then repeat signed-out desktop and phone smoke tests and signed-in entry checks.
 
-### Two-account group testing is incomplete
+### Score-sync authentication fails open when the secret is absent
 
-Risk: create/join links, RLS visibility, leaderboard aggregation, and OAuth return may work for the owner but fail for an invited account.
+Risk: `sync-cfbd-scores` accepts an unauthenticated trigger if `SYNC_SECRET` is not configured while using service-role access internally.
 
-Next action: run a documented owner/member test using two accounts and separate browsers.
+Next action: make the secret mandatory or place the function behind a verified authenticated scheduler, then test rejection and success paths.
 
-### Entry lifecycle needs live deadline testing
+### Two-account and cross-device testing is incomplete
 
-Risk: submit, reopen, and automatic locking depend on deployed RPCs, catalog completeness, deadline configuration, and scheduled invocation.
+Risk: create/join links, RLS visibility, leaderboard aggregation, OAuth return, and version 2 entry restoration may work for one account but fail across identities or browsers.
 
-Next action: validate against a temporary deadline in a non-production test path, then restore the official deadline.
+Next action: run a documented owner/member test with two dedicated accounts and restore a submitted and locked entry in a second browser.
+
+### Entry deadline and locking need live testing
+
+Risk: submit, reopen, automatic locking, and locked scorecards depend on deployed RPCs, catalog completeness, deadline configuration, and scheduled invocation.
+
+Next action: validate with a temporary controlled deadline, confirm both prediction layers in `locked_payload`, then restore the official deadline.
 
 ## P1
 
-- CFBD score sync and provider secret configuration require live validation.
+- CFBD provider mapping and real final-score ingestion require live validation.
 - Apple and email-link authentication have not been recorded as passing.
 - Championship participants use simplified standings tiebreakers.
-- The G6 playoff team is still an unnamed reserved slot.
+- The G6 playoff team is an unnamed reserved slot.
 - Week-by-week full-slate picking is not implemented.
 - Vegas season win totals remain manual; the removed Odds API returned the wrong market.
-- CI does not run lint, TypeScript-only checks, or browser end-to-end tests.
+- CI does not run lint, a dedicated TypeScript check, or browser end-to-end tests.
+- No shared QA credentials or administrator role exist; formal testing needs two dedicated standard-user accounts.
 
 ## P2
 
-- Commissioner controls do not yet cover removing members, transferring ownership, leaving/deleting groups, or renaming groups.
+- Commissioner controls do not cover member removal, ownership transfer, leaving, deletion, or renaming.
 - No error monitoring or product analytics is configured.
 - Bundle-size optimization has not been prioritized.
-- OAuth and deployment configuration are partly external to Git and require an operations checklist.
+- OAuth and deployment configuration are partly external to Git and need an operations checklist.
+- Both `package-lock.json` and `bun.lock` are tracked while CI uses npm; the canonical package manager should eventually be documented or consolidated without disrupting Lovable.

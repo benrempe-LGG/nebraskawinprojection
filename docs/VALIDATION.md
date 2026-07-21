@@ -1,41 +1,54 @@
 # Validation Record
 
-## 2026-07-17 — Account integration branch
+## 2026-07-20 — Entry dashboard and release-candidate QC
 
 Branch: `feature/accounts-scorecards-foundation`  
-PR: [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2)
+PR: [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2)  
+Feature head before documentation reconciliation: `aeb8ad9e1276af2ad6c36981ac0a75b74c84b9f3`
 
-Feature-head GitHub Actions run 106 completed successfully at `94d60436148cfb80ef6c8bdd91694467f1d290a0`. Documentation-head run 113 also completed successfully at `c0f8743d75883195be6ab399ac81aad630d9a552`.
+### Automated validation
 
-CI results:
+GitHub Actions CI run 132 completed successfully for `aeb8ad9`.
 
-- `npm install` — passed
+- `npm install` — passed in CI
 - `npm test` — passed
-- `npm run build` — passed
+- 22 tests — reported passing in the Lovable current-head validation
+- `npm run build` — passed in CI and Lovable validation
 - preview artifact upload — passed
 
-Automated coverage includes canonical cross-team predictions, schedule integrity, standings, Notre Dame/playoff selection, and the requirement that the playoff remains incomplete until all four P4 championship games are picked.
+Automated coverage includes canonical cross-team predictions, schedule integrity, standings, Notre Dame/playoff selection, playoff gating on four championship winners, and versioned cloud-entry parsing/restoration.
 
-Manual evidence recorded during the session:
+### Manual Lovable preview QC
 
-- Lovable production/live test was reported working before the later feature additions.
-- Google OAuth initially failed because Google lacked the exact Supabase callback.
-- Google OAuth passed after registering `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`.
-- Championship and private-group navigation changes built successfully, but were not yet recorded as live multi-account tests.
+Validated against the current feature head:
 
-Not validated:
+- All public routes loaded and the 404 route rendered.
+- Signed-out Groups and Scorecards redirected to Account.
+- Persistent desktop navigation rendered cleanly.
+- At a 390 by 844 viewport, the navigation was 73 pixels high with the brand on row one and four navigation links on row two.
+- `/review#fifty` scrolled to the 50% section after the React page rendered.
+- Predictor and Analytics exposed main landmarks; Account exposed a level-one heading.
+- The My Entry dashboard and account navigation were present.
+- Lovable reported the workspace at `aeb8ad9`, all 22 tests passing, and the production build succeeding without modifying files or settings.
 
-- exact set of applied Lovable migrations
-- cross-device draft restore and locked-entry restore
+### Production evidence
+
+- Google OAuth previously passed after registering `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`.
+- The production My Entry experience was manually reported as working and visually strong.
+- The final July 20 review-anchor, mobile-navigation, and accessibility corrections have not yet been published to production.
+
+### Not validated
+
+- exact Lovable migration ledger and duplicate migration handling
+- cross-device version 2 draft, submitted, and locked restore
+- two-account private-group create, invite, join, and leaderboard flow
 - Apple and email-link authentication
-- two-account private-group create/join/leaderboard flow
-- championship cloud persistence
-- CFBD score ingestion and weekly scoring with real final games
-- deadline scheduler/automatic lock execution
-- manual mobile and desktop smoke suite
+- CFBD score ingestion, secret rejection, team mapping, and weekly scoring
+- deadline scheduler and automatic lock execution
+- signed-in production regression after the final publish
 - `npm run lint`
-- a dedicated TypeScript-only command
-- browser end-to-end automation
-- post-merge GitHub Pages and Lovable deployments
+- a dedicated TypeScript-only command, which is not defined
+- browser end-to-end automation, which is not configured as a script
+- post-merge GitHub Pages and Lovable verification
 
-A green build is not evidence that external OAuth, database migrations, Edge Functions, scheduled jobs, or cross-device behavior are configured.
+A green build is not evidence that external OAuth, migrations, Edge Functions, scheduled jobs, or cross-device behavior are configured.

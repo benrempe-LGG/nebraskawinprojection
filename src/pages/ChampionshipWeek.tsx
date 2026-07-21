@@ -46,6 +46,7 @@ const ChampionshipWeek = () => {
     let active = true;
     setCloudReady(false);
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any)
       .from("ballots")
       .select("status, draft_payload, locked_payload")
@@ -107,7 +108,8 @@ const ChampionshipWeek = () => {
 
     if (!user) return;
     const payload = createCloudEntryPayload(predictions, next);
-    const { error } = await (supabase as any).rpc("save_entry_draft", {
+    const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("save_entry_draft", {
       payload,
       target_season: 2026,
     });

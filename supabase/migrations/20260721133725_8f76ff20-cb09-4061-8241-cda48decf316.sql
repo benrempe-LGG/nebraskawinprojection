@@ -1,6 +1,3 @@
--- Restrict global 2026 catalog mutation to trusted server-side provisioning.
--- Ordinary signed-in users must never be able to rewrite shared teams or games.
-
 create or replace function public.sync_2026_catalog(catalog jsonb)
 returns integer
 language plpgsql security definer set search_path = ''

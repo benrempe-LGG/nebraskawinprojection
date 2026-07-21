@@ -10,6 +10,7 @@ import {
   type CloudEntryPayloadV2,
 } from "@/lib/cloudEntry";
 import { getChampionshipGames, loadChampionshipPicks } from "@/lib/championships";
+import { LatestSaveQueue, type CloudSaveStatus } from "@/lib/cloudSaveQueue";
 import {
   loadPredictionStore,
   type GamePredictionStore,
@@ -40,7 +41,9 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
   const [entryStatus, setEntryStatus] = useState<EntryStatus>("draft");
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
   const [storageRevision, setStorageRevision] = useState(0);
-  const lastSaved = useRef("");
+  const [saveState, setSaveState] = useState<CloudSaveStatus>("idle");
+  const saveQueue = useRef<LatestSaveQueue<CloudEntryPayloadV2> | null>(null);
+  const loadedUserId = useRef<string | null>(null);
 
   useEffect(() => {
     const refreshProgress = () => setStorageRevision((value) => value + 1);
@@ -61,13 +64,44 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     : 0;
 
   useEffect(() => {
+    saveQueue.current?.dispose();
+    saveQueue.current = null;
+    loadedUserId.current = user?.id ?? null;
+
     if (!user) {
       setCloudReady(false);
       setEntryStatus("draft");
+      setSubmittedAt(null);
+      setSaveState("idle");
       return;
     }
 
     let active = true;
+    setCloudReady(false);
+    setSaveState("loading");
+
+    const queue = new LatestSaveQueue<CloudEntryPayloadV2>(
+      async (payload) => {
+        if (loadedUserId.current !== user.id) {
+          throw new Error("The signed-in account changed before this save started.");
+        }
+        const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        (supabase as any).rpc("save_entry_draft", {
+          payload,
+          target_season: 2026,
+        });
+        if (error) throw new Error(error.message);
+      },
+      (status, error) => {
+        if (!active) return;
+        setSaveState(status);
+        if (status === "error" && error) {
+          toast.error("Cloud save failed: " + error.message);
+        }
+      }
+    );
+    saveQueue.current = queue;
+
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any)
       .from("ballots")
@@ -75,7 +109,7 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
       .eq("user_id", user.id)
       .eq("season", 2026)
       .maybeSingle()
-      .then(async ({
+      .then(({
         data,
         error,
       }: {
@@ -89,6 +123,7 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
       }) => {
         if (!active) return;
         if (error) {
+          setSaveState("error");
           toast.error("Could not load your entry: " + error.message);
           return;
         }
@@ -106,16 +141,16 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
           (data?.status === "locked" ||
             Object.keys(restored.predictions).length > 0)
         ) {
-          lastSaved.current = JSON.stringify(restored);
+          queue.seed(JSON.stringify(restored));
           window.dispatchEvent(new CustomEvent("cloud-entry-loaded"));
         } else {
           const payload = currentEntryPayload();
-          lastSaved.current = JSON.stringify(payload);
-          await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    (supabase as any).rpc("save_entry_draft", {
-            payload,
-            target_season: 2026,
-          });
+          const serialized = JSON.stringify(payload);
+          const hasLocalEntry =
+            Object.keys(payload.predictions).length > 0 ||
+            Object.keys(payload.championshipPicks).length > 0;
+          if (hasLocalEntry) queue.enqueue(serialized, payload);
+          else queue.seed(serialized);
         }
 
         setEntryStatus(data?.status ?? "draft");
@@ -125,6 +160,8 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
 
     return () => {
       active = false;
+      queue.dispose();
+      if (saveQueue.current === queue) saveQueue.current = null;
     };
   }, [user]);
 
@@ -132,16 +169,9 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     if (!user || !cloudReady || entryStatus === "locked") return;
     const payload = currentEntryPayload();
     const serialized = JSON.stringify(payload);
-    if (serialized === lastSaved.current) return;
 
-    const timer = window.setTimeout(async () => {
-      const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    (supabase as any).rpc("save_entry_draft", {
-        payload,
-        target_season: 2026,
-      });
-      if (error) toast.error("Cloud save failed: " + error.message);
-      else lastSaved.current = serialized;
+    const timer = window.setTimeout(() => {
+      saveQueue.current?.enqueue(serialized, payload);
     }, 700);
 
     return () => window.clearTimeout(timer);
@@ -157,6 +187,10 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
     if (!confirmed) return;
 
     const payload = currentEntryPayload();
+    const serialized = JSON.stringify(payload);
+    saveQueue.current?.enqueue(serialized, payload);
+    await saveQueue.current?.waitForIdle();
+
     const { data, error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any).rpc("submit_entry", {
       payload,
@@ -164,10 +198,13 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
       target_season: 2026,
     });
 
-    if (error) return toast.error(error.message);
+    if (error) {
+      setSaveState("error");
+      return toast.error(error.message);
+    }
     setEntryStatus("submitted");
     setSubmittedAt(data?.submitted_at ?? new Date().toISOString());
-    lastSaved.current = JSON.stringify(payload);
+    saveQueue.current?.seed(serialized);
     toast.success("Your 2026 entry has been submitted.");
   }
 
@@ -229,13 +266,19 @@ const SeasonBallot = ({ revision }: SeasonBallotProps) => {
           <span>
             {!user
               ? "Saved on this device"
-              : !cloudReady
-                ? "Loading cloud entry…"
-                : entryStatus === "submitted"
-                  ? "Submitted " + (submittedAt ? new Date(submittedAt).toLocaleDateString() : "")
-                  : entryStatus === "locked"
-                    ? "Locked for the season"
-                    : "Automatically saved to your account"}
+              : entryStatus === "locked"
+                ? "Locked for the season"
+                : !cloudReady || saveState === "loading"
+                  ? "Loading cloud entry…"
+                  : saveState === "pending"
+                    ? "Changes waiting to save…"
+                    : saveState === "saving"
+                      ? "Saving changes…"
+                      : saveState === "error"
+                        ? "Save failed — edit a pick to retry"
+                        : entryStatus === "submitted"
+                          ? "Submitted " + (submittedAt ? new Date(submittedAt).toLocaleDateString() : "") + " · Saved"
+                          : "Saved to your account"}
           </span>
         </div>
       </div>

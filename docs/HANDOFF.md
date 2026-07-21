@@ -1,27 +1,40 @@
 # Engineering Handoff
 
-Updated: 2026-07-20
+Updated: 2026-07-21
 
 ## Exact stopping point
 
-Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open, mergeable, and 91 commits ahead of `main`. It remains on `feature/accounts-scorecards-foundation`.
+Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The current live feature baseline was validated at `9e4cdb19039474b588865546254e2f122ce3583e`; this handoff reconciliation adds documentation-only commits after that baseline.
 
-The audit head before authorization remediation was `92d7b80454e58593e1cf6b8b57f099ba69547e79`. The current branch adds targeted fixes for catalog mutation and fail-open score synchronization; use the live PR head for restart.
+Lovable production is published and reports `Up to date`. The product is ready for a small friends-and-family beta. Do not begin a new feature before reviewing beta feedback and the remaining integration boundaries below.
 
-No local checkout exists in the Codex workspace. GitHub connector writes are the repository working state, so there is no local uncommitted working tree to preserve.
+No local checkout exists in the Codex workspace. GitHub connector commits are the repository working state; there is no local uncommitted working tree to preserve.
 
-## Working state
+## Current product state
 
-- Accounts, one official entry per user, cloud draft/submission/locking RPCs, weekly scorecard foundations, private groups, favorite-team defaults, Next Team navigation, standings projections, and Championship Week are implemented on the feature branch.
-- Regular-season and Championship Week selections now use a version 2 cloud entry payload with legacy flat-payload compatibility.
-- `My Entry` and persistent navigation provide the main signed-in workflow.
-- Google OAuth was manually confirmed after the exact Lovable Cloud callback was registered.
-- Lovable preview at the feature head passed route, desktop, 390-pixel phone, review-anchor, and accessibility QC.
-- Production contains the account and entry experience, but the final July 20 anchor, mobile-nav, and accessibility corrections are still unpublished.
-- PR #2 is intentionally still a draft.
-- The browser no longer invokes `sync_2026_catalog`; a forward-only migration restricts the RPC to service-role JWTs.
-- `sync-cfbd-scores` now fails closed when `SYNC_SECRET` is absent or blank.
-- These security changes are not live until Lovable applies the migration and deploys the Edge Function.
+- Google and email-link authentication work in production. Apple authentication is unvalidated and should remain unadvertised.
+- Every account starts with zero picks and has one official 2026 entry across all private groups.
+- Account switching clears account-scoped browser data before restoring the next user's cloud entry.
+- Regular-season picks synchronize across both teams' schedules.
+- Championship Week derives four P4 title games and gates the playoff field until all winners are chosen.
+- Private-group creation, invitation, owner/member isolation, display names, and member-only invite visibility were tested with two dedicated accounts.
+- A complete 476-game, four-champion QC entry submitted successfully through the production `submit_entry` RPC.
+- The My Entry dashboard restores cloud data and reports submitted state correctly.
+- Automatic cloud saves are serialized per page and expose loading, waiting, saving, saved, and failed states.
+- A production change/save/revert/reload smoke test passed without changing the QC member's final picks.
+- PR #2 remains intentionally draft.
+
+## Security and database state
+
+- `sync_2026_catalog` is restricted to service-role JWTs in source and production.
+- `sync-cfbd-scores` fails closed. Missing and incorrect secret headers return 401; `SYNC_SECRET` is configured.
+- The migration ledger is reconciled and guarded by `scripts/validate-migrations.mjs`.
+- Deadline checks exist in entry RPCs and at the ballot write boundary.
+- Independent scheduled locking covers draft and submitted entries.
+- Submission completeness and all four P4 championship winners are validated server-side.
+- The production PostgreSQL-17 incompatibility in `submit_entry` was fixed with a tracked migration using `jsonb_object_keys`; CI prevents regression.
+- Temporary-season tests validated deadline and locking logic without changing the real 2026 deadline.
+- Locked payload immutability remains a non-negotiable recovery rule.
 
 ## Repository and deployment state
 
@@ -31,44 +44,50 @@ PR: https://github.com/benrempe-LGG/nebraskawinprojection/pull/2
 Lovable project: https://lovable.dev/projects/aa959e7e-80e8-43d4-b07c-fd05e6b0a950  
 Production: https://nebraskawinprojection.lovable.app/
 
-GitHub remote is configured through the connector. The intended repository boundary is this repository only; the surrounding Codex workspace is not a checkout and must not be initialized as the project repository.
+The GitHub remote is available through the connector. The surrounding Codex workspace is not a checkout and must not be initialized as this repository.
 
-## Important unvalidated state
+## Validation evidence
 
-- Lovable's exact applied-migration ledger, including duplicate manual and generated versioned-payload migrations
-- Cross-device restoration of draft, submitted, and locked version 2 payloads
-- Two-account private-group RLS, invitation, OAuth return, and leaderboard behavior
-- Apple and email-link authentication
-- CFBD secret configuration, rejection behavior, team mapping, score ingestion, and weekly scorecard population
-- Deadline scheduler and automatic locking
-- Signed-in production regression after the pending Lovable update
-- Lint, standalone type checking, and browser end-to-end automation
+- GitHub Actions run 157 passed lint, typecheck, unit tests, migration validation, and production build.
+- Lovable production reported `Up to date` after publication.
+- Google OAuth and email-link authentication were exercised.
+- Two-account group membership and identity isolation were exercised.
+- Fresh-account zero-state was exercised.
+- Complete production submission was exercised through the real RPC.
+- Ordered cloud saving was exercised with a production change, visible save state, reversion, and reload.
 
-## Security and hygiene
+See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for safe production procedures.
 
-- No credentials were present in the inspected configuration, changed source, or canonical documentation; only environment-variable names and the public OAuth callback are documented. This was not a full-history secret scan.
-- `.gitignore` excludes dependencies, builds, logs, local files, and common editor state.
-- The feature-branch score-sync function fails closed, but Lovable deployment and secret configuration must be verified before enabling scheduled or public invocation.
-- Both `package-lock.json` and `bun.lock` are tracked; CI uses npm. Avoid removing either until the Lovable workflow and canonical package manager are explicitly reconciled.
-- Do not delete either versioned-payload migration until the applied migration ledger is understood.
+## Remaining unvalidated or incomplete state
 
-## Read first
+- True cross-device restore and editing using two different physical browsers/devices
+- Server-side optimistic concurrency or immutable revisions for simultaneous-device edits
+- Apple authentication configuration and policy
+- A real successful CFBD score import, provider mapping, and weekly scorecard population
+- Automatic locking at the real 2026 deadline
+- Post-merge GitHub Pages and Lovable verification
+- Browser end-to-end automation as a repeatable CI script
+- Dependency audit remediation; CI currently reports 4 moderate and 13 high transitive vulnerabilities
+- Week-by-week full-slate picking
+- Product analytics and fan-base prediction insights
+- Multiple named entries per account
 
-1. `README.md`
-2. `docs/ROADMAP.md`
-3. `docs/KNOWN_ISSUES.md`
-4. `docs/ARCHITECTURE.md`
-5. `docs/DECISIONS.md`
-6. `docs/VALIDATION.md`
-7. PR #2
+## Decisions still in force
+
+- One official 2026 entry per account during beta
+- Submitted entries remain editable until the deadline
+- Locked payloads are immutable and scorecards use the locked snapshot
+- Private groups are invitation-only
+- PR #2 stays draft until beta exit criteria are met
+- Google and email are the supported beta login paths
 
 ## Recommended next tasks
 
-1. Apply and verify `202607210001_secure_catalog_and_score_sync.sql` in Lovable, deploy the updated Edge Function, and confirm `SYNC_SECRET` is configured.
-2. Verify authenticated users cannot invoke `sync_2026_catalog`; run missing, incorrect, and valid score-sync secret tests.
-3. Enforce the entry deadline directly in write RPCs and RLS, then reconcile the duplicate migration ledger.
-4. Run two-account group and cross-device entry tests, including locked Championship Week restoration.
-5. Publish the validated preview, complete production smoke tests, and prepare PR #2 for review.
+1. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
+2. Run a documented two-device restore test for draft and submitted entries, then decide whether optimistic concurrency is required before broader launch.
+3. Run one controlled CFBD import against known final-game fixtures and verify weekly scorecards without exposing the endpoint.
+4. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
+5. Reconcile beta findings, update PR #2, mark it ready, merge to `main`, and verify Lovable plus GitHub Pages.
 
 ## Restart instructions
 
@@ -77,9 +96,20 @@ git clone https://github.com/benrempe-LGG/nebraskawinprojection.git
 cd nebraskawinprojection
 git switch feature/accounts-scorecards-foundation
 npm install
-npm test
-npm run build
+npm run ci
 npm run dev
 ```
 
-Then read the documents above and inspect Lovable's migration and production state before changing application behavior.
+Then read, in order:
+
+1. `README.md`
+2. `docs/HANDOFF.md`
+3. `docs/ROADMAP.md`
+4. `docs/KNOWN_ISSUES.md`
+5. `docs/BETA_OPERATIONS.md`
+6. `docs/ARCHITECTURE.md`
+7. `docs/DECISIONS.md`
+8. `docs/VALIDATION.md`
+9. PR #2
+
+Before any production database write, identify one exact test account and season, capture before/after evidence, and preserve all locked payloads.

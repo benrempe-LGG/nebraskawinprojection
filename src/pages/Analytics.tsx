@@ -40,7 +40,7 @@ const Analytics = () => {
   }, [confFilter]);
 
   return (
-    <div className="gradient-page min-h-screen pb-16">
+    <main className="gradient-page min-h-screen pb-16">
       {/* Header */}
       <div className="gradient-header py-6 sm:py-8 border-b border-border">
         <div className="max-w-[1100px] mx-auto px-4">
@@ -194,7 +194,7 @@ const Analytics = () => {
       <div className="max-w-[1100px] mx-auto mt-8 px-4 text-center text-[11px] text-muted-foreground/50">
         SP+ data via Bill Connelly. Talent Composite via 247Sports. 2016–2025 seasons.
       </div>
-    </div>
+    </main>
   );
 };
 

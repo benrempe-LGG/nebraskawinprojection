@@ -1,20 +1,15 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  buildCanonicalUpdate,
+  buildGameIndex,
+  buildTeamIndex,
+  matchIncomingGame,
+  type CfbdGameLike,
+} from "./matcher.ts";
 
 const CFBD_BASE_URL = "https://api.collegefootballdata.com";
 
-interface CfbdGame {
-  id: number;
-  season: number;
-  week: number;
-  start_date: string;
-  completed: boolean;
-  neutral_site: boolean;
-  venue: string | null;
-  home_team: string;
-  home_points: number | null;
-  away_team: string;
-  away_points: number | null;
-}
+type CfbdGame = CfbdGameLike;
 
 Deno.serve(async (request) => {
   const expectedSecret = Deno.env.get("SYNC_SECRET");
@@ -59,54 +54,65 @@ Deno.serve(async (request) => {
   }
 
   const [{ data: teams, error: teamError }, { data: existingGames, error: gameError }] = await Promise.all([
-    supabase.from("teams").select("id, cfbd_team").not("cfbd_team", "is", null),
+    supabase.from("teams").select("id, name, cfbd_team"),
     supabase.from("games").select("id, home_team_id, away_team_id").eq("season", season),
   ]);
   if (teamError) return Response.json({ error: teamError.message }, { status: 500 });
   if (gameError) return Response.json({ error: gameError.message }, { status: 500 });
 
-  const teamIds = new Map((teams ?? []).map((team) => [team.cfbd_team, team.id]));
-  const gameIds = new Map(
-    (existingGames ?? []).map((game) => [
-      `${game.home_team_id}|${game.away_team_id}`,
-      game.id,
-    ]),
-  );
+  const teamIndex = buildTeamIndex(teams ?? []);
+  const gameIndex = buildGameIndex(existingGames ?? []);
+  const now = new Date().toISOString();
 
-  const rows = incoming.flatMap((game) => {
-    const homeTeamId = teamIds.get(game.home_team);
-    const awayTeamId = teamIds.get(game.away_team);
-    if (!homeTeamId || !awayTeamId) return [];
+  const updates: ReturnType<typeof buildCanonicalUpdate>[] = [];
+  const unmatchedTeams = new Set<string>();
+  const unmatchedGames: Array<{ home: string; away: string; cfbd_game_id: number }> = [];
+  let reversedCount = 0;
 
-    const existingId = gameIds.get(`${homeTeamId}|${awayTeamId}`);
-    return [{
-      ...(existingId ? { id: existingId } : {}),
-      season: game.season,
-      week: game.week,
-      kickoff_at: game.start_date,
-      home_team_id: homeTeamId,
-      away_team_id: awayTeamId,
-      neutral_site: game.neutral_site,
-      venue: game.venue,
-      cfbd_game_id: game.id,
-      status: game.completed ? "final" : "scheduled",
-      home_score: game.home_points,
-      away_score: game.away_points,
-      completed_at: game.completed ? new Date().toISOString() : null,
-    }];
-  });
-
-  if (rows.length) {
-    const { error } = await supabase.from("games").upsert(rows, { onConflict: "id" });
-    if (error) return Response.json({ error: error.message }, { status: 500 });
+  for (const game of incoming) {
+    const match = matchIncomingGame(game.home_team, game.away_team, teamIndex, gameIndex);
+    if (match.kind === "unmatched_team") {
+      unmatchedTeams.add(match.team);
+      continue;
+    }
+    if (match.kind === "no_canonical_game") {
+      unmatchedGames.push({ home: match.home, away: match.away, cfbd_game_id: game.id });
+      continue;
+    }
+    if (match.reversed) reversedCount += 1;
+    updates.push(buildCanonicalUpdate(game, match, now));
   }
 
-  return Response.json({
+  // Update matched canonical rows in place by primary key. We deliberately do
+  // NOT insert new rows here: the 2026 catalog is authoritative and inserting a
+  // reversed row would violate the (season, home_team_id, away_team_id) unique
+  // constraint or create a duplicate opposite-orientation game.
+  let updated = 0;
+  for (const row of updates) {
+    const { id, ...patch } = row;
+    const { error } = await supabase.from("games").update(patch).eq("id", id);
+    if (error) {
+      console.error("games update failed", { id, error: error.message });
+      return Response.json({ error: error.message, failed_id: id }, { status: 500 });
+    }
+    updated += 1;
+  }
+
+  const summary = {
     season,
     week: weekParam ? Number(weekParam) : null,
     received: incoming.length,
-    matched: rows.length,
-    skipped: incoming.length - rows.length,
+    matched: updates.length,
+    updated,
+    reversed_orientation: reversedCount,
+    unmatched_teams: Array.from(unmatchedTeams).sort(),
+    unmatched_games: unmatchedGames,
     entries_locked: entriesLocked ?? 0,
-  });
+  };
+
+  if (unmatchedTeams.size || unmatchedGames.length) {
+    console.warn("sync-cfbd-scores skipped rows", summary);
+  }
+
+  return Response.json(summary);
 });

@@ -8,6 +8,8 @@
  *      UUID suffix) that would shadow the reconciled UUID-suffixed ledger.
  *   3. Duplicate CREATE TYPE / CREATE TABLE targets across the ordered chain
  *      (bare form, without IF NOT EXISTS), which cause fresh-apply conflicts.
+ *   4. A latest submit_entry definition that uses unsupported jsonb_object_length
+ *      instead of PostgreSQL-17-compatible jsonb_object_keys counting.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -54,6 +56,7 @@ const createdTables = new Map();
 const stmtType = /create\s+type\s+([a-z0-9_."]+)/gi;
 const stmtTable = /create\s+table\s+(?!if\s+not\s+exists)([a-z0-9_."]+)/gi;
 const stmtTableSafe = /create\s+table\s+if\s+not\s+exists\s+([a-z0-9_."]+)/gi;
+let latestSubmitEntry = null;
 
 function stripComments(sql) {
   return sql
@@ -65,6 +68,12 @@ for (const name of entries) {
   const path = join(DIR, name);
   if (!statSync(path).isFile()) continue;
   const raw = stripComments(readFileSync(path, "utf8"));
+  const submitEntryIndex = raw
+    .toLowerCase()
+    .lastIndexOf("create or replace function public.submit_entry");
+  if (submitEntryIndex >= 0) {
+    latestSubmitEntry = { name, sql: raw.slice(submitEntryIndex) };
+  }
 
   for (const m of raw.matchAll(stmtType)) {
     const id = m[1].toLowerCase();
@@ -87,6 +96,22 @@ for (const name of entries) {
     const id = m[1].toLowerCase();
     if (!createdTables.has(id)) createdTables.set(id, name);
   }
+}
+
+if (!latestSubmitEntry) {
+  errors.push("No public.submit_entry definition found in migration history.");
+} else if (/jsonb_object_length\s*\(/i.test(latestSubmitEntry.sql)) {
+  errors.push(
+    `Latest submit_entry definition in ${latestSubmitEntry.name} uses unsupported jsonb_object_length(jsonb).`
+  );
+} else if (
+  !/from\s+jsonb_object_keys\s*\(\s*predictions_payload\s*\)/i.test(
+    latestSubmitEntry.sql
+  )
+) {
+  errors.push(
+    `Latest submit_entry definition in ${latestSubmitEntry.name} must count predictions with jsonb_object_keys.`
+  );
 }
 
 if (errors.length) {

@@ -109,21 +109,28 @@ export default function Account() {
   if (loading) return <main className="container py-12">Loading account…</main>;
 
   return (
-    <main className="container max-w-xl py-12">
-      <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Back to predictor</Link>
-      <Card className="mt-6">
+    <main className="container max-w-2xl py-12">
+      <Card>
         <CardHeader>
-          <CardTitle>{user ? "Your account" : "Save your 2026 ballot"}</CardTitle>
+          <CardTitle>{user ? "Account & entry settings" : "Save your 2026 entry"}</CardTitle>
           <CardDescription>
             {user
-              ? "Your predictions can be saved across devices and locked for the season."
-              : "Sign in to save predictions across devices, lock your ballot, and receive weekly scorecards."}
+              ? "Manage your official entry, favorite team, groups, and weekly results."
+              : "Sign in to save predictions across devices, submit your entry, and receive weekly scorecards."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {user ? (
             <>
               <p className="text-sm">Signed in as <strong>{user.email}</strong></p>
+
+              <Button asChild className="w-full">
+                <Link to="/entry">Open my 2026 entry</Link>
+              </Button>
+              <Button asChild className="w-full" variant="secondary">
+                <Link to="/">Continue making picks</Link>
+              </Button>
+
               <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4">
                 <label htmlFor="favorite-team" className="text-sm font-bold text-foreground">
                   Your team
@@ -151,13 +158,20 @@ export default function Account() {
                   {savingTeam ? "Saving…" : "Save my team"}
                 </Button>
               </div>
-              <Button asChild className="w-full">
-                <Link to="/scorecards">View weekly scorecards</Link>
-              </Button>
-              <Button asChild className="w-full" variant="secondary">
-                <Link to="/groups">Private groups</Link>
-              </Button>
-              <Button variant="outline" onClick={() => signOut().catch((error) => toast.error(error.message))}>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button asChild variant="outline">
+                  <Link to="/scorecards">Weekly scorecards</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/groups">Private groups</Link>
+                </Button>
+              </div>
+
+              <Button
+                variant="ghost"
+                onClick={() => signOut().catch((error) => toast.error(error.message))}
+              >
                 Sign out
               </Button>
             </>

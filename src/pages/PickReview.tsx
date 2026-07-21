@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getSeasonGames } from "@/lib/ballot";
 import { getProjectedWinner } from "@/lib/oddsmaker";
@@ -64,7 +64,7 @@ const PickReview = () => {
           </div>
         </div>
 
-        <section id="remaining" className="scroll-mt-5">
+        <section id="remaining" className="scroll-mt-24">
           <h2 className="text-xl font-black text-foreground font-display">
             Remaining games
           </h2>
@@ -103,7 +103,7 @@ const PickReview = () => {
           )}
         </section>
 
-        <section id="fifty" className="mt-10 scroll-mt-5">
+        <section id="fifty" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-black text-foreground font-display">
             50% games
           </h2>

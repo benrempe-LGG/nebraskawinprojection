@@ -65,6 +65,23 @@ describe("LatestSaveQueue", () => {
     expect(statuses.at(-1)).toBe("saved");
   });
 
+  it("persists a reversion when an older write is already active", async () => {
+    const first = deferred();
+    const saved: string[] = [];
+    const queue = new LatestSaveQueue<string>(async (value) => {
+      saved.push(value);
+      if (value === "changed") await first.promise;
+    }, () => undefined);
+
+    queue.seed("original");
+    queue.enqueue("changed", "changed");
+    queue.enqueue("original", "original");
+    first.resolve();
+    await queue.waitForIdle();
+
+    expect(saved).toEqual(["changed", "original"]);
+  });
+
   it("does not save a seeded payload again", async () => {
     const save = vi.fn(async () => undefined);
     const queue = new LatestSaveQueue(save, () => undefined);

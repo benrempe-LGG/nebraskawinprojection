@@ -16,6 +16,8 @@ export default function Account() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const [savingName, setSavingName] = useState(false);
   const [favoriteTeam, setFavoriteTeam] = useState("");
   const [savingTeam, setSavingTeam] = useState(false);
 
@@ -29,6 +31,7 @@ export default function Account() {
 
   useEffect(() => {
     if (!user) {
+      setDisplayName("");
       setFavoriteTeam("");
       return;
     }
@@ -36,7 +39,7 @@ export default function Account() {
     let active = true;
     supabase
       .from("profiles")
-      .select("favorite_team")
+      .select("display_name, favorite_team")
       .eq("id", user.id)
       .single()
       .then(({ data, error }) => {
@@ -45,7 +48,13 @@ export default function Account() {
           toast.error("Could not load your favorite team: " + error.message);
           return;
         }
+        const savedName =
+          data?.display_name ||
+          (typeof user.user_metadata?.full_name === "string"
+            ? user.user_metadata.full_name
+            : "");
         const savedTeam = data?.favorite_team || "";
+        setDisplayName(savedName);
         setFavoriteTeam(savedTeam);
         if (savedTeam && ALL_TEAMS[savedTeam]) {
           localStorage.setItem(FAVORITE_TEAM_KEY, savedTeam);
@@ -56,6 +65,30 @@ export default function Account() {
       active = false;
     };
   }, [user]);
+
+  async function saveDisplayName() {
+    if (!user) return;
+    const trimmedName = displayName.trim();
+    if (trimmedName.length < 2) {
+      toast.error("Display name must be at least 2 characters.");
+      return;
+    }
+
+    setSavingName(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: trimmedName })
+      .eq("id", user.id);
+    setSavingName(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    setDisplayName(trimmedName);
+    toast.success("Your group display name was saved.");
+  }
 
   async function saveFavoriteTeam() {
     if (!user || !favoriteTeam) return;
@@ -125,6 +158,31 @@ export default function Account() {
               <Button asChild className="w-full" variant="secondary">
                 <Link to="/">Continue making picks</Link>
               </Button>
+
+              <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4">
+                <label htmlFor="display-name" className="text-sm font-bold text-foreground">
+                  Group display name
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  Friends will see this name in private-group standings.
+                </p>
+                <Input
+                  id="display-name"
+                  minLength={2}
+                  maxLength={40}
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  placeholder="Your name or nickname"
+                />
+                <Button
+                  type="button"
+                  className="w-full"
+                  disabled={displayName.trim().length < 2 || savingName}
+                  onClick={saveDisplayName}
+                >
+                  {savingName ? "Saving…" : "Save display name"}
+                </Button>
+              </div>
 
               <div className="space-y-2 rounded-lg border border-border bg-muted/40 p-4">
                 <label htmlFor="favorite-team" className="text-sm font-bold text-foreground">

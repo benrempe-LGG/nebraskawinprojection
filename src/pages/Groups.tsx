@@ -36,7 +36,8 @@ export default function Groups() {
 
   const loadGroups = useCallback(async () => {
     if (!user) return;
-    const { data, error } = await (supabase as any)
+    const { data, error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any)
       .from("prediction_groups")
       .select("id, name, season, owner_id, invite_code")
       .order("created_at", { ascending: true });
@@ -57,6 +58,7 @@ export default function Groups() {
       setLeaders([]);
       return;
     }
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any)
       .rpc("get_group_leaderboard", { target_group: selected.id })
       .then(({ data, error }: { data: Leader[] | null; error: { message: string } | null }) => {
@@ -68,7 +70,8 @@ export default function Groups() {
   async function createGroup(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
-    const { error } = await (supabase as any).rpc("create_private_group", {
+    const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("create_private_group", {
       group_name: name,
       target_season: 2026,
     });
@@ -82,7 +85,8 @@ export default function Groups() {
   async function joinGroup(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
-    const { error } = await (supabase as any).rpc("join_private_group", { code });
+    const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("join_private_group", { code });
     setBusy(false);
     if (error) return toast.error(error.message);
     setCode("");
@@ -99,7 +103,8 @@ export default function Groups() {
 
   async function regenerateInvite() {
     if (!selected) return;
-    const { error } = await (supabase as any).rpc("regenerate_group_invite", {
+    const { error } = await /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    (supabase as any).rpc("regenerate_group_invite", {
       target_group: selected.id,
     });
     if (error) return toast.error(error.message);

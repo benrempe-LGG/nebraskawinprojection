@@ -27,6 +27,7 @@ export default function Scorecards() {
     }
 
     let active = true;
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (supabase as any)
       .from("weekly_scorecards")
       .select("ballot_id, season, week, games_final, correct_picks, incorrect_picks")

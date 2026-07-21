@@ -1,57 +1,75 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-20
+Updated: 2026-07-21
 
-## P0 before merging PR #2
+There are no known release-blocking defects for the small friends-and-family beta. The following items block broader launch or PR #2 merge readiness.
 
-### Security fixes require Lovable deployment
+## P1 — Before broader launch or merge
 
-Status: the feature branch removes the browser call to `sync_2026_catalog`, adds a forward-only migration restricting that RPC to service-role JWTs, and makes `sync-cfbd-scores` fail closed when `SYNC_SECRET` is missing.
+### Cross-device conflict protection is incomplete
 
-Risk: source control is fixed, but production remains vulnerable until Lovable applies `202607210001_secure_catalog_and_score_sync.sql`, deploys the updated Edge Function, and confirms `SYNC_SECRET` is configured.
+Status: cloud entries restore correctly in production, account isolation is verified, and automatic writes from one page are serialized with visible save states.
 
-Next action: apply and verify those changes in Lovable, then confirm authenticated users receive permission denied from `sync_2026_catalog` and missing/incorrect sync secrets receive 500/401 responses.
+Risk: two devices editing simultaneously can still overwrite one another because the server does not enforce optimistic concurrency or retain immutable draft revisions.
 
+Next action: run a documented two-device test, then add an expected-version check or ballot revision history if concurrent editing is likely.
 
-### Lovable migration history needs reconciliation
+### Real CFBD ingestion is not validated
 
-Risk: the repository contains manual and Lovable-generated copies of the versioned Championship Week payload migration. Git contents do not prove which migration identifiers production recorded.
+Status: secret denial paths, fixture matching, reversed orientation, aliases, unmatched games, and idempotent behavior are covered. The deployed endpoint fails closed.
 
-Next action: inspect Lovable's migration ledger and database RPC definitions. Do not delete an applied migration merely to make the repository look cleaner.
+Risk: a real provider payload or mapping difference could prevent results and weekly scorecards from populating.
 
-### Final preview corrections are not published
+Next action: run one controlled successful import with known games and verify results plus scorecards.
 
-Risk: production can lag the branch even when CI and Lovable preview pass.
+### Apple authentication is unsupported for beta
 
-Next action: publish the current branch through Lovable, then repeat signed-out desktop and phone smoke tests and signed-in entry checks.
+Status: Google and email-link authentication work. Apple produced provider/configuration errors and has not been validated with developer credentials.
 
-### Two-account and cross-device testing is incomplete
+Risk: exposing the Apple button creates a broken onboarding path.
 
-Risk: create/join links, RLS visibility, leaderboard aggregation, OAuth return, and version 2 entry restoration may work for one account but fail across identities or browsers.
+Next action: keep Apple unadvertised or disabled until a supported configuration is tested; otherwise remove the UI path.
 
-Next action: run a documented owner/member test with two dedicated accounts and restore a submitted and locked entry in a second browser.
+### Real-deadline automatic locking is not exercised
 
-### Entry deadline and locking need live testing
+Status: RPC, trigger, scheduler, completeness, and locked-payload behavior passed temporary-season database tests.
 
-Risk: submit, reopen, automatic locking, and locked scorecards depend on deployed RPCs, catalog completeness, deadline configuration, and scheduled invocation.
+Risk: production scheduling or deadline configuration could differ at the real 2026 cutoff.
 
-Next action: validate with a temporary controlled deadline, confirm both prediction layers in `locked_payload`, then restore the official deadline.
+Next action: repeat the temporary-season operational test near release and verify scheduler visibility. Never change the official 2026 deadline merely for testing.
 
-## P1
+### Dependency audit findings need triage
 
-- CFBD provider mapping and real final-score ingestion require live validation.
-- Apple and email-link authentication have not been recorded as passing.
+Status: CI installs successfully but reports 4 moderate and 13 high npm vulnerabilities.
+
+Risk: the findings may be transitive or development-only, but their production relevance is not yet documented.
+
+Next action: inspect `npm audit --omit=dev`, identify runtime exposure, and update dependencies selectively. Do not run a blind force fix.
+
+## P2 — Product and operational debt
+
+- Browser end-to-end tests are not configured as a repeatable CI command.
+- Product error monitoring and a user-facing beta feedback path are not implemented.
+- Privacy-safe aggregate prediction analytics and own-team fan-cohort insights are not implemented.
+- One account supports only one official 2026 entry; multiple named entries require new entry identity, scoring, and group-leaderboard design.
+- Commissioner controls do not cover member removal, ownership transfer, leaving, deletion, or renaming.
 - Championship participants use simplified standings tiebreakers.
 - The G6 playoff team is an unnamed reserved slot.
 - Week-by-week full-slate picking is not implemented.
 - Vegas season win totals remain manual; the removed Odds API returned the wrong market.
-- CI does not run lint, a dedicated TypeScript check, or browser end-to-end tests.
-- No shared QA credentials or administrator role exist; formal testing needs two dedicated standard-user accounts.
+- OAuth and deployment configuration remain partly external to Git.
+- Both `package-lock.json` and `bun.lock` are tracked while CI uses npm; consolidation must not disrupt Lovable.
 
-## P2
+## Resolved July 21
 
-- Commissioner controls do not cover member removal, ownership transfer, leaving, deletion, or renaming.
-- No error monitoring or product analytics is configured.
-- Bundle-size optimization has not been prioritized.
-- OAuth and deployment configuration are partly external to Git and need an operations checklist.
-- Both `package-lock.json` and `bun.lock` are tracked while CI uses npm; the canonical package manager should eventually be documented or consolidated without disrupting Lovable.
+- Production and Lovable preview drift was published and reconciled.
+- Migration history was reconciled and is CI-validated.
+- Browser catalog mutation was removed and the RPC restricted to service-role JWTs.
+- Score synchronization now fails closed and rejects missing or incorrect secrets.
+- Entry deadlines are enforced in RPCs and at the ballot write boundary.
+- Automatic locking covers draft and submitted ballots.
+- Server submission validates catalog completeness and all four P4 champions.
+- PostgreSQL-17 submission compatibility was repaired and protected by CI.
+- Fresh accounts begin with zero picks; account switching no longer leaks browser state.
+- Two-account private-group owner/member behavior was exercised.
+- Automatic saves are ordered and expose truthful save status.

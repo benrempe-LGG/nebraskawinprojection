@@ -1,40 +1,57 @@
 # Architecture
 
-Updated: 2026-07-20
+Updated: 2026-07-21
 
-## System boundary
+## Product flow
 
-The product is a Vite, React, and TypeScript single-page application deployed through Lovable and GitHub Pages. Lovable Cloud provides the Supabase-compatible authentication and PostgreSQL backend used by the feature branch. GitHub is the source repository, pull-request surface, and CI system.
+The application is a Vite/React single-page app for a 2026 Power Four season prediction game.
 
-## Client and navigation
+1. A user selects a team and assigns win probabilities to regular-season games.
+2. `predictionStore.ts` stores each matchup once using a canonical season/team-pair key.
+3. Both teams' schedule views read the same prediction and display complementary probabilities.
+4. Standings derive overall and conference records from projected winners.
+5. Championship Week selects the top two teams in each P4 conference.
+6. The user picks four conference champions.
+7. The playoff model adjusts title-game participants and produces a 12-team field.
+8. Signed-in users submit one official entry and compare it in private groups.
+9. Locked entries and final results feed weekly scorecards.
 
-`SiteNav.tsx` provides persistent routes to the predictor, My Entry, groups, and authentication. `MyEntry.tsx` is the entry dashboard. `Index.tsx` drives team schedule picking, and `PickReview.tsx` provides remaining-game and 50% review sections.
+## Frontend structure
 
-`predictionStore.ts` assigns a canonical season/team-pair key so one probability updates both team schedules. LocalStorage remains the immediate cache and supports unsigned use.
+- `src/App.tsx` — routes and protected-route composition
+- `src/components/SiteNav.tsx` — persistent responsive navigation
+- `src/pages/Index.tsx` — team schedule predictor
+- `src/pages/MyEntry.tsx` — official-entry dashboard
+- `src/components/SeasonBallot.tsx` — progress, cloud hydration, autosave, submission, and status UI
+- `src/pages/PickReview.tsx` — remaining and 50% review
+- `src/pages/Standings.tsx` — conference standings
+- `src/pages/ChampionshipWeek.tsx` — derived title games and winners
+- `src/pages/Playoff.tsx` — championship-gated playoff projection
+- `src/pages/Groups.tsx` — private groups and invitations
+- `src/pages/Scorecards.tsx` — read-only weekly scoring surface
+- `src/contexts/AuthContext.tsx` — authentication and account-isolated browser state
 
-Derived modules remain intentionally one-way:
+## Prediction identity
 
-1. Canonical regular-season picks
-2. Conference and overall standings
-3. P4 Championship Week participants and winners
-4. Championship-adjusted playoff résumés
-5. Final playoff field
+Regular-season games use a canonical key built from season and alphabetically ordered team names. Date is excluded because schedule sources previously disagreed on dates and created duplicate entries.
 
-The playoff page remains gated until all four P4 championship winners are selected.
+This keeps both team schedules synchronized. The constraint is that same-season rematches require a separate identity layer. Generated conference championship games remain outside the regular-season key set.
 
-## Identity and roles
+## Identity and local storage
 
-`AuthContext.tsx` wraps Supabase session state. `Account.tsx` exposes Google, Apple, and email-link entry points plus favorite-team selection. Group invitation destinations are temporarily stored in sessionStorage so OAuth return can continue the invitation.
+Lovable Cloud supplies a Supabase-compatible session. Google and email-link authentication work in production. Apple is not a supported beta path.
 
-There is no product administrator role. Authenticated users have one official 2026 entry. Private groups add owner and member relationships without granting application-wide administration.
+Unsigned users store picks only in `localStorage`. Signed-in account changes clear prediction, championship, favorite-team, and Vegas browser state before the new account's cloud entry loads. This prevents one account's local cache from appearing in another.
+
+`accountStorage.ts` owns account-scoped resets. `cloud-entry-loaded` and `account-storage-reset` events refresh predictor and entry-dashboard views after hydration.
 
 ## Cloud entry lifecycle
 
-`SeasonBallot.tsx` and `ChampionshipWeek.tsx` bridge local state and Supabase RPCs. The modeled lifecycle is:
+The lifecycle is:
 
 `draft -> submitted -> locked`
 
-Submitted entries may continue saving until the configured deadline. Locked entries preserve an immutable payload.
+Submitted entries remain editable until the configured deadline. Locked entries preserve an immutable `locked_payload` for scoring.
 
 `cloudEntry.ts` defines payload version 2:
 
@@ -46,35 +63,65 @@ Submitted entries may continue saving until the configured deadline. Locked entr
 }
 ```
 
-Legacy flat payloads are read as version 1 and normalized to version 2. Restored Championship Week selections are filtered against the participants derived from the restored regular-season predictions.
+Legacy flat payloads normalize to version 2. Restored championship selections are filtered against participants derived from restored regular-season picks.
 
-## Database and migrations
+Each account has one 2026 ballot. That same entry is visible in every private group the user joins.
 
-Migrations define profiles, seasons, teams, games, ballots, predictions, results, private groups, membership, scorecards, RPCs, entry deadlines, favorite-team preference, and versioned entry payloads. RLS restricts users to their mutable data. A security-definer leaderboard RPC exposes aggregate scorecard results only to group members.
+## Automatic save ordering
 
-The repository currently contains both `202607200001_versioned_championship_payload.sql` and a Lovable-generated timestamped copy, `20260720175508_a3382964-14bb-43af-aa78-011fbace957f.sql`. Do not delete or reapply either until the Lovable migration ledger is reconciled; applied migration history is an operational source of truth.
+`cloudSaveQueue.ts` serializes writes from one active browser page:
+
+1. A local change becomes the newest desired payload.
+2. Only one RPC write runs at a time.
+3. Queued stale payloads that never started are skipped.
+4. If a write is active, the newest desired payload runs afterward.
+5. The UI reports loading, waiting, saving, saved, or failed.
+6. Submission waits for the active save queue to become idle, then submits the complete current payload through `submit_entry`.
+
+This prevents out-of-order completion within one page. It does not prevent two independent devices from overwriting one another; server-side optimistic concurrency or immutable revisions are future work.
+
+## Database and authorization
+
+Tracked migrations define profiles, seasons, teams, games, ballots, normalized predictions, results, groups, membership, scorecards, RPCs, deadlines, and scheduled locking.
+
+Key controls:
+
+- RLS scopes mutable user data.
+- `sync_2026_catalog` requires a service-role JWT.
+- `sync-cfbd-scores` requires a matching configured secret and uses server-side credentials.
+- Entry RPCs and a ballot trigger enforce the deadline.
+- Scheduled locking snapshots both draft and submitted entries.
+- `submit_entry` derives the required game count server-side and requires four P4 championship winners.
+- Locked payloads are immutable.
+- `scripts/validate-migrations.mjs` checks canonical migration identities, duplicate schema creation, and the current submission-count implementation.
+
+The production database uses PostgreSQL 17. Submission counts use `jsonb_object_keys`; `jsonb_object_length(jsonb)` is intentionally rejected by CI.
+
+## Groups
+
+Private groups use an eight-character invitation code or shareable link. Membership RLS limits group visibility. Owners can regenerate invitation codes; members cannot see owner-only invite controls. Display names are profile-scoped. There is no application-wide administrator role.
 
 ## Scores
 
-`supabase/functions/sync-cfbd-scores/index.ts` fetches CFBD games, invokes deadline locking, matches catalog teams and games, and upserts final results. Provider and service-role credentials remain server-side.
+`supabase/functions/sync-cfbd-scores/` fetches CFBD games, invokes due-entry locking, matches canonical or reversed game orientation, applies team aliases, and upserts final results idempotently.
 
-Current security constraint: the function only rejects an invalid request when `SYNC_SECRET` exists. If the variable is absent, the endpoint accepts unauthenticated triggers. It must fail closed before scheduling or public exposure.
-
-Weekly scorecards compare a locked entry's normalized predictions with final game results.
+Denial paths and fixture matching are verified. A real successful provider import and production weekly scorecard population remain pending.
 
 ## Deployment
 
-- Lovable: primary hosted application and database configuration surface
-- GitHub Pages: static mirror deployed from `main`
-- GitHub Actions: Node 22, dependency install, tests, build, and preview artifact
-- Google OAuth callback: `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`
+- Lovable — primary application, database, migrations, authentication, Edge Functions, and production publication
+- GitHub Pages — static mirror deployed from `main`
+- GitHub Actions — Node 22; lint, typecheck, unit tests, migration validation, production build, preview artifact
+- Google OAuth callback — `https://chcsxbqdycmftlivpksq.supabase.co/auth/v1/callback`
 
-Preview and production are separate states. The July 20 branch head is validated in Lovable preview, while its final anchor, mobile-nav, and accessibility corrections still require a Lovable production update.
+Repository commits, Lovable preview, applied migrations, Edge Functions, and production publication are separate states. The beta operations runbook requires explicit reconciliation and smoke testing.
 
 ## Constraints
 
-- The playoff model is an explainable heuristic, not an official ranking.
-- The top two conference rows determine title-game participants; official tiebreaker trees are not implemented.
+- The playoff model is an explainable heuristic, not an official committee ranking.
+- Conference title participants use simplified standings tiebreakers.
 - G6 selection is a reserved slot, not a ranked G6 schedule.
-- The canonical team-pair key needs expansion for same-season rematches outside the generated championship layer.
-- CI does not replace live OAuth, migration-ledger, Edge Function, scheduler, mobile, or cross-device testing.
+- Same-season regular-season rematches need a richer canonical identity.
+- Simultaneous-device entry edits lack server-side conflict detection.
+- Weekly full-slate picking is not implemented.
+- Live CFBD ingestion, real-deadline locking, and Apple authentication remain unvalidated.

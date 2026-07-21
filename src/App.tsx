@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import SiteNav from "./components/SiteNav.tsx";
 import Index from "./pages/Index.tsx";
 import Analytics from "./pages/Analytics.tsx";
 import Standings from "./pages/Standings.tsx";
@@ -11,6 +12,7 @@ import ChampionshipWeek from "./pages/ChampionshipWeek.tsx";
 import PickReview from "./pages/PickReview.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Account from "./pages/Account.tsx";
+import MyEntry from "./pages/MyEntry.tsx";
 import Scorecards from "./pages/Scorecards.tsx";
 import Groups from "./pages/Groups.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
@@ -24,8 +26,10 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <SiteNav />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/entry" element={<MyEntry />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/standings" element={<Standings />} />
             <Route path="/championships" element={<ChampionshipWeek />} />

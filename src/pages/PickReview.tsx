@@ -32,6 +32,23 @@ const PickReview = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const scrollToHash = () => {
+      const sectionId = decodeURIComponent(window.location.hash.slice(1));
+      if (!sectionId) return;
+
+      document.getElementById(sectionId)?.scrollIntoView({ block: "start" });
+    };
+
+    const frameId = window.requestAnimationFrame(scrollToHash);
+    window.addEventListener("hashchange", scrollToHash);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("hashchange", scrollToHash);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen gradient-page pb-20">
       <header className="gradient-header border-b-2 border-primary px-5 py-7 text-center">

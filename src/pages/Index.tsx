@@ -129,11 +129,16 @@ const Index = () => {
     saveStore(VEGAS_KEY, team, vegasTotal);
   }, [vegasTotal, team]);
 
-  // A signed-in entry may be restored from Supabase after the page first renders.
+  // Account changes clear browser-scoped data before Supabase restores the
+  // authenticated user's entry. Refresh immediately for both transitions.
   useEffect(() => {
     const restoreCloudEntry = () => setWinPcts(loadPreds(team));
+    window.addEventListener("account-storage-reset", restoreCloudEntry);
     window.addEventListener("cloud-entry-loaded", restoreCloudEntry);
-    return () => window.removeEventListener("cloud-entry-loaded", restoreCloudEntry);
+    return () => {
+      window.removeEventListener("account-storage-reset", restoreCloudEntry);
+      window.removeEventListener("cloud-entry-loaded", restoreCloudEntry);
+    };
   }, [team, loadPreds]);
 
   useEffect(() => {

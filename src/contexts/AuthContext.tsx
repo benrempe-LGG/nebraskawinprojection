@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { syncStorageToAuthUser } from "@/lib/accountStorage";
 
 interface AuthState {
   user: User | null;
@@ -17,16 +18,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) {
-        setSession(data.session);
-        setLoading(false);
+    const applySession = (nextSession: Session | null) => {
+      if (!active) return;
+      const storageChanged = syncStorageToAuthUser(
+        localStorage,
+        nextSession?.user.id ?? null
+      );
+      if (storageChanged) {
+        window.dispatchEvent(new CustomEvent("account-storage-reset"));
       }
+      setSession(nextSession);
+      setLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      applySession(data.session);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setLoading(false);
+      applySession(nextSession);
     });
 
     return () => {

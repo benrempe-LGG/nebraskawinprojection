@@ -97,26 +97,23 @@ Decision: favor SEC and Big Ten résumés, track Notre Dame separately, normally
 
 Consequence: coefficients are assumptions and require continued scenario testing.
 
-## Decision Required — Score-sync authentication
+## 2026-07-21 — Score sync fails closed
 
-Conflict: the score-sync function uses service-role access but accepts unauthenticated triggers when `SYNC_SECRET` is absent.
+Decision: require a configured matching `SYNC_SECRET` for every score-sync invocation.
 
-Options:
+Rationale: a privileged ingestion endpoint must never become public because configuration is missing.
 
-1. Fail closed unless the secret exists and matches.
-2. Restrict invocation through another authenticated scheduler mechanism.
-3. Leave the current optional-secret behavior.
-
-Recommendation: fail closed and test the configured scheduler before enabling score ingestion.
-
-Impact of delay: an accidentally unconfigured deployment could expose a privileged, resource-consuming endpoint.
+Consequences: missing and incorrect secrets return 401; the production secret is configured; a controlled successful CFBD import is still required.
 
 ## Decision Required — Merge readiness
 
-Conflict: feature code, versioned entry persistence, preview QC, and CI are healthy, but migration-ledger reconciliation, production publication, two-account groups, cross-device locked-entry restore, Apple/email auth, CFBD sync, and deadline locking remain incomplete.
+Conflict: production, migrations, security, two-account groups, complete submission, and one-page cloud saving pass controlled QC, while real cross-device editing, successful CFBD ingestion, Apple disposition, and real scorecard operation remain incomplete.
 
-Options: merge as an explicitly incomplete beta, or complete the integration-beta exit criteria first.
+Options:
 
-Recommendation: keep PR #2 in draft until the Now roadmap exit criteria are recorded.
+1. Merge now as an explicitly incomplete private beta.
+2. Keep PR #2 draft until the private-beta and live-scoring exit criteria are recorded.
 
-Impact of delay: production remains on a known state while the team avoids merging partially verified external integrations.
+Recommendation: keep PR #2 draft while real users test, then merge after beta blockers and live-score validation are resolved or explicitly accepted.
+
+Impact of delay: the branch remains large, but production stays on the same tested feature state and avoids declaring incomplete integrations complete.

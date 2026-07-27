@@ -84,6 +84,12 @@ This prevents out-of-order completion within one page. It does not prevent two i
 
 Tracked migrations define profiles, seasons, teams, games, ballots, normalized predictions, results, groups, membership, scorecards, RPCs, deadlines, and scheduled locking.
 
+Confidence scoring is derived at query time from locked normalized predictions
+and current final game results. `weekly_scorecards` exposes eligible-game
+counts and an unrounded weekly Confidence Score; the member-only group RPC
+combines weekly values by game count and ranks by Confidence Score, Correct
+Picks, then display name. No confidence aggregate is persisted.
+
 Key controls:
 
 - RLS scopes mutable user data.

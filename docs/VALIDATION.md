@@ -1,5 +1,31 @@
 # Validation Record
 
+## 2026-07-27 - Confidence Scoring Unit 2 source validation
+
+Implemented one forward-only migration for weekly scorecards and the private
+group leaderboard without applying it to production.
+
+- Weekly scorecards remain security-invoker and score only locked normalized
+  predictions.
+- Final tied games are excluded from accuracy and confidence calculations.
+- Null confidence remains eligible for accuracy when resolvable but is excluded
+  from `confidence_games` and Confidence Score.
+- Group totals weight weekly scores by eligible games.
+- Private leaderboard access retains its membership check, security-definer
+  fixed search path, and restricted execution grants.
+- Ranking uses unrounded Confidence Score, Correct Picks, then display name.
+- Generated Supabase result types were synchronized with the added columns.
+- A rollback-only SQL fixture covers eligibility, ties, null confidence,
+  weighted totals, ranking, Correct Picks tie-breaking, score corrections, and
+  non-member rejection.
+- CI passed with 9 existing lint warnings and 0 errors, TypeScript typecheck,
+  69 tests, validation of 12 migrations, and the production build.
+
+The SQL fixture has not been executed because this checkout has no disposable
+PostgreSQL/Supabase runtime. Static CI guards validate the migration contract,
+not PostgreSQL execution. No production migration, data write, deployment, or
+configuration change occurred.
+
 ## 2026-07-27 - Confidence Scoring Unit 1
 
 Implemented the pure TypeScript scoring boundary without database, UI, or

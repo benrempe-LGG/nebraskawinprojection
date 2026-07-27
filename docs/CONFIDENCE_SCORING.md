@@ -1,6 +1,6 @@
 # Confidence Scoring Specification
 
-Status: approved product specification for implementation planning
+Status: approved; Unit 1 implemented and validated
 Updated: 2026-07-27
 
 ## Objective
@@ -234,6 +234,11 @@ UI tests:
 - Keep the helper independent of React and Supabase.
 
 Definition of done: calculation and aggregation tests pass with full precision.
+
+Implemented 2026-07-27 in `src/lib/confidenceScore.ts`. The helper validates
+the stored 50-100 confidence range, excludes missing confidence and unresolved
+results, preserves unrounded point totals, and combines periods by eligible
+games rather than by unweighted period averages.
 
 ### Unit 2 — Database scoring migration
 

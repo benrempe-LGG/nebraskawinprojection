@@ -1,5 +1,25 @@
 # Validation Record
 
+## 2026-07-27 - Confidence Scoring Unit 1
+
+Implemented the pure TypeScript scoring boundary without database, UI, or
+production changes.
+
+- All approved worked examples passed, including the neutral 50% benchmark.
+- Missing confidence and unresolved/tied outcomes are excluded rather than
+  treated as zero or 50%.
+- Confidence outside the stored 50-100 range is rejected.
+- Weekly aggregation uses the arithmetic mean of eligible games.
+- Cumulative aggregation weights by eligible games and preserves unrounded
+  values for later ranking.
+- The focused suite passed 21 tests.
+- The complete local CI gate passed: lint with 9 existing warnings and 0
+  errors, TypeScript typecheck, 69 tests across 12 files, validation of 11
+  migrations, and the production build.
+
+Unit 1 does not prove database scoring, leaderboard ordering, UI display, or
+production behavior. Those remain separate implementation units.
+
 ## 2026-07-20 — Entry dashboard and release-candidate QC
 
 Branch: `feature/accounts-scorecards-foundation`  

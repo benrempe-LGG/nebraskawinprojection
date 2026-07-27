@@ -8,7 +8,14 @@ Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is o
 
 Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
 
-No local checkout exists in the Codex workspace. GitHub connector commits are the repository working state; there is no local uncommitted working tree to preserve.
+Confidence Scoring Unit 1 is implemented locally on the feature branch: the
+framework-independent formula and game-weighted aggregation boundary have 21
+focused tests and pass the full local CI gate. No scoring migration, UI, or
+production change is included in Unit 1.
+
+A disposable checkout was created outside the Codex workspace to implement and
+validate Unit 1. The feature branch on GitHub remains the durable repository
+state; do not initialize the surrounding Codex workspace as this repository.
 
 ## Current product state
 
@@ -85,7 +92,7 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Recommended next tasks
 
-1. Implement Unit 1 of the approved confidence-scoring specification: pure calculation and aggregation helpers with tests.
+1. Implement Unit 2 of the approved confidence-scoring specification as one forward-only database migration with SQL fixtures and regenerated types.
 2. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
 3. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
 4. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.

@@ -91,3 +91,46 @@ Operational safeguards and recovery steps are documented in [Beta Operations and
 ### Remaining boundary
 
 The browser queue ensures ordered writes from one active page. Server-side optimistic concurrency or immutable ballot revisions are still recommended before supporting simultaneous editing from multiple devices.
+
+## 2026-07-27 — Physical cross-device entry validation
+
+The product owner exercised the live private beta on a Surface laptop, iPhone, and iPad.
+
+- The same draft entry restored on the Surface and iPhone.
+- A saved Surface change appeared on the iPhone after refresh.
+- A saved iPhone change appeared on the Surface after refresh.
+- The same bidirectional checks passed after submission while the entry remained editable.
+- Controlled overlapping edits from a common starting version passed without an observed silent overwrite.
+- A separate control account on the iPad remained unchanged.
+- The test account was restored to its intended final state.
+
+This closes the physical-device validation criterion for the private beta based on the product owner's report. It does not add a server-side concurrency guarantee; broader beta monitoring should still record any conflicting-edit incident.
+
+## 2026-07-27 — Dependency audit triage
+
+A fresh production-only dependency audit against the branch lockfile reported 14 high, 15 moderate, 3 low, and 0 critical advisories before remediation.
+
+- React Router redirect advisories were treated as runtime-relevant.
+- Recharts' Lodash path was treated as runtime-transitive.
+- Vite, Rollup, PostCSS, glob, minimatch, picomatch, and related findings primarily follow build-time Lovable MCP or Tailwind paths.
+- Blind force upgrades were rejected.
+
+The remediation pass updated compatible direct dependencies, pinned a patched Lodash through npm overrides, and validated post-auth navigation as an internal application path.
+
+### Remediation result
+
+- `react-router-dom` resolved from 6.30.1 to 6.30.4.
+- `@remix-run/router` resolved from 1.23.0 to 1.23.3.
+- PostCSS resolved from 8.5.6 to 8.5.23.
+- Recharts remains on 2.15.4 while its Lodash dependency resolves to the patched 4.18.1 through npm overrides.
+- The production-only audit fell from 14 high, 15 moderate, and 3 low findings to 7 high, 7 moderate, and 0 low findings.
+- Remaining high findings follow Vite, Rollup, glob, minimatch, picomatch, and brace-expansion build-tooling paths.
+- Remaining moderate runtime findings include React Router advisories that require a major upgrade for complete package-level removal; current post-auth navigation is now restricted to same-origin internal paths.
+
+### Automated validation
+
+- lint passed with 9 existing warnings and 0 errors
+- TypeScript typecheck passed
+- 48 unit tests passed across 11 files, including 7 internal-path cases
+- migration validation passed for 11 migrations
+- production build passed

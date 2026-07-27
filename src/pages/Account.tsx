@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { safeInternalPath } from "@/lib/internalPath";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +27,7 @@ export default function Account() {
     const postAuthPath = sessionStorage.getItem("post_auth_path");
     if (!postAuthPath) return;
     sessionStorage.removeItem("post_auth_path");
-    navigate(postAuthPath, { replace: true });
+    navigate(safeInternalPath(postAuthPath, "/"), { replace: true });
   }, [navigate, user]);
 
   useEffect(() => {

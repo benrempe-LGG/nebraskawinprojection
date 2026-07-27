@@ -6,13 +6,13 @@ There are no known release-blocking defects for the small friends-and-family bet
 
 ## P1 — Before broader launch or merge
 
-### Cross-device conflict protection is incomplete
+### Cross-device conflict protection lacks a server-side guarantee
 
-Status: cloud entries restore correctly in production, account isolation is verified, and automatic writes from one page are serialized with visible save states.
+Status: physical testing on a Surface, iPhone, and iPad passed draft and submitted restoration, bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration. No silent overwrite was observed.
 
-Risk: two devices editing simultaneously can still overwrite one another because the server does not enforce optimistic concurrency or retain immutable draft revisions.
+Risk: the implementation still does not enforce optimistic concurrency or retain immutable draft revisions, so the successful test is evidence rather than a server-side guarantee.
 
-Next action: run a documented two-device test, then add an expected-version check or ballot revision history if concurrent editing is likely.
+Next action: monitor the private beta for conflicting-edit incidents. Add an expected-version check or ballot revision history before broader launch if simultaneous editing becomes a supported behavior or any silent overwrite is reported.
 
 ### Real CFBD ingestion is not validated
 
@@ -40,11 +40,11 @@ Next action: repeat the temporary-season operational test near release and verif
 
 ### Dependency audit findings need triage
 
-Status: CI installs successfully but reports 4 moderate and 13 high npm vulnerabilities.
+Status: a fresh July 27 production-only audit reported 14 high, 15 moderate, 3 low, and 0 critical advisories before remediation. Compatible updates reduced that to 7 high, 7 moderate, 0 low, and 0 critical. Full CI passes.
 
-Risk: the findings may be transitive or development-only, but their production relevance is not yet documented.
+Risk: the remaining high findings follow Vite, Rollup, glob, minimatch, picomatch, and brace-expansion build-tooling paths. React Router retains moderate advisories that require a major upgrade for complete package-level removal; application post-auth redirects are now constrained to internal same-origin paths.
 
-Next action: inspect `npm audit --omit=dev`, identify runtime exposure, and update dependencies selectively. Do not run a blind force fix.
+Next action: assess React Router 7 and the latest Lovable MCP/Vite stack as separately validated upgrades. Do not run a blind force fix.
 
 ## P2 — Product and operational debt
 

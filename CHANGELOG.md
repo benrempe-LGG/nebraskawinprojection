@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-27
+
+- Validated draft and submitted entry restoration across a Surface, iPhone, and iPad, including bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration.
+- Added internal-only validation for the post-auth redirect target.
+- Completed compatible dependency remediation for React Router, PostCSS, and Recharts' transitive Lodash dependency, reducing the production-only audit from 32 to 14 findings without forced upgrades.
+
 ## [Unreleased] — 2026-07-21
 
 ### Added

@@ -1,12 +1,12 @@
 # Engineering Handoff
 
-Updated: 2026-07-21
+Updated: 2026-07-27
 
 ## Exact stopping point
 
 Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The current live feature baseline was validated at `9e4cdb19039474b588865546254e2f122ce3583e`; this handoff reconciliation adds documentation-only commits after that baseline.
 
-Lovable production is published and reports `Up to date`. The product is ready for a small friends-and-family beta. Do not begin a new feature before reviewing beta feedback and the remaining integration boundaries below.
+Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
 
 No local checkout exists in the Codex workspace. GitHub connector commits are the repository working state; there is no local uncommitted working tree to preserve.
 
@@ -22,6 +22,8 @@ No local checkout exists in the Codex workspace. GitHub connector commits are th
 - The My Entry dashboard restores cloud data and reports submitted state correctly.
 - Automatic cloud saves are serialized per page and expose loading, waiting, saving, saved, and failed states.
 - A production change/save/revert/reload smoke test passed without changing the QC member's final picks.
+- Draft and submitted entries passed bidirectional physical-device restoration and controlled overlapping-edit checks without an observed silent overwrite.
+- A separate iPad control account remained unchanged, and the test account was restored to its intended final state.
 - PR #2 remains intentionally draft.
 
 ## Security and database state
@@ -60,14 +62,13 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Remaining unvalidated or incomplete state
 
-- True cross-device restore and editing using two different physical browsers/devices
 - Server-side optimistic concurrency or immutable revisions for simultaneous-device edits
 - Apple authentication configuration and policy
 - A real successful CFBD score import, provider mapping, and weekly scorecard population
 - Automatic locking at the real 2026 deadline
 - Post-merge GitHub Pages and Lovable verification
 - Browser end-to-end automation as a repeatable CI script
-- Dependency audit remediation; CI currently reports 4 moderate and 13 high transitive vulnerabilities
+- Remaining dependency advisories that require separate React Router, Lovable MCP, or Vite major-version work
 - Week-by-week full-slate picking
 - Product analytics and fan-base prediction insights
 - Multiple named entries per account
@@ -84,8 +85,8 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 ## Recommended next tasks
 
 1. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
-2. Run a documented two-device restore test for draft and submitted entries, then decide whether optimistic concurrency is required before broader launch.
-3. Run one controlled CFBD import against known final-game fixtures and verify weekly scorecards without exposing the endpoint.
+2. Run one controlled CFBD import against known final-game fixtures and verify weekly scorecards without exposing the endpoint.
+3. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
 4. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
 5. Reconcile beta findings, update PR #2, mark it ready, merge to `main`, and verify Lovable plus GitHub Pages.
 

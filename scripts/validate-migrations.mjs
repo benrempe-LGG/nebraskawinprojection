@@ -61,6 +61,7 @@ const stmtTableSafe = /create\s+table\s+if\s+not\s+exists\s+([a-z0-9_."]+)/gi;
 let latestSubmitEntry = null;
 let latestWeeklyScorecards = null;
 let latestGroupLeaderboard = null;
+let migrationChain = "";
 
 function stripComments(sql) {
   return sql
@@ -72,6 +73,7 @@ for (const name of entries) {
   const path = join(DIR, name);
   if (!statSync(path).isFile()) continue;
   const raw = stripComments(readFileSync(path, "utf8"));
+  migrationChain += `\n${raw}`;
   const submitEntryIndex = raw
     .toLowerCase()
     .lastIndexOf("create or replace function public.submit_entry");
@@ -147,6 +149,15 @@ if (!latestWeeklyScorecards) {
         `Latest weekly_scorecards definition in ${latestWeeklyScorecards.name} must ${requirement}.`
       );
     }
+  }
+}
+
+for (const [pattern, requirement] of [
+  [/revoke\s+all\s+privileges\s+on\s+public\.weekly_scorecards\s+from\s+public/i, "revoke public scorecard-view privileges"],
+  [/revoke\s+all\s+privileges\s+on\s+public\.weekly_scorecards\s+from\s+anon/i, "revoke anonymous scorecard-view privileges"],
+]) {
+  if (!pattern.test(migrationChain)) {
+    errors.push(`Migration history must ${requirement}.`);
   }
 }
 

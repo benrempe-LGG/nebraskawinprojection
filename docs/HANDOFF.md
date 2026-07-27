@@ -24,6 +24,7 @@ No local checkout exists in the Codex workspace. GitHub connector commits are th
 - A production change/save/revert/reload smoke test passed without changing the QC member's final picks.
 - Draft and submitted entries passed bidirectional physical-device restoration and controlled overlapping-edit checks without an observed silent overwrite.
 - A separate iPad control account remained unchanged, and the test account was restored to its intended final state.
+- A read-only CFBD readiness inventory confirmed that production has only the 2026 season, 476 scheduled games, no CFBD IDs or final results, and no scorecard rows.
 - PR #2 remains intentionally draft.
 
 ## Security and database state
@@ -85,7 +86,7 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 ## Recommended next tasks
 
 1. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
-2. Run one controlled CFBD import against known final-game fixtures and verify weekly scorecards without exposing the endpoint.
+2. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
 3. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
 4. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
 5. Reconcile beta findings, update PR #2, mark it ready, merge to `main`, and verify Lovable plus GitHub Pages.

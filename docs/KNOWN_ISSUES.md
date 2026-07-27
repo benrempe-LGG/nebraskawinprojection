@@ -16,11 +16,11 @@ Next action: monitor the private beta for conflicting-edit incidents. Add an exp
 
 ### Real CFBD ingestion is not validated
 
-Status: secret denial paths, fixture matching, reversed orientation, aliases, unmatched games, and idempotent behavior are covered. The deployed endpoint fails closed.
+Status: secret denial paths, fixture matching, reversed orientation, aliases, unmatched games, and idempotent behavior are covered. The deployed endpoint fails closed. A July 27 read-only production inventory confirmed 476 scheduled 2026 games, no CFBD IDs, no final or in-progress games, no scorecard rows, and no retained temporary season.
 
 Risk: a real provider payload or mapping difference could prevent results and weekly scorecards from populating.
 
-Next action: run one controlled successful import with known games and verify results plus scorecards.
+Next action: run one controlled successful import after the first 2026 final and verify results plus scorecards. Do not weaken the production season constraint or change the source/target season contract solely to manufacture a historical test.
 
 ### Apple authentication is unsupported for beta
 

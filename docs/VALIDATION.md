@@ -134,3 +134,17 @@ The remediation pass updated compatible direct dependencies, pinned a patched Lo
 - 48 unit tests passed across 11 files, including 7 internal-path cases
 - migration validation passed for 11 migrations
 - production build passed
+
+## 2026-07-27 — CFBD production-readiness inventory
+
+A read-only Lovable production inspection was completed before any authorized historical fixture write.
+
+- `public.seasons` contains only the active 2026 season with an August 29, 2026 UTC deadline.
+- The 2026 catalog contains 476 scheduled games across weeks 1–12.
+- No game has a CFBD game ID, final status, or in-progress status.
+- Production contains 3 draft ballots, 2 submitted ballots, and 0 locked ballots.
+- `weekly_scorecards` returns 0 rows.
+- No temporary non-2026 season or catalog remains.
+- No writes, function invocations, migrations, deployments, or configuration changes were made.
+
+The authorized 2025 historical fixture test was not executed because the schema restricts season years to 2026–2100 and the deployed sync function uses one season parameter for both the CFBD source year and target catalog. Proceeding would require a production schema or ingestion-contract change solely for testing. A true CFBD import and scorecard validation remains deferred until a 2026 final exists or a separately reviewed testability design is approved.

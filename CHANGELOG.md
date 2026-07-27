@@ -5,6 +5,7 @@
 - Validated draft and submitted entry restoration across a Surface, iPhone, and iPad, including bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration.
 - Added internal-only validation for the post-auth redirect target.
 - Completed compatible dependency remediation for React Router, PostCSS, and Recharts' transitive Lodash dependency, reducing the production-only audit from 32 to 14 findings without forced upgrades.
+- Completed a read-only CFBD production-readiness inventory; confirmed that no final 2026 games or temporary historical catalog exists and deferred the real import rather than changing production schema solely for testing.
 
 ## [Unreleased] — 2026-07-21
 

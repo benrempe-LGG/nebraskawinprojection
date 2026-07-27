@@ -21,7 +21,9 @@ Exit criteria: no unexplained entry loss, group invitations work for real users,
 
 Goal: turn locked preseason entries into reliable weekly competition and finish PR #2.
 
-- Implement the approved [Confidence Scoring](CONFIDENCE_SCORING.md) specification in separate calculation, database, UI, and production-validation units.
+- Publish the implemented Confidence Scoring calculation, database, and UI
+  units as one controlled release, then complete production validation after
+  real final results exist. See [Confidence Scoring](CONFIDENCE_SCORING.md).
 - Run one controlled successful CFBD import after the first 2026 final and verify canonical/reversed matching, aliases, unmatched games, and idempotency against production-safe fixtures.
 - Populate and validate weekly scorecards from locked entries and final results.
 - Validate scheduled locking with a temporary test season without changing the real 2026 deadline.

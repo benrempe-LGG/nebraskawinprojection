@@ -1,5 +1,30 @@
 # Validation Record
 
+## 2026-07-27 - Confidence Scoring Unit 3 source validation
+
+Implemented the scorecard and private-group Confidence Score UI without
+publishing it.
+
+- Season Confidence Score is weighted by `confidence_games`, not weekly rows.
+- Weekly and season values display to one decimal while the RPC retains
+  full-precision ranking.
+- Scorecards retain correct-pick and accuracy context.
+- Group rows show Confidence Score, correct of final picks, and confidence
+  games so partial data remains visible.
+- The 75 = 50/50 benchmark explanation is visible on both pages.
+- Empty scorecards and null confidence use `Not scored yet`, not zero.
+- The leaderboard renders rows in RPC order and does not re-sort rounded values.
+- Responsive grid classes stack score details below member/game context on
+  phones and restore columns at the existing `sm` breakpoint.
+- Three focused page tests passed for empty state, precision, game weighting,
+  benchmark copy, and RPC order.
+- Full CI passed: 9 existing lint warnings and 0 errors, TypeScript typecheck,
+  72 tests across 14 files, 12-migration contract validation, and production
+  build.
+
+The UI was not connected to production because the Unit 2 migration is not yet
+applied there. No production deployment or configuration change occurred.
+
 ## 2026-07-27 - Confidence Scoring Unit 2 source validation
 
 Implemented one forward-only migration for weekly scorecards and the private

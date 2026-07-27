@@ -1,6 +1,6 @@
 # Confidence Scoring Specification
 
-Status: approved; Units 1 and 2 implemented and validated
+Status: approved; Units 1-3 implemented and validated in source
 Updated: 2026-07-27
 
 ## Objective
@@ -262,6 +262,15 @@ the migration to production.
 - Keep mobile layout usable at the existing beta breakpoints.
 
 Definition of done: scorecards and groups render correct weekly/cumulative values on desktop and mobile, with no change to entry creation or locking.
+
+Implemented and validated in source 2026-07-27. Scorecards show weekly and
+game-weighted season values to one decimal, preserve accuracy context, explain
+the 75 benchmark, and use `Not scored yet` for empty confidence. Private groups
+render the RPC's confidence-first order with Correct Picks and both eligible
+game counts. Responsive layouts and page tests cover phone-safe stacking,
+display precision, empty state, benchmark copy, weighting, and RPC order.
+
+Unit 3 must not be published before the Unit 2 migration is applied.
 
 ### Unit 4 — Production validation
 

@@ -1,8 +1,21 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-21
+Updated: 2026-07-27
 
 There are no known release-blocking defects for the small friends-and-family beta. The following items block broader launch or PR #2 merge readiness.
+
+## Confidence Scoring is implemented but not published
+
+Status: calculation, database, SQL fixture, scorecard, and private-group UI
+units pass source validation. The migration and UI are committed to draft PR
+#2 but are not applied or published in production.
+
+Risk: publishing the UI before the migration would make scorecard and group
+queries request columns that production does not yet expose.
+
+Next action: apply the Unit 2 migration and publish Unit 3 together through the
+normal controlled release path, then run signed-in desktop and phone smoke
+tests.
 
 ## P1 — Before broader launch or merge
 

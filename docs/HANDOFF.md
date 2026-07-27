@@ -19,6 +19,13 @@ contract guards. Full local CI passes, and the migration plus fixture passed in
 an ephemeral in-memory PostgreSQL runtime using a minimal Supabase-compatible
 schema. The migration is not applied in production.
 
+Confidence Scoring Unit 3 is implemented and validated in source. Scorecards
+and private groups now render game-weighted Confidence Score, correct-pick and
+game-count context, one-decimal values, benchmark guidance, responsive layouts,
+and unscored states. Three focused page tests and the full 72-test CI suite
+pass. The UI is not published because production does not yet have the Unit 2
+database contract.
+
 A disposable checkout was created outside the Codex workspace to implement and
 validate Unit 1. The feature branch on GitHub remains the durable repository
 state; do not initialize the surrounding Codex workspace as this repository.
@@ -98,8 +105,8 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Recommended next tasks
 
-1. Implement Unit 3 scorecard and leaderboard UI against the validated database contract, keeping production unchanged.
-2. Review and apply the Unit 2 migration through the normal deployment path before publishing Unit 3.
+1. Review and apply the Unit 2 migration through the normal deployment path, then publish Unit 3 in the same controlled release.
+2. Run signed-in desktop and phone smoke tests for Scorecards and Groups after publication; production will remain unscored until real finals exist.
 3. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
 4. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
 5. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.

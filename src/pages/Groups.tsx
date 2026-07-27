@@ -23,6 +23,12 @@ interface Leader {
   games_final: number;
   correct_picks: number;
   accuracy: number;
+  confidence_games: number;
+  confidence_score: number | null;
+}
+
+function formatConfidenceScore(score: number | null) {
+  return score === null ? "Not scored yet" : score.toFixed(1);
 }
 
 export default function Groups() {
@@ -154,7 +160,10 @@ export default function Groups() {
         <Card>
           <CardHeader>
             <CardTitle>My groups</CardTitle>
-            <CardDescription>Season-long standings update as game results become final.</CardDescription>
+            <CardDescription>
+              Confidence Score ranks how accurate everyone&apos;s percentages were.
+              75 is the 50/50 benchmark.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {groups.length === 0 ? (
@@ -186,15 +195,20 @@ export default function Groups() {
                     </div>
                     <div className="divide-y rounded-lg border">
                       {leaders.map((leader, index) => (
-                        <div key={leader.user_id} className="grid grid-cols-[36px_1fr_auto] items-center gap-3 p-4">
+                        <div key={leader.user_id} className="grid grid-cols-[36px_1fr] items-center gap-3 p-4 sm:grid-cols-[36px_1fr_auto]">
                           <span className="text-lg font-bold text-muted-foreground">{index + 1}</span>
                           <div>
                             <p className="font-medium">{leader.display_name}{leader.user_id === user.id ? " (you)" : ""}</p>
                             <p className="text-xs text-muted-foreground">{leader.role === "owner" ? "Commissioner" : `${leader.weeks_scored} weeks scored`}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold">{leader.correct_picks}/{leader.games_final}</p>
-                            <p className="text-xs text-muted-foreground">{leader.accuracy}%</p>
+                          <div className="col-start-2 flex flex-wrap items-baseline justify-between gap-x-4 sm:col-start-auto sm:block sm:text-right">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Confidence Score</p>
+                              <p className="font-bold">{formatConfidenceScore(leader.confidence_score)}</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {leader.correct_picks} of {leader.games_final} correct / {leader.confidence_games} scored
+                            </p>
                           </div>
                         </div>
                       ))}

@@ -9,6 +9,7 @@
 - Approved a proper probability-based Confidence Score as the primary private-group ranking metric and documented its formula, edge cases, UX, data impact, tests, and implementation units.
 - Implemented the framework-independent Confidence Score formula and game-weighted aggregation helpers with boundary and full-precision unit coverage.
 - Added the forward-only Confidence Score database migration, synchronized Supabase result types, rollback-only SQL fixtures, and CI guards for scoring and private-group security boundaries.
+- Added Confidence Score to weekly/season scorecards and private-group standings with game-weighted totals, one-decimal display, benchmark guidance, responsive layouts, and unscored states.
 
 ## [Unreleased] — 2026-07-21
 

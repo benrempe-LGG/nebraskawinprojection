@@ -85,11 +85,11 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Recommended next tasks
 
-1. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
-2. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
-3. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
-4. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
-5. Reconcile beta findings, update PR #2, mark it ready, merge to `main`, and verify Lovable plus GitHub Pages.
+1. Implement Unit 1 of the approved confidence-scoring specification: pure calculation and aggregation helpers with tests.
+2. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
+3. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
+4. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
+5. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
 
 ## Restart instructions
 

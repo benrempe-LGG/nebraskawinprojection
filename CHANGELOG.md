@@ -6,6 +6,7 @@
 - Added internal-only validation for the post-auth redirect target.
 - Completed compatible dependency remediation for React Router, PostCSS, and Recharts' transitive Lodash dependency, reducing the production-only audit from 32 to 14 findings without forced upgrades.
 - Completed a read-only CFBD production-readiness inventory; confirmed that no final 2026 games or temporary historical catalog exists and deferred the real import rather than changing production schema solely for testing.
+- Approved a proper probability-based Confidence Score as the primary private-group ranking metric and documented its formula, edge cases, UX, data impact, tests, and implementation units.
 
 ## [Unreleased] — 2026-07-21
 

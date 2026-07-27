@@ -1,4 +1,12 @@
 
+## 2026-07-27 — Rank entries by probability quality
+
+Decision: retain Correct Picks as a visible statistic and first tie-breaker, while using a 0–100 Confidence Score based on the complement of the binary Brier score as the primary private-group ranking metric.
+
+Rationale: the product already collects a probability for every matchup. A proper scoring rule rewards accurate probabilities and penalizes misplaced confidence without encouraging users to exaggerate every favorite.
+
+Consequences: 75 is the neutral 50/50 benchmark; weekly and cumulative scores must be weighted by eligible final games; tied results are excluded; confidence scoring reads only normalized predictions from locked ballots. The full specification is in [Confidence Scoring](CONFIDENCE_SCORING.md).
+
 ## 2026-07-21 — One official entry per account during beta
 
 Decision: each authenticated account has one official 2026 entry, and that same entry appears in every private group the user joins.

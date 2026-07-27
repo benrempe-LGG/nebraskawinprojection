@@ -87,6 +87,7 @@ npm run preview
 - `scripts/validate-migrations.mjs` — migration-ledger and RPC compatibility guard
 - `.github/workflows/ci.yml` — full validation pipeline
 - `docs/BETA_OPERATIONS.md` — deployment, smoke-test, and entry-recovery runbook
+- `docs/CONFIDENCE_SCORING.md` — approved entry-ranking and scorecard specification
 
 ## Restart order
 

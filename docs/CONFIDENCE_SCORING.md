@@ -1,6 +1,6 @@
 # Confidence Scoring Specification
 
-Status: approved; Units 1-3 implemented and validated in source
+Status: Units 1-3 implemented, validated, and published; Unit 4 awaits real finals
 Updated: 2026-07-27
 
 ## Objective
@@ -270,7 +270,7 @@ render the RPC's confidence-first order with Correct Picks and both eligible
 game counts. Responsive layouts and page tests cover phone-safe stacking,
 display precision, empty state, benchmark copy, weighting, and RPC order.
 
-Unit 3 must not be published before the Unit 2 migration is applied.
+Published with the Unit 2 migration on 2026-07-27.
 
 ### Unit 4 — Production validation
 

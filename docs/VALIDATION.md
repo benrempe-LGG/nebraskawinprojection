@@ -1,5 +1,43 @@
 # Validation Record
 
+## 2026-07-27 - Confidence Scoring controlled production release
+
+The Unit 2 database contract and Unit 3 UI were released together after local,
+disposable-PostgreSQL, and GitHub CI validation.
+
+Database evidence:
+
+- Lovable recorded and applied confidence migration
+  `20260727203225_3d3c8878-8710-46ba-8672-77d0b8ebe3a7`.
+- Lovable recorded and applied scorecard ACL migration
+  `20260727204031_5963c6d0-f886-4d23-980e-cd195dca53f4`.
+- `weekly_scorecards` exposes `confidence_games` and `confidence_score` and
+  retains `security_invoker=true`.
+- `get_group_leaderboard` exposes both confidence fields, retains its fixed
+  security-definer search path and membership check, and is not executable by
+  anon or public.
+- Anonymous and public privileges were removed from `weekly_scorecards`;
+  authenticated and service-role access remain.
+- Ballot counts remained 3 draft, 2 submitted, and 0 locked.
+- Prediction count remained 952, and no ballot or prediction payload changed.
+- `weekly_scorecards` remained at 0 rows because production has no locked
+  ballots or final games.
+
+Application evidence:
+
+- Lovable production publish completed and reported `Up to date`.
+- A signed-in production session loaded `/scorecards` and displayed
+  `Not scored yet` without a query error.
+- A signed-in production session loaded `/groups` and displayed the Confidence
+  Score explanation and 75 benchmark without a query error.
+- Production browser logs contained no errors during these checks.
+- The source ledger was reconciled to Lovable's actual applied migration
+  identities; no duplicate pending migration remains.
+
+Real numeric scoring, populated leaderboard order, and idempotent result refresh
+remain deferred until a real 2026 final exists. No synthetic production result
+was created.
+
 ## 2026-07-27 - Confidence Scoring Unit 3 source validation
 
 Implemented the scorecard and private-group Confidence Score UI without

@@ -25,8 +25,8 @@ Lovable production and the feature branch were reconciled and published on July 
 - Version 2 cloud payloads containing regular-season and Championship Week picks
 - Ordered automatic cloud saves with visible loading, saving, saved, and failure states
 - My Entry dashboard and persistent site navigation
-- Private groups with invitation codes, display names, membership RLS, and aggregate leaderboards
-- Weekly scorecard schema and read-only scorecard UI
+- Private groups with invitation codes, display names, membership RLS, and Confidence Score leaderboards
+- Weekly Confidence Score schema and read-only scorecard UI
 - CFBD score-sync Edge Function foundation
 - Team projection links, forum text, and image export
 

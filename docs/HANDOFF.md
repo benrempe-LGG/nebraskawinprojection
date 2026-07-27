@@ -4,7 +4,7 @@ Updated: 2026-07-27
 
 ## Exact stopping point
 
-Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The current live feature baseline was validated at `9e4cdb19039474b588865546254e2f122ce3583e`; this handoff reconciliation adds documentation-only commits after that baseline.
+Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; this handoff reconciliation adds documentation-only changes after that baseline.
 
 Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
 
@@ -13,18 +13,24 @@ framework-independent formula and game-weighted aggregation boundary have 21
 focused tests and pass the full local CI gate. No scoring migration, UI, or
 production change is included in Unit 1.
 
-Confidence Scoring Unit 2 is implemented in source as a forward-only migration,
+At source validation, Confidence Scoring Unit 2 consisted of a forward-only migration,
 synchronized Supabase result types, a rollback-only SQL fixture, and CI
 contract guards. Full local CI passes, and the migration plus fixture passed in
 an ephemeral in-memory PostgreSQL runtime using a minimal Supabase-compatible
-schema. The migration is not applied in production.
+schema. It was not yet applied during that source-validation stage.
 
-Confidence Scoring Unit 3 is implemented and validated in source. Scorecards
-and private groups now render game-weighted Confidence Score, correct-pick and
-game-count context, one-decimal values, benchmark guidance, responsive layouts,
-and unscored states. Three focused page tests and the full 72-test CI suite
-pass. The UI is not published because production does not yet have the Unit 2
-database contract.
+At source validation, Confidence Scoring Unit 3 made Scorecards and private
+groups render game-weighted Confidence Score, correct-pick and game-count
+context, one-decimal values, benchmark guidance, responsive layouts, and
+unscored states. Three focused page tests and the full 72-test CI suite passed.
+It was not yet published during that source-validation stage.
+
+Confidence Scoring Units 2 and 3 are now published in production. Lovable
+applied and recorded the confidence schema and ACL cleanup migrations, then
+published the matching UI and reported `Up to date`. Signed-in Scorecards and
+Groups loaded without browser errors. Ballots remained 3 draft, 2 submitted,
+and 0 locked; predictions remained 952; scorecards remained empty because
+there are no final games. Real numeric scoring validation remains Unit 4.
 
 A disposable checkout was created outside the Codex workspace to implement and
 validate Unit 1. The feature branch on GitHub remains the durable repository
@@ -105,11 +111,11 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Recommended next tasks
 
-1. Review and apply the Unit 2 migration through the normal deployment path, then publish Unit 3 in the same controlled release.
-2. Run signed-in desktop and phone smoke tests for Scorecards and Groups after publication; production will remain unscored until real finals exist.
+1. Run one controlled CFBD import after the first 2026 final and verify Confidence Score by hand without exposing the endpoint.
+2. Run physical phone QC for the published Scorecards and populated Groups layouts when scored data exists.
 3. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
-4. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
-5. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
+4. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
+5. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
 
 ## Restart instructions
 

@@ -10,6 +10,7 @@
 - Implemented the framework-independent Confidence Score formula and game-weighted aggregation helpers with boundary and full-precision unit coverage.
 - Added the forward-only Confidence Score database migration, synchronized Supabase result types, rollback-only SQL fixtures, and CI guards for scoring and private-group security boundaries.
 - Added Confidence Score to weekly/season scorecards and private-group standings with game-weighted totals, one-decimal display, benchmark guidance, responsive layouts, and unscored states.
+- Published the Confidence Score database and UI together, removed legacy anonymous scorecard-view grants, and verified signed-in production empty states without changing ballots or predictions.
 
 ## [Unreleased] — 2026-07-21
 

@@ -4,18 +4,18 @@ Updated: 2026-07-27
 
 There are no known release-blocking defects for the small friends-and-family beta. The following items block broader launch or PR #2 merge readiness.
 
-## Confidence Scoring is implemented but not published
+## Confidence Scoring awaits real-final validation
 
 Status: calculation, database, SQL fixture, scorecard, and private-group UI
-units pass source validation. The migration and UI are committed to draft PR
-#2 but are not applied or published in production.
+units are published. Production schema, ACL, signed-in Scorecards empty state,
+and Groups benchmark copy passed validation.
 
-Risk: publishing the UI before the migration would make scorecard and group
-queries request columns that production does not yet expose.
+Risk: production has no locked ballots or final games, so numeric scorecards,
+populated leaderboard order, corrected-result recomputation, and real provider
+integration are not yet proven end to end.
 
-Next action: apply the Unit 2 migration and publish Unit 3 together through the
-normal controlled release path, then run signed-in desktop and phone smoke
-tests.
+Next action: after the first real 2026 final, run one controlled CFBD import and
+compare weekly and season Confidence Score with a hand calculation.
 
 ## P1 — Before broader launch or merge
 

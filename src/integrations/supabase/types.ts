@@ -417,7 +417,7 @@ export type Database = {
         Returns: {
           accuracy: number
           confidence_games: number
-          confidence_score: number | null
+          confidence_score: number
           correct_picks: number
           display_name: string
           games_final: number

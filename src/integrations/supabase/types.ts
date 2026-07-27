@@ -373,6 +373,8 @@ export type Database = {
       weekly_scorecards: {
         Row: {
           ballot_id: string | null
+          confidence_games: number | null
+          confidence_score: number | null
           correct_picks: number | null
           games_final: number | null
           incorrect_picks: number | null
@@ -414,6 +416,8 @@ export type Database = {
         Args: { target_group: string }
         Returns: {
           accuracy: number
+          confidence_games: number
+          confidence_score: number
           correct_picks: number
           display_name: string
           games_final: number

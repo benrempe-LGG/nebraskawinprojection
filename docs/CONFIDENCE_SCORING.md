@@ -1,6 +1,6 @@
 # Confidence Scoring Specification
 
-Status: approved product specification for implementation planning  
+Status: approved product specification for implementation planning
 Updated: 2026-07-27
 
 ## Objective
@@ -269,4 +269,3 @@ Definition of done: production evidence agrees with hand calculations and no edi
 - Championship Week confidence percentages
 - Public leaderboards
 - Historical recalibration or model-quality analytics
-

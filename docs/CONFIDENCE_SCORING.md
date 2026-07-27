@@ -1,6 +1,6 @@
 # Confidence Scoring Specification
 
-Status: approved; Units 1 and 2 implemented in source
+Status: approved; Units 1 and 2 implemented and validated
 Updated: 2026-07-27
 
 ## Objective
@@ -248,11 +248,12 @@ games rather than by unweighted period averages.
 
 Definition of done: forward migration validates cleanly, existing RLS behavior is preserved, and known fixtures match the TypeScript helper.
 
-Implemented in source 2026-07-27. The forward-only migration extends the
+Implemented and validated 2026-07-27. The forward-only migration extends the
 security-invoker weekly scorecard, replaces the membership-gated leaderboard
 RPC, preserves full precision, and adds CI contract checks plus a rollback-only
-SQL fixture. The fixture still requires execution against a disposable
-PostgreSQL/Supabase database before Unit 2 is considered database-validated.
+SQL fixture. The migration and fixture passed in an ephemeral in-memory
+PostgreSQL runtime. This validates SQL execution and behavior without applying
+the migration to production.
 
 ### Unit 3 — Scorecard and leaderboard UI
 

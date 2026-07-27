@@ -15,9 +15,9 @@ production change is included in Unit 1.
 
 Confidence Scoring Unit 2 is implemented in source as a forward-only migration,
 synchronized Supabase result types, a rollback-only SQL fixture, and CI
-contract guards. Full local CI passes, but the SQL fixture has not run against
-a disposable PostgreSQL/Supabase database. The migration is not applied in
-production.
+contract guards. Full local CI passes, and the migration plus fixture passed in
+an ephemeral in-memory PostgreSQL runtime using a minimal Supabase-compatible
+schema. The migration is not applied in production.
 
 A disposable checkout was created outside the Codex workspace to implement and
 validate Unit 1. The feature branch on GitHub remains the durable repository
@@ -98,8 +98,8 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 
 ## Recommended next tasks
 
-1. Execute the Unit 2 rollback-only SQL fixture against a disposable Supabase database, then review and apply the migration through the normal deployment path.
-2. Implement Unit 3 scorecard and leaderboard UI only after the migrated database contract is available in a test environment.
+1. Implement Unit 3 scorecard and leaderboard UI against the validated database contract, keeping production unchanged.
+2. Review and apply the Unit 2 migration through the normal deployment path before publishing Unit 3.
 3. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
 4. Run one controlled CFBD import after the first 2026 final and verify weekly scorecards without exposing the endpoint.
 5. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.

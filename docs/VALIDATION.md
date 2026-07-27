@@ -18,13 +18,14 @@ group leaderboard without applying it to production.
 - A rollback-only SQL fixture covers eligibility, ties, null confidence,
   weighted totals, ranking, Correct Picks tie-breaking, score corrections, and
   non-member rejection.
+- The migration applied and the rollback-only fixture passed in PGlite 0.5.4,
+  an ephemeral in-memory PostgreSQL runtime.
 - CI passed with 9 existing lint warnings and 0 errors, TypeScript typecheck,
   69 tests, validation of 12 migrations, and the production build.
 
-The SQL fixture has not been executed because this checkout has no disposable
-PostgreSQL/Supabase runtime. Static CI guards validate the migration contract,
-not PostgreSQL execution. No production migration, data write, deployment, or
-configuration change occurred.
+The PGlite harness used a minimal Supabase-compatible schema, so this is not a
+full local Supabase-stack integration test. No production migration, data
+write, deployment, or configuration change occurred.
 
 ## 2026-07-27 - Confidence Scoring Unit 1
 

@@ -5,6 +5,8 @@
 - Added a public, read-only 2026 FPI-based benchmark covering all 476 canonical
   games with source attribution, transparent assumptions, and no access to
   private user ballots.
+- Extended the FPI benchmark through projected conference standings,
+  Championship Week, and a public 12-team playoff scenario.
 - Upgraded Vite from 5.4.19 to 7.3.6 and refreshed compatible transitive tooling, including Sucrase 3.35.1.
 - Reduced the production-only dependency audit from 7 high, 7 moderate, and 0 low findings to 0 high, 5 moderate, and 1 low.
 - Passed the complete local and GitHub Actions gates with 72 tests, 13 migration validations, typecheck, lint, and the Vite 7 production build.

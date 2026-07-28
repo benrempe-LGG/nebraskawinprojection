@@ -44,6 +44,12 @@ export default function FpiModel() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
+            <Link
+              to="/models/fpi/season"
+              className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              View projected standings and playoff
+            </Link>
             <div className="grid gap-4 sm:grid-cols-[minmax(220px,1fr)_auto_auto] sm:items-end">
               <label className="space-y-2 text-sm font-medium">
                 Team

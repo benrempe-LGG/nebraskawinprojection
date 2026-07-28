@@ -28,6 +28,7 @@ Lovable production and the feature branch were reconciled through the Confidence
 - Private groups with invitation codes, display names, membership RLS, and Confidence Score leaderboards
 - Weekly Confidence Score schema and read-only scorecard UI
 - Public, read-only 2026 FPI-based benchmark with team schedules and transparent model assumptions
+- Public FPI end-of-year standings, Championship Week, and 12-team playoff scenario
 - CFBD score-sync Edge Function foundation
 - Team projection links, forum text, and image export
 

@@ -44,6 +44,12 @@ and static; it does not authenticate, query Lovable Cloud, or change ballot RLS.
 The probabilities are an independent derived model, not official ESPN matchup
 predictions.
 
+`fpiSeason.ts` converts the static probabilities into deterministic winners,
+sorts conference-record ties by expected conference wins and expected overall
+wins, projects neutral-site P4 championship games, and feeds those champions
+into the existing record-based playoff proxy. The public
+`/models/fpi/season` route remains static and read-only.
+
 ## Prediction identity
 
 Regular-season games use a canonical key built from season and alphabetically ordered team names. Date is excluded because schedule sources previously disagreed on dates and created duplicate entries.

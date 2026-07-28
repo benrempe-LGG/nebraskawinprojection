@@ -46,6 +46,12 @@ non-affiliation disclaimer are visible. The derived probabilities are not
 represented as official ESPN matchup predictions and require a source refresh
 when FPI changes.
 
+The public end-of-year scenario converts the higher probability to a projected
+winner, awards exact 50/50 regular-season games to the home team, uses expected
+conference and overall wins to break conference-record ties, and projects
+conference championships at a neutral site. Its playoff uses the existing
+committee proxy and retains the unnamed G6 reserve.
+
 ## 2026-07-20 — Version cloud entries
 
 Decision: use a version 2 cloud payload containing canonical regular-season predictions and Championship Week winners.

@@ -17,6 +17,14 @@
   Nebraska 6.7-5.3 projection, all schedule rows, fallback disclosure, and
   independent-model disclaimer. Production publication evidence remains
   separate.
+- Added a public FPI end-of-year scenario with 67 complete P4 records, four
+  conference standings, four neutral-site championship projections, 11 named
+  playoff selections, and the reserved G6 position.
+- Verified FPI-specific tie-breaking ranks Miami above Louisville and Texas
+  Tech above BYU when projected conference records are equal.
+- Full local validation passed after the season view with 83 tests across 18
+  files, TypeScript checks, 13 migration validations, lint (nine existing
+  warnings, zero errors), and a Vite production build.
 
 ## 2026-07-27 - Confidence Scoring controlled production release
 

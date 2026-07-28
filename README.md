@@ -9,7 +9,7 @@ A browser-based college football season prediction game. Users make one canonica
 Production: https://nebraskawinprojection.lovable.app/  
 GitHub Pages mirror: https://benrempe-lgg.github.io/nebraskawinprojection/
 
-Lovable production and the feature branch were reconciled and published on July 21, 2026. CI, submission, two-account isolation, private-group membership, signed-in cloud saves, and physical cross-device restoration pass. PR #2 remains draft while a small friends-and-family beta validates real usage, locking, and score ingestion.
+Lovable production and the feature branch were reconciled through the Confidence Score release on July 27, 2026. CI, submission, two-account isolation, private-group membership, signed-in cloud saves, and physical cross-device restoration pass. PR #2 remains draft while a small friends-and-family beta validates real usage, locking, and score ingestion.
 
 ## Current capabilities
 

@@ -4,7 +4,7 @@ Updated: 2026-07-28
 
 ## Exact stopping point
 
-Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; subsequent branch work records the release and hardens the dependency toolchain without changing production behavior.
+Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. Commit `38c9906` contains the validated dependency hardening; this final handoff reconciliation follows it. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; subsequent branch work records the release and hardens the dependency toolchain without changing production behavior.
 
 Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
 
@@ -78,7 +78,7 @@ The GitHub remote is available through the connector. The surrounding Codex work
 
 ## Validation evidence
 
-- GitHub Actions run 157 passed lint, typecheck, unit tests, migration validation, and production build.
+- GitHub Actions run [30365881447](https://github.com/benrempe-LGG/nebraskawinprojection/actions/runs/30365881447) passed dependency installation, lint, typecheck, 72 unit tests, migration validation, and the Vite 7 production build on Node 22.
 - Lovable production reported `Up to date` after publication.
 - Google OAuth and email-link authentication were exercised.
 - Two-account group membership and identity isolation were exercised.

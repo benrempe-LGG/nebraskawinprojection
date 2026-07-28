@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-28
+
+- Upgraded Vite from 5.4.19 to 7.3.6 and refreshed compatible transitive tooling, including Sucrase 3.35.1.
+- Reduced the production-only dependency audit from 7 high, 7 moderate, and 0 low findings to 0 high, 5 moderate, and 1 low.
+- Passed the complete local and GitHub Actions gates with 72 tests, 13 migration validations, typecheck, lint, and the Vite 7 production build.
+- Reconciled the README, roadmap, handoff, known-issues, and validation records for friends-and-family beta onboarding.
+
 ## 2026-07-27
 
 - Validated draft and submitted entry restoration across a Surface, iPhone, and iPad, including bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration.

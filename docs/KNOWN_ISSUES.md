@@ -71,7 +71,7 @@ Next action: assess React Router 7 as a separate application migration and monit
 - Week-by-week full-slate picking is not implemented.
 - Vegas season win totals remain manual; the removed Odds API returned the wrong market.
 - OAuth and deployment configuration remain partly external to Git.
-- Both `package-lock.json` and `bun.lock` are tracked while CI uses npm; consolidation must not disrupt Lovable.
+- `package-lock.json`, `bun.lock`, and the legacy `bun.lockb` are tracked while CI uses npm; consolidation must not disrupt Lovable.
 
 ## Resolved July 21
 

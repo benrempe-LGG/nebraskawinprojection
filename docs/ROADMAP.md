@@ -1,15 +1,14 @@
 # Product Roadmap
 
-Updated: 2026-07-21
+Updated: 2026-07-28
 
 ## Now — Prove the private beta
 
 Goal: observe real friends-and-family usage without risking entries or expanding scope before PR #2 is ready.
 
+- Physical Surface, iPhone, and iPad validation has passed for draft and submitted restoration, bidirectional saves, overlapping edits, account isolation, and final-state restoration.
 - Have 3 to 10 users complete Google or email sign-in, favorite-team setup, a full entry, Championship Week, submission, and private-group join.
 - Record feedback with page, browser, device, and reproduction steps.
-- Test draft and submitted restore on two genuinely separate devices.
-- Verify that editing on one device appears on the other after refresh.
 - Decide whether server-side optimistic concurrency or immutable ballot revisions are required before broader launch.
 - Keep Apple login unadvertised until configured and validated.
 - Keep the one-entry-per-account rule during beta.

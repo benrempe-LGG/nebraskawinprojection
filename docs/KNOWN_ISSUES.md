@@ -1,6 +1,6 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-27
+Updated: 2026-07-28
 
 There are no known release-blocking defects for the small friends-and-family beta. The following items block broader launch or PR #2 merge readiness.
 
@@ -53,11 +53,11 @@ Next action: repeat the temporary-season operational test near release and verif
 
 ### Dependency audit findings need triage
 
-Status: a fresh July 27 production-only audit reported 14 high, 15 moderate, 3 low, and 0 critical advisories before remediation. Compatible updates reduced that to 7 high, 7 moderate, 0 low, and 0 critical. Full CI passes.
+Status: the July 28 follow-up upgraded Vite from 5.4.19 to 7.3.6 and refreshed compatible transitive tooling. The production-only audit is now 0 high, 5 moderate, 1 low, and 0 critical. Full CI passes.
 
-Risk: the remaining high findings follow Vite, Rollup, glob, minimatch, picomatch, and brace-expansion build-tooling paths. React Router retains moderate advisories that require a major upgrade for complete package-level removal; application post-auth redirects are now constrained to internal same-origin paths.
+Risk: React Router retains moderate advisories that require a major upgrade for package-level removal; application post-auth redirects are constrained to internal same-origin paths. The Lovable MCP chain retains moderate Hono/MCP advisories without an upstream fix and one low esbuild development-server advisory.
 
-Next action: assess React Router 7 and the latest Lovable MCP/Vite stack as separately validated upgrades. Do not run a blind force fix.
+Next action: assess React Router 7 as a separate application migration and monitor the Lovable MCP chain for an upstream release. Do not run a blind force fix.
 
 ## P2 — Product and operational debt
 

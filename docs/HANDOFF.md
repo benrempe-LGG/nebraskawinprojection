@@ -1,10 +1,10 @@
 # Engineering Handoff
 
-Updated: 2026-07-27
+Updated: 2026-07-28
 
 ## Exact stopping point
 
-Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; this handoff reconciliation adds documentation-only changes after that baseline.
+Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; subsequent branch work records the release and hardens the dependency toolchain without changing production behavior.
 
 Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
 
@@ -52,6 +52,7 @@ state; do not initialize the surrounding Codex workspace as this repository.
 - A separate iPad control account remained unchanged, and the test account was restored to its intended final state.
 - A read-only CFBD readiness inventory confirmed that production has only the 2026 season, 476 scheduled games, no CFBD IDs or final results, and no scorecard rows.
 - PR #2 remains intentionally draft.
+- Vite is upgraded to 7.3.6 and compatible transitive tooling is refreshed. The production-only dependency audit is 0 high, 5 moderate, 1 low, and 0 critical.
 
 ## Security and database state
 
@@ -95,7 +96,7 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 - Automatic locking at the real 2026 deadline
 - Post-merge GitHub Pages and Lovable verification
 - Browser end-to-end automation as a repeatable CI script
-- Remaining dependency advisories that require separate React Router, Lovable MCP, or Vite major-version work
+- Remaining dependency advisories that require separate React Router work or an upstream Lovable MCP fix
 - Week-by-week full-slate picking
 - Product analytics and fan-base prediction insights
 - Multiple named entries per account
@@ -114,7 +115,7 @@ See `docs/VALIDATION.md` for detailed evidence and `docs/BETA_OPERATIONS.md` for
 1. Run one controlled CFBD import after the first 2026 final and verify Confidence Score by hand without exposing the endpoint.
 2. Run physical phone QC for the published Scorecards and populated Groups layouts when scored data exists.
 3. Let 3 to 10 friends complete the real sign-in, entry, submission, and private-group journey; log every issue with device and browser.
-4. Assess the remaining React Router, Lovable MCP, and Vite advisories as separately validated upgrade work.
+4. Assess React Router 7 as a separate application migration and monitor Lovable MCP for an upstream advisory fix.
 5. Validate scheduled locking again near release using a temporary season; never move the real 2026 deadline for testing.
 
 ## Restart instructions

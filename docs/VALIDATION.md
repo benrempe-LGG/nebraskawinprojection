@@ -258,3 +258,24 @@ A read-only Lovable production inspection was completed before any authorized hi
 - No writes, function invocations, migrations, deployments, or configuration changes were made.
 
 The authorized 2025 historical fixture test was not executed because the schema restricts season years to 2026–2100 and the deployed sync function uses one season parameter for both the CFBD source year and target catalog. Proceeding would require a production schema or ingestion-contract change solely for testing. A true CFBD import and scorecard validation remains deferred until a 2026 final exists or a separately reviewed testability design is approved.
+
+## 2026-07-28 — Vite 7 dependency hardening
+
+Vite was upgraded from 5.4.19 to 7.3.6 as a bounded security update. The existing React SWC plugin supports Vite 7, local Node 24 and CI Node 22 satisfy its engine requirement, and no application source or production configuration changed. Compatible transitive tooling was refreshed, including Sucrase 3.35.1, which replaces its vulnerable Glob chain with Tinyglobby.
+
+### Remediation result
+
+- Vite resolves to 7.3.6, Rollup to 4.62.3, and the root esbuild to 0.28.1.
+- Sucrase resolves to 3.35.1 and no longer installs the vulnerable Glob 10 chain in the npm dependency tree.
+- `package-lock.json` and `bun.lock` were both refreshed.
+- The production-only audit fell from 7 high, 7 moderate, 0 low, and 0 critical to 0 high, 5 moderate, 1 low, and 0 critical.
+- Remaining moderate findings are React Router and the Lovable MCP/Hono chain. React Router requires a separately validated major application migration; the Lovable MCP chain has no upstream audit fix.
+- The remaining low finding is an esbuild development-server path under Lovable MCP.
+
+### Automated validation
+
+- lint passed with 9 existing warnings and 0 errors
+- both TypeScript typechecks passed
+- 72 tests passed across 14 files
+- migration validation passed for 13 migrations
+- the Vite 7 production build passed

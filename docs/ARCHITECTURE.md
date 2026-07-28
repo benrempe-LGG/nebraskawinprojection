@@ -15,6 +15,9 @@ The application is a Vite/React single-page app for a 2026 Power Four season pre
 7. The playoff model adjusts title-game participants and produces a 12-team field.
 8. Signed-in users submit one official entry and compare it in private groups.
 9. Locked entries and final results feed weekly scorecards.
+10. A separate public route derives a read-only benchmark from a static,
+    attributed snapshot of ESPN FPI team ratings; it does not read or expose
+    user ballots.
 
 ## Frontend structure
 
@@ -30,6 +33,16 @@ The application is a Vite/React single-page app for a 2026 Power Four season pre
 - `src/pages/Groups.tsx` — private groups and invitations
 - `src/pages/Scorecards.tsx` — read-only weekly scoring surface
 - `src/contexts/AuthContext.tsx` — authentication and account-isolated browser state
+
+## Public FPI benchmark
+
+`fpiRatings2026.ts` contains the attributed July 21, 2026 rating snapshot.
+`fpiModel.ts` applies a documented 2.5-point home-field adjustment and logistic
+conversion to create one probability for every canonical game. An unrated
+opponent receives a documented -25 fallback. The `/models/fpi` page is public
+and static; it does not authenticate, query Lovable Cloud, or change ballot RLS.
+The probabilities are an independent derived model, not official ESPN matchup
+predictions.
 
 ## Prediction identity
 

@@ -5,6 +5,7 @@ const navItems = [
   { to: "/", label: "Predictor", end: true },
   { to: "/entry", label: "My Entry" },
   { to: "/groups", label: "Groups" },
+  { to: "/models/fpi", label: "FPI" },
 ];
 
 function navClass(isActive: boolean) {
@@ -33,7 +34,7 @@ export default function SiteNav() {
           P4 ODDSMAKER
         </NavLink>
 
-        <div className="grid grid-cols-4 gap-1 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+        <div className="grid grid-cols-5 gap-1 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
           {navItems.map((item) => (
             <NavLink
               key={item.to}

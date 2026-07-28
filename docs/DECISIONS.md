@@ -33,6 +33,19 @@ Consequences: Google and email are supported beta paths; Apple remains unadverti
 
 # Decision Log
 
+## 2026-07-28 - Publish FPI as a static benchmark
+
+Decision: expose a public, read-only FPI-based model at `/models/fpi` while
+keeping all user ballots private.
+
+Rationale: anyone should be able to compare entries against a recognizable
+baseline without creating a public account or weakening entry authorization.
+
+Consequences: the source snapshot, update date, assumptions, fallback, and
+non-affiliation disclaimer are visible. The derived probabilities are not
+represented as official ESPN matchup predictions and require a source refresh
+when FPI changes.
+
 ## 2026-07-20 — Version cloud entries
 
 Decision: use a version 2 cloud payload containing canonical regular-season predictions and Championship Week winners.

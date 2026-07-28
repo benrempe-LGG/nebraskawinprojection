@@ -1,5 +1,23 @@
 # Validation Record
 
+## 2026-07-28 - Public FPI benchmark source validation
+
+- Captured 138 published 2026 FPI team ratings from ESPN's July 21, 2026 table.
+- Generated one probability for all 476 canonical beta games.
+- Verified every tracked P4 team maps to a published rating and only documented
+  unranked opponents use the fallback.
+- Nebraska's derived expected record is 6.7-5.3, matching the displayed ESPN
+  projected record to one decimal under the documented conversion.
+- Confirmed the page renders without authentication and contains source,
+  assumptions, fallback disclosure, and non-affiliation language.
+- Seven focused model/page tests passed. Full local validation passed with 79
+  tests across 16 files, TypeScript checks, 13 migration validations, lint
+  (nine existing warnings, zero errors), and a Vite production build.
+- Local signed-out browser validation confirmed the public route, attribution,
+  Nebraska 6.7-5.3 projection, all schedule rows, fallback disclosure, and
+  independent-model disclaimer. Production publication evidence remains
+  separate.
+
 ## 2026-07-27 - Confidence Scoring controlled production release
 
 The Unit 2 database contract and Unit 3 UI were released together after local,

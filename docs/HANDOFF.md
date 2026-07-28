@@ -4,6 +4,12 @@ Updated: 2026-07-28
 
 ## Exact stopping point
 
+A public, read-only 2026 FPI-based benchmark is implemented at `/models/fpi`.
+It uses a static, attributed July 21 ESPN rating snapshot to derive all 476
+canonical game probabilities with documented home-field, conversion, and
+unrated-opponent assumptions. It is deliberately separate from authenticated
+ballots and does not change database policy or expose private entries.
+
 Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. Commit `38c9906` contains the validated dependency hardening; this final handoff reconciliation follows it. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; subsequent branch work records the release and hardens the dependency toolchain without changing production behavior.
 
 Lovable production is published and reports `Up to date`. Physical cross-device validation has now passed on a Surface, iPhone, and iPad. The product remains in a small friends-and-family beta while live scoring and remaining integration boundaries are validated.
@@ -52,6 +58,8 @@ state; do not initialize the surrounding Codex workspace as this repository.
 - A separate iPad control account remained unchanged, and the test account was restored to its intended final state.
 - A read-only CFBD readiness inventory confirmed that production has only the 2026 season, 476 scheduled games, no CFBD IDs or final results, and no scorecard rows.
 - PR #2 remains intentionally draft.
+- The public FPI-based benchmark is available without authentication and does
+  not read user ballot data.
 - Vite is upgraded to 7.3.6 and compatible transitive tooling is refreshed. The production-only dependency audit is 0 high, 5 moderate, 1 low, and 0 critical.
 
 ## Security and database state

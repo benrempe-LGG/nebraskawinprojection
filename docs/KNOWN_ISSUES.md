@@ -1,47 +1,88 @@
 # Known Issues and Technical Debt
 
-Updated: 2026-07-15
+Updated: 2026-07-28
 
-## P0 before production beta
+There are no known release-blocking defects for the small friends-and-family beta. The following items block broader launch or PR #2 merge readiness.
 
-### Full schedule/date audit is incomplete
+## Confidence Scoring awaits real-final validation
 
-Risk: incorrect opponents, dates, venues, or home/away designations can distort picks, records, and navigation. ACC and Big 12 opponent matrices are normalized and integrity-tested, but some normalized matchups can display `TBD` dates. The broader P4 dataset still needs official-source verification.
+Status: calculation, database, SQL fixture, scorecard, and private-group UI
+units are published. Production schema, ACL, signed-in Scorecards empty state,
+and Groups benchmark copy passed validation.
 
-Next action: replace the compact source data with an audited canonical dataset and add fixture tests for every conference's expected game counts and reciprocal matchups.
+Risk: production has no locked ballots or final games, so numeric scorecards,
+populated leaderboard order, corrected-result recomputation, and real provider
+integration are not yet proven end to end.
 
-### Manual release QA is unrecorded
+Next action: after the first real 2026 final, run one controlled CFBD import and
+compare weekly and season Confidence Score with a hand calculation.
 
-Risk: CI does not prove responsive layout, localStorage migration, sharing, image export, or deployment behavior.
+## P1 — Before broader launch or merge
 
-Next action: run and record desktop/mobile smoke tests and verify both production hosts after merge.
+### Cross-device conflict protection lacks a server-side guarantee
 
-## P1
+Status: physical testing on a Surface, iPhone, and iPad passed draft and submitted restoration, bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration. No silent overwrite was observed.
 
-### Accounts and cloud persistence are absent
+Risk: the implementation still does not enforce optimistic concurrency or retain immutable draft revisions, so the successful test is evidence rather than a server-side guarantee.
 
-Predictions and locks exist only in localStorage. Clearing storage or changing devices loses access.
+Next action: monitor the private beta for conflicting-edit incidents. Add an expected-version check or ballot revision history before broader launch if simultaneous editing becomes a supported behavior or any silent overwrite is reported.
 
-### Conference championships are not simulated
+### Real CFBD ingestion is not validated
 
-Conference leaders are treated as champions. Full tiebreakers, championship participants, and title-game outcomes are not modeled.
+Status: secret denial paths, fixture matching, reversed orientation, aliases, unmatched games, and idempotent behavior are covered. The deployed endpoint fails closed. A July 27 read-only production inventory confirmed 476 scheduled 2026 games, no CFBD IDs, no final or in-progress games, no scorecard rows, and no retained temporary season.
 
-### Playoff model is heuristic
+Risk: a real provider payload or mapping difference could prevent results and weekly scorecards from populating.
 
-Conference coefficients and the ACC/Big 12 cap are transparent assumptions but lack a formal scenario-test suite.
+Next action: run one controlled successful import after the first 2026 final and verify results plus scorecards. Do not weaken the production season constraint or change the source/target season contract solely to manufacture a historical test.
 
-### G6 team is a placeholder
+### Apple authentication is unsupported for beta
 
-Seed 12 is reserved without tracking or ranking actual Group-of-Six schedules.
+Status: Google and email-link authentication work. Apple produced provider/configuration errors and has not been validated with developer credentials.
 
-### Week-by-week full slate is absent
+Risk: exposing the Apple button creates a broken onboarding path.
 
-Users must navigate through team schedules rather than predict each week's complete P4 slate.
+Next action: keep Apple unadvertised or disabled until a supported configuration is tested; otherwise remove the UI path.
 
-## P2
+### Real-deadline automatic locking is not exercised
 
-- README and PR description can drift when model coefficients change.
-- CI does not currently run `npm run lint`.
-- No dedicated TypeScript `typecheck` script exists.
-- No end-to-end browser test suite is configured despite Playwright being installed.
-- No error monitoring or product analytics is configured.
+Status: RPC, trigger, scheduler, completeness, and locked-payload behavior passed temporary-season database tests.
+
+Risk: production scheduling or deadline configuration could differ at the real 2026 cutoff.
+
+Next action: repeat the temporary-season operational test near release and verify scheduler visibility. Never change the official 2026 deadline merely for testing.
+
+### Dependency audit findings need triage
+
+Status: the July 28 follow-up upgraded Vite from 5.4.19 to 7.3.6 and refreshed compatible transitive tooling. The production-only audit is now 0 high, 5 moderate, 1 low, and 0 critical. Full CI passes.
+
+Risk: React Router retains moderate advisories that require a major upgrade for package-level removal; application post-auth redirects are constrained to internal same-origin paths. The Lovable MCP chain retains moderate Hono/MCP advisories without an upstream fix and one low esbuild development-server advisory.
+
+Next action: assess React Router 7 as a separate application migration and monitor the Lovable MCP chain for an upstream release. Do not run a blind force fix.
+
+## P2 — Product and operational debt
+
+- Browser end-to-end tests are not configured as a repeatable CI command.
+- Product error monitoring and a user-facing beta feedback path are not implemented.
+- Privacy-safe aggregate prediction analytics and own-team fan-cohort insights are not implemented.
+- One account supports only one official 2026 entry; multiple named entries require new entry identity, scoring, and group-leaderboard design.
+- Commissioner controls do not cover member removal, ownership transfer, leaving, deletion, or renaming.
+- Championship participants use simplified standings tiebreakers.
+- The G6 playoff team is an unnamed reserved slot.
+- Week-by-week full-slate picking is not implemented.
+- Vegas season win totals remain manual; the removed Odds API returned the wrong market.
+- OAuth and deployment configuration remain partly external to Git.
+- `package-lock.json`, `bun.lock`, and the legacy `bun.lockb` are tracked while CI uses npm; consolidation must not disrupt Lovable.
+
+## Resolved July 21
+
+- Production and Lovable preview drift was published and reconciled.
+- Migration history was reconciled and is CI-validated.
+- Browser catalog mutation was removed and the RPC restricted to service-role JWTs.
+- Score synchronization now fails closed and rejects missing or incorrect secrets.
+- Entry deadlines are enforced in RPCs and at the ballot write boundary.
+- Automatic locking covers draft and submitted ballots.
+- Server submission validates catalog completeness and all four P4 champions.
+- PostgreSQL-17 submission compatibility was repaired and protected by CI.
+- Fresh accounts begin with zero picks; account switching no longer leaks browser state.
+- Two-account private-group owner/member behavior was exercised.
+- Automatic saves are ordered and expose truthful save status.

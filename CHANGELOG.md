@@ -1,109 +1,119 @@
 # Changelog
 
-## [Unreleased] — 2026-07-15
+## 2026-07-29
+
+- Added a private, read-only You vs. FPI view with team conviction rankings,
+  opposite winners, probability gaps, conference races, and playoff-field
+  differences.
+
+## 2026-07-28
+
+- Added a public, read-only 2026 FPI-based benchmark covering all 476 canonical
+  games with source attribution, transparent assumptions, and no access to
+  private user ballots.
+- Extended the FPI benchmark through projected conference standings,
+  Championship Week, and a public 12-team playoff scenario.
+- Upgraded Vite from 5.4.19 to 7.3.6 and refreshed compatible transitive tooling, including Sucrase 3.35.1.
+- Reduced the production-only dependency audit from 7 high, 7 moderate, and 0 low findings to 0 high, 5 moderate, and 1 low.
+- Passed the complete local and GitHub Actions gates with 72 tests, 13 migration validations, typecheck, lint, and the Vite 7 production build.
+- Reconciled the README, roadmap, handoff, known-issues, and validation records for friends-and-family beta onboarding.
+
+## 2026-07-27
+
+- Validated draft and submitted entry restoration across a Surface, iPhone, and iPad, including bidirectional saves, controlled overlapping edits, control-account isolation, and final restoration.
+- Added internal-only validation for the post-auth redirect target.
+- Completed compatible dependency remediation for React Router, PostCSS, and Recharts' transitive Lodash dependency, reducing the production-only audit from 32 to 14 findings without forced upgrades.
+- Completed a read-only CFBD production-readiness inventory; confirmed that no final 2026 games or temporary historical catalog exists and deferred the real import rather than changing production schema solely for testing.
+- Approved a proper probability-based Confidence Score as the primary private-group ranking metric and documented its formula, edge cases, UX, data impact, tests, and implementation units.
+- Implemented the framework-independent Confidence Score formula and game-weighted aggregation helpers with boundary and full-precision unit coverage.
+- Added the forward-only Confidence Score database migration, synchronized Supabase result types, rollback-only SQL fixtures, and CI guards for scoring and private-group security boundaries.
+- Added Confidence Score to weekly/season scorecards and private-group standings with game-weighted totals, one-decimal display, benchmark guidance, responsive layouts, and unscored states.
+- Published the Confidence Score database and UI together, removed legacy anonymous scorecard-view grants, and verified signed-in production empty states without changing ballots or predictions.
+
+## [Unreleased] — 2026-07-21
 
 ### Added
 
-- Canonical season matchup storage with complementary cross-team probabilities
-- Legacy per-team and date-based prediction migration
-- Full-season progress, missing-game review, 50% review, and immutable local ballot locks
-- Projected conference standings and overall records
-- Weighted playoff outlook with Notre Dame and a reserved G6 slot
-- ACC and Big 12 conference schedule integrity validation
-- Pull-request CI for tests, production build, and preview artifact
-- Canonical roadmap, architecture, decisions, known issues, validation, and handoff documents
+- Lovable Cloud/Supabase schema for profiles, seasons, games, entries, predictions, results, and weekly scorecards
+- Google, Apple, and email-link authentication surfaces
+- Draft, submitted, reopen-before-deadline, and locked entry lifecycle
+- Version 2 cloud payloads containing regular-season and Championship Week selections
+- Legacy flat-payload compatibility and Championship Week restoration validation
+- Private groups with invite codes, membership RLS, aggregate leaderboards, and OAuth return
+- Favorite-team profile preference and personalized default schedule
+- Next Team schedule navigation
+- Predicted overall and conference wins in standings
+- P4 Championship Week derived from conference standings
+- Playoff gating until all four championship winners are selected
+- My Entry dashboard and persistent site navigation
+- CFBD score-sync Edge Function foundation
+- Account-isolated browser storage and fresh-account zero state
+- Group display names and dedicated owner/member QC coverage
+- Ordered cloud-save queue with visible save status and race-condition tests
+- Beta operations and entry-recovery runbook
 
 ### Changed
 
-- A 50% home game now defaults to the home-field favorite; neutral 50% games remain unresolved
-- 2026 ACC and Big 12 league matchups are normalized to official opponent matrices
-- Playoff selection favors SEC and Big Ten résumés and normally caps ACC/Big 12 at three combined teams
+- Championship outcomes adjust participant records and determine P4 champion bids
+- Championship picks now save through the signed-in cloud entry instead of remaining browser-only
+- Mobile navigation uses a compact two-row phone layout
+- Review hash links scroll after React rendering
+- Account, predictor, and analytics pages expose improved landmark and heading structure
+- CI uses Node 22 and gates lint, typecheck, unit tests, migration validation, and production build
+- My Entry refreshes after authenticated cloud hydration
+- Automatic saves serialize writes and preserve the newest queued payload
+- Production now runs the complete private-beta feature set
+- Documentation distinguishes feature-branch code, applied migrations, preview state, and production deployment
+
+### Security
+
+- Removed client-side invocation of the global catalog synchronization RPC
+- Added a forward-only migration restricting `sync_2026_catalog` to service-role JWTs
+- Made `sync-cfbd-scores` fail closed when `SYNC_SECRET` is absent or blank
+- Enforced entry deadlines in RPCs and at the ballot write boundary
+- Added scheduled locking for draft and submitted entries
+- Validated submission completeness and four P4 championship winners server-side
+- Repaired PostgreSQL-17 submission counting and added a CI compatibility guard
+
+### Validation
+
+- GitHub Actions run 157 passed lint, typecheck, unit tests, migration validation, and production build
+- Lovable production published and reported up to date
+- Google OAuth and email-link authentication passed
+- Fresh-account zero state and two-account private-group isolation passed
+- A 476-game, four-champion entry submitted through the production RPC
+- Production automatic save showed saving, saved, revert, and reload behavior without changing the final QC entry
 
 ### Known limitations
 
-- Full P4 opponent/date/location audit and manual release QA remain incomplete
-- Accounts, cloud saving, conference championship simulation, specific G6 selection, and week-by-week full-slate picking are not implemented
+- True simultaneous-device edits lack server-side conflict detection
+- Apple authentication, successful live CFBD ingestion, real weekly scoring, and real-deadline locking remain unvalidated
+- Browser end-to-end automation is not configured as a repeatable CI command
+- Week-by-week full-slate picking, aggregate fan insights, multiple entries, and a ranked G6 champion are not implemented
+- Dependency audit findings require production-impact triage
 
 ---
-
-All notable changes to the P4 Oddsmaker are documented here.
 
 ## [1.0.0] — 2026-06-10
 
 ### Added
 
-- **Shareable Projections**: Encode team, per-game win %, and Vegas total into the URL. Share a link like `?t=Nebraska&p=90,85,95,...&v=6.5` to let others see your exact picks and post their own back. Drops users straight into pre-filled form for instant comparison.
-
-- **Copy Forum Post Button**: Generate a paste-ready text breakdown for message boards. Output includes:
-  - Headline with your expected win total
-  - Over/under lean vs. Vegas (if all games filled in)
-  - Full game-by-game list with your win % for each
-  - Projected record (wins–losses) and conference wins
-  - Bowl eligibility odds
-  - Challenge link at the bottom
-
-- **GitHub Pages Deployment**: Automatic CI/CD via GitHub Actions. Push to main branch → build runs → artifacts deployed to https://benrempe-lgg.github.io/nebraskawinprojection/ within 2 minutes. Includes SPA fallback (404.html) so `/analytics` route works.
-
-- **Host-Agnostic Build Path**: Vite reads `DEPLOY_BASE_PATH` env var. GitHub Pages build sets it to `/nebraskawinprojection/`; Lovable build defaults to `/`. Same codebase, different deployment paths.
-
-- **Clipboard Fallback**: Users on browsers that block the Clipboard API see a fallback using `execCommand('copy')` instead of throwing an error.
-
-- **Vegas Total Persistence**: Manual entry field (no longer fetches from Odds API). Saves per team in localStorage, so switching teams doesn't lose your lines.
+- Shareable projections encoded in the URL
+- Copyable forum-post and challenge-link output
+- GitHub Pages deployment with SPA fallback
+- Host-agnostic Vite base paths
+- Clipboard fallback and manually persisted Vegas totals
 
 ### Changed
 
-- **Removed Odds API Integration**: The `/src/lib/vegasApi.ts` file (containing a leaked API key) was deleted and scrubbed from all git history. Vegas season win totals are now entered manually—more reliable anyway, since the API was returning game point totals, not season totals.
-
-- **Updated Metadata**: OG tags and README now point to https://nebraskawinprojection.lovable.app/ as the primary URL, with GitHub Pages noted as a mirror.
+- Removed the Odds API integration because it returned game point totals rather than season win totals
+- Updated metadata to use the Lovable application as the primary URL
 
 ### Security
 
-- **API Key Scrubbed**: Odds API key (2564d956...) was present in git history. Removed via `git filter-branch`, force-pushed, and history was garbage-collected. Verify the key is rotated at the-odds-api.com.
-
-- **Repository Made Public**: Repo was private until June 2026, required for GitHub Pages free tier. Now public.
-
----
-
-## Pre-Release
-
-### Initial Commit (Lovable-Generated)
-
-- Vite + React scaffold
-- Schedule data for 130 Power 4 teams (2026 season)
-- Per-game win % input with spread calculation
-- Win distribution chart (binomial convolution)
-- Conference game detection and filtering
-- Team/conference picker
-- Image export (`html2canvas`)
-- shadcn/ui component library
-- Tailwind CSS styling
+- Removed and scrubbed the previously exposed Odds API key; rotation remains the account owner's responsibility
+- Made the repository public for GitHub Pages
 
 ---
 
-## Roadmap
-
-### Near Term
-
-- [ ] Prefill win % based on team preseason expectations or historical performance
-- [ ] Inline help tooltips explaining spread math and home-field advantage
-- [ ] Mobile UX refinement (test on iPhone/Android, optimize input layout for small screens)
-
-### Medium Term
-
-- [ ] Analytics: Track which teams users project on, peak usage times, most popular records
-- [ ] Team season records: Display preseason O/U lines from major books for comparison
-- [ ] Shareable charts: Generate win distribution chart as PNG for forum posts
-
-### Longer Term
-
-- [ ] Leaderboard: Track predictions across users, show accuracy over the season as actual results come in
-- [ ] Lineup builder: Select multiple teams and see their combined bowl odds
-- [ ] Historical calibration: Upload prior season picks to see how well your model predicted actual outcomes
-
----
-
-## Known Issues
-
-- ESLint warnings in shadcn/ui components (not in our code; low priority)
-- Chart bundle size is large (~578kb gzipped); could split with dynamic import
-- No automated tests for the shareable URL feature; manual testing covers the main flows
+All notable changes to the P4 Oddsmaker are documented here.

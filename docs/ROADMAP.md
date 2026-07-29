@@ -1,45 +1,56 @@
 # Product Roadmap
 
-Updated: 2026-07-15
+Updated: 2026-07-28
 
-## Now — Production beta readiness
+## Now — Prove the private beta
 
-Goal: make the current season predictor safe to merge and label as a public beta.
+Goal: observe real friends-and-family usage without risking entries or expanding scope before PR #2 is ready.
 
-- Complete an official-source audit of every 2026 P4 opponent, date, location, and neutral-site designation.
-- Remove all temporary `TBD` normalized schedule dates.
-- Verify saved prediction migration after the final schedule dataset is installed.
-- Run manual desktop and mobile QA for picking, shared games, review, standings, playoff, locking, and sharing.
-- Reconcile PR #1 description with the implemented model and documentation.
-- Merge the draft PR and verify both GitHub Pages and Lovable production deployments.
+- Physical Surface, iPhone, and iPad validation has passed for draft and submitted restoration, bidirectional saves, overlapping edits, account isolation, and final-state restoration.
+- Have 3 to 10 users complete Google or email sign-in, favorite-team setup, a full entry, Championship Week, submission, and private-group join.
+- Record feedback with page, browser, device, and reproduction steps.
+- Decide whether server-side optimistic concurrency or immutable ballot revisions are required before broader launch.
+- Keep Apple login unadvertised until configured and validated.
+- Keep the one-entry-per-account rule during beta.
+- Preserve production through the safeguards in `docs/BETA_OPERATIONS.md`.
 
-Exit criteria: CI is green, no known schedule mismatch remains, existing local predictions migrate, primary flows pass manual QA, and production deployment is verified.
+Exit criteria: no unexplained entry loss, group invitations work for real users, cloud state survives device changes, all beta blockers are closed or explicitly accepted, production smoke testing passes, and CI remains green.
 
-## Next — Full-slate picking
+## Next — Complete live scoring and merge
 
-Goal: let users predict chronologically instead of only by team.
+Goal: turn locked preseason entries into reliable weekly competition and finish PR #2.
 
-- Add a week-by-week route covering the complete tracked P4 slate.
-- Provide week, conference, picked/unpicked, and 50% filters.
-- Reuse canonical matchup storage so week and team pages always stay synchronized.
-- Show weekly progress and direct navigation to the next unfinished game.
-- Preserve team schedule, standings, review, and playoff behavior.
+- Complete Confidence Scoring production validation after real final results
+  exist; calculation, database, and UI units are published. See
+  [Confidence Scoring](CONFIDENCE_SCORING.md).
+- Run one controlled successful CFBD import after the first 2026 final and verify canonical/reversed matching, aliases, unmatched games, and idempotency against production-safe fixtures.
+- Populate and validate weekly scorecards from locked entries and final results.
+- Validate scheduled locking with a temporary test season without changing the real 2026 deadline.
+- Decide the supported Apple authentication path or remove its UI.
+- Address actionable beta findings and dependency-audit risk.
+- Mark PR #2 ready, merge to `main`, and verify Lovable plus GitHub Pages.
 
-Exit criteria: every canonical matchup appears exactly once in the weekly view and edits are immediately reflected everywhere else.
+Exit criteria: scores populate correctly, locked entries cannot change, scorecards agree with known results, supported authentication paths are documented, CI passes, and both production surfaces pass post-merge smoke tests.
 
-## Later — Accounts and simulation depth
+## Then — Week-by-week full slate
 
-- Authentication, cloud drafts, cross-device persistence, and named locked ballots
-- Ballot history, comparison, public links, and prediction scoring
-- Conference tiebreakers and championship-game simulation
-- Résumé model using schedule strength, ranked wins, head-to-head, and bad losses
-- Specific Group-of-Six team schedules and selection
-- Live results, frozen completed games, accuracy tracking, and community consensus
+Goal: support chronological picking across the complete tracked P4 slate.
 
-## Product milestones
+- Add a weekly route using the canonical game catalog.
+- Provide conference, picked/unpicked, 50%, and remaining-game filters.
+- Synchronize weekly picks with team pages, standings, Championship Week, and playoff projections.
+- Show weekly completion and direct navigation to the next unfinished game.
+- Integrate actual results and weekly scoring views.
 
-1. Public beta
-2. Full-slate weekly picker
-3. Account-backed ballots
-4. Championship and committee simulation
-5. Live-season prediction platform
+Exit criteria: every canonical matchup appears exactly once in the weekly slate and all projections remain consistent with team-by-team entry.
+
+## Later
+
+- Add privacy-safe aggregate prediction insights, including own-team fan cohorts and bias analysis.
+- Add multiple named entries per account only after group scoring and entry identity are redesigned.
+- Rank an actual G6 champion instead of reserving an unnamed seed.
+- Add official conference tiebreaker procedures.
+- Import and maintain preseason win totals from a reliable licensed or free source.
+- Add commissioner controls, member removal, ownership transfer, group lifecycle, and public groups.
+- Add production error monitoring, product analytics, feedback capture, and browser end-to-end CI.
+- Calibrate the playoff heuristic with historical committee outcomes.

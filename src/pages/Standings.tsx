@@ -25,12 +25,18 @@ const Standings = () => {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-7">
+        <div className="mb-7 flex flex-wrap gap-3">
           <Link
             to="/"
             className="inline-flex rounded-lg border border-border bg-muted px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:text-accent"
           >
             ← Back to predictions
+          </Link>
+          <Link
+            to="/championships"
+            className="inline-flex rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Championship Week →
           </Link>
         </div>
 
@@ -61,38 +67,50 @@ const Standings = () => {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[30px_minmax(82px,1fr)_58px_58px_48px] border-b border-border bg-surface-alt px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    <span>#</span>
-                    <span>Team</span>
-                    <span className="text-center">Conf</span>
-                    <span className="text-center">Overall</span>
-                    <span className="text-right">Done</span>
-                  </div>
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[560px]">
+                      <div className="grid grid-cols-[30px_minmax(96px,1fr)_58px_58px_62px_62px_48px] border-b border-border bg-surface-alt px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        <span>#</span>
+                        <span>Team</span>
+                        <span className="text-center">Conf</span>
+                        <span className="text-center">Overall</span>
+                        <span className="text-center">Pred Conf W</span>
+                        <span className="text-center">Pred W</span>
+                        <span className="text-right">Done</span>
+                      </div>
 
-                  {rows.map((row, index) => (
-                    <div
-                      key={row.team}
-                      className="grid grid-cols-[30px_minmax(82px,1fr)_58px_58px_48px] items-center border-b border-border/70 px-4 py-2.5 last:border-0"
-                    >
-                      <span className="text-xs font-bold text-muted-foreground font-mono-data">
-                        {index + 1}
-                      </span>
-                      <span className="truncate text-sm font-bold text-foreground">
-                        {row.team}
-                      </span>
-                      <span className="text-center text-sm font-black text-accent font-mono-data">
-                        {row.wins}-{row.losses}
-                        {row.undecided ? "-" + row.undecided : ""}
-                      </span>
-                      <span className="text-center text-sm font-bold text-foreground font-mono-data">
-                        {row.overallWins}-{row.overallLosses}
-                        {row.overallUndecided ? "-" + row.overallUndecided : ""}
-                      </span>
-                      <span className="text-right text-xs text-muted-foreground font-mono-data">
-                        {row.projectedGames}/{row.totalConferenceGames}
-                      </span>
+                      {rows.map((row, index) => (
+                        <div
+                          key={row.team}
+                          className="grid grid-cols-[30px_minmax(96px,1fr)_58px_58px_62px_62px_48px] items-center border-b border-border/70 px-4 py-2.5 last:border-0"
+                        >
+                          <span className="text-xs font-bold text-muted-foreground font-mono-data">
+                            {index + 1}
+                          </span>
+                          <span className="truncate text-sm font-bold text-foreground">
+                            {row.team}
+                          </span>
+                          <span className="text-center text-sm font-black text-accent font-mono-data">
+                            {row.wins}-{row.losses}
+                            {row.undecided ? "-" + row.undecided : ""}
+                          </span>
+                          <span className="text-center text-sm font-bold text-foreground font-mono-data">
+                            {row.overallWins}-{row.overallLosses}
+                            {row.overallUndecided ? "-" + row.overallUndecided : ""}
+                          </span>
+                          <span className="text-center text-sm font-black text-accent font-mono-data">
+                            {row.expectedConferenceWins.toFixed(1)}
+                          </span>
+                          <span className="text-center text-sm font-black text-foreground font-mono-data">
+                            {row.expectedWins.toFixed(1)}
+                          </span>
+                          <span className="text-right text-xs text-muted-foreground font-mono-data">
+                            {row.projectedGames}/{row.totalConferenceGames}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </section>
               );
             })}

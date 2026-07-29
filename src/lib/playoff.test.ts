@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_TEAMS } from "@/lib/oddsmaker";
+import { getChampionshipGames } from "@/lib/championships";
 import {
   getGameId,
   setTeamGamePrediction,
@@ -70,8 +71,22 @@ describe("playoff outlook", () => {
     expect(ohioState).toMatchObject({ wins: 0, losses: 1 });
   });
 
-  it("reserves four P4 champion bids, seven at-larges, and one G6 slot", () => {
+  it("keeps the playoff incomplete until every championship is picked", () => {
     const outlook = projectPlayoffField(completeSeason());
+
+    expect(outlook.championshipsComplete).toBe(false);
+    expect(outlook.complete).toBe(false);
+  });
+
+  it("reserves four P4 champion bids, seven at-larges, and one G6 slot", () => {
+    const predictions = completeSeason();
+    const championshipPicks = Object.fromEntries(
+      getChampionshipGames(predictions).map((game) => [
+        game.conference,
+        game.firstTeam,
+      ])
+    );
+    const outlook = projectPlayoffField(predictions, championshipPicks);
 
     expect(outlook.teams).toHaveLength(11);
     expect(
@@ -87,6 +102,7 @@ describe("playoff outlook", () => {
       ).length
     ).toBeLessThanOrEqual(4);
     expect(outlook.groupOfSixSeed).toBe(12);
+    expect(outlook.championshipsComplete).toBe(true);
     expect(outlook.complete).toBe(true);
   });
 });

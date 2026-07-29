@@ -11,8 +11,10 @@
   across all 476 games.
 - Verified a one-game partial entry reports its coverage, expected-win gap,
   and opposite winner without producing a final playoff comparison.
-- Three focused calculation/UI tests passed. Full local validation passed with
-  86 tests across 20 files, TypeScript checks, 13 migration validations, lint
+- Four focused calculation/UI/privacy tests passed, including a signed-out
+  gate that does not expose the official-entry comparison. Full local
+  validation passed with 86 tests across 20 files before that added regression
+  test, plus TypeScript checks, 13 migration validations, lint
   (nine existing warnings, zero errors), and a Vite production build.
 - Production validation remains separate.
 

@@ -52,6 +52,18 @@ conference and overall wins to break conference-record ties, and projects
 conference championships at a neutral site. Its playoff uses the existing
 committee proxy and retains the unnamed G6 reserve.
 
+## 2026-07-29 - Compare private entries with the public FPI benchmark
+
+Decision: provide a signed-in, read-only `/compare/fpi` view sourced from the
+account's official cloud ballot.
+
+Rationale: team-level expected-win gaps and opposite winners make a 476-game
+entry understandable as a set of football convictions.
+
+Consequences: the comparison reads the draft payload until lock and the
+immutable locked payload afterward. It never changes either entry. Partial
+ballots show shared-game coverage and withhold final playoff differences.
+
 ## 2026-07-20 — Version cloud entries
 
 Decision: use a version 2 cloud payload containing canonical regular-season predictions and Championship Week winners.

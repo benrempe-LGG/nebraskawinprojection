@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-29
+
+- Added a private, read-only You vs. FPI view with team conviction rankings,
+  opposite winners, probability gaps, conference races, and playoff-field
+  differences.
+
 ## 2026-07-28
 
 - Added a public, read-only 2026 FPI-based benchmark covering all 476 canonical

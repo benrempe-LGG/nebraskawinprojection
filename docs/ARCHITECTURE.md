@@ -50,6 +50,14 @@ wins, projects neutral-site P4 championship games, and feeds those champions
 into the existing record-based playoff proxy. The public
 `/models/fpi/season` route remains static and read-only.
 
+`entryFpiComparison.ts` compares an authenticated account's cloud ballot with
+the static benchmark without writing either source. `/compare/fpi` reads the
+current draft payload, or the immutable locked payload after locking, directly
+under existing ballot RLS. It reports shared-game coverage, expected-win gaps,
+opposite winners, probability differences, conference races, and playoff-field
+differences. Partial ballots are labeled and do not produce a final playoff
+comparison.
+
 ## Prediction identity
 
 Regular-season games use a canonical key built from season and alphabetically ordered team names. Date is excluded because schedule sources previously disagreed on dates and created duplicate entries.

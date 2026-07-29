@@ -1,5 +1,21 @@
 # Validation Record
 
+## 2026-07-29 - You vs. FPI source validation
+
+- Added a private, read-only comparison route for the authenticated account's
+  official cloud entry.
+- Compared shared-game coverage, expected wins by team, deterministic records,
+  opposite winners, probability gaps, conference top fives, and named playoff
+  selections.
+- Verified a benchmark entry produces zero probability and winner differences
+  across all 476 games.
+- Verified a one-game partial entry reports its coverage, expected-win gap,
+  and opposite winner without producing a final playoff comparison.
+- Three focused calculation/UI tests passed. Full local validation passed with
+  86 tests across 20 files, TypeScript checks, 13 migration validations, lint
+  (nine existing warnings, zero errors), and a Vite production build.
+- Production validation remains separate.
+
 ## 2026-07-28 - Public FPI benchmark source validation
 
 - Captured 138 published 2026 FPI team ratings from ESPN's July 21, 2026 table.

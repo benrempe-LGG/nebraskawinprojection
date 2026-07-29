@@ -12,6 +12,8 @@ ballots and does not change database policy or expose private entries.
 The linked `/models/fpi/season` route extends the same static model through
 conference standings, projected P4 championships, and the existing 12-team
 playoff proxy.
+The private `/compare/fpi` route compares the signed-in account's official
+cloud ballot against that benchmark without changing either entry.
 
 Draft PR [#2](https://github.com/benrempe-LGG/nebraskawinprojection/pull/2) is open and mergeable on `feature/accounts-scorecards-foundation`. Commit `38c9906` contains the validated dependency hardening; this final handoff reconciliation follows it. The published Confidence Score release baseline is `212830298bb4da184976f589fb324622fb870a23`; subsequent branch work records the release and hardens the dependency toolchain without changing production behavior.
 

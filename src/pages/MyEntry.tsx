@@ -19,6 +19,11 @@ const actionLinks = [
     description: "Choose the conference champions that shape your playoff field.",
   },
   {
+    to: "/compare/fpi",
+    title: "You vs. FPI",
+    description: "Find your biggest team convictions, opposite winners, and playoff differences.",
+  },
+  {
     to: "/scorecards",
     title: "Weekly scorecards",
     description: "Compare your locked picks with the games as they are played.",

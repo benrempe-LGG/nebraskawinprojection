@@ -17,6 +17,7 @@ import Scorecards from "./pages/Scorecards.tsx";
 import Groups from "./pages/Groups.tsx";
 import FpiModel from "./pages/FpiModel.tsx";
 import FpiSeason from "./pages/FpiSeason.tsx";
+import EntryVsFpi from "./pages/EntryVsFpi.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/groups" element={<Groups />} />
             <Route path="/models/fpi" element={<FpiModel />} />
             <Route path="/models/fpi/season" element={<FpiSeason />} />
+            <Route path="/compare/fpi" element={<EntryVsFpi />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
